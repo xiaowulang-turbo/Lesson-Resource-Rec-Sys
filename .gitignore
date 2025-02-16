@@ -1,0 +1,14 @@
+### TEAMPLATE ###
+#launch.json folder
+.vscode
+
+node_modules
+dist
+build
+test
+bundle.js
+bundle.js.map
+test.js
+
+.cache
+.env

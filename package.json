@@ -1,0 +1,28 @@
+{
+    "name": "Config-Project",
+    "version": "1.0.0",
+    "description": "The eslint and prettier configs that you should follow for a new project",
+    "main": "app.js",
+    "scripts": {
+        "start": "nodemon app.js",
+        "start:prod": "cross-env NODE_ENV=production nodemon app.js"
+    },
+    "author": "Xiaowu",
+    "license": "ISC",
+    "dependencies": {
+        "dotenv": "^16.4.7",
+        "morgan": "^1.10.0"
+    },
+    "devDependencies": {
+        "cross-env": "^7.0.3",
+        "eslint": "^8.57.1",
+        "eslint-config-airbnb": "^19.0.4",
+        "eslint-config-prettier": "^10.0.1",
+        "eslint-plugin-import": "^2.31.0",
+        "eslint-plugin-jsx-a11y": "^6.10.2",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-prettier": "^5.2.2",
+        "eslint-plugin-react": "^7.37.4",
+        "prettier": "^3.4.2"
+    }
+}
