@@ -1,2 +1,3 @@
-# Config-Template-Project
-The eslint and prettier configs that you should follow for a new project
+# Lesson-Resource-Reconmendation-System
+
+This is a recommendation system for lesson resources.
