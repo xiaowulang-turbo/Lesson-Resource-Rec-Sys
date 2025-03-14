@@ -1,71 +1,98 @@
 /* eslint-disable no-unused-vars */
-import supabase, { supabaseUrl } from "./supabase";
+import { BASE_URL } from './apiConfig'
+
+function getStoredAuth() {
+    const auth = localStorage.getItem('auth')
+    return auth ? JSON.parse(auth) : null
+}
 
 export async function getCabins() {
-  const { data, error } = await supabase
-    .from("cabins")
-    .select("*")
-    .order("id", { ascending: true });
+    try {
+        const auth = getStoredAuth()
+        if (!auth?.token) throw new Error('未登录')
 
-  if (error) {
-    console.error(error);
-    throw new Error("Cabins could not be loaded");
-  }
+        const res = await fetch(`${BASE_URL}/resources`, {
+            headers: {
+                Authorization: `Bearer ${auth.token}`,
+            },
+        })
 
-  return data;
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || '无法加载资源')
+
+        return data.data.resources
+    } catch (error) {
+        console.error(error)
+        throw new Error('无法加载资源')
+    }
 }
 
 export async function createEditCabin(newCabin, id) {
-  const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl);
-
-  const imageName = `${Math.random()}-${newCabin.image?.name}`.replace("/", "");
-
-  const imagePath = hasImagePath
-    ? newCabin.image
-    : `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
-
-  // 1. Create/Edit cabin
-  let query = supabase.from("cabins");
-
-  // A) Create
-  if (!id) {
-    query = query.insert([{ ...newCabin, image: imagePath }]);
-  }
-
-  // B) Edit
-  if (id) {
-    query = query.update({ ...newCabin, image: imagePath }).eq("id", id);
-  }
-
-  const { data, error } = await query.select().single();
-
-  if (error) {
-    console.error(error);
-    throw new Error("Cabins could not be created");
-  }
-
-  // 2. Upload image
-  if (hasImagePath) return data;
-
-  const { error: storageError } = await supabase.storage
-    .from("cabin-images")
-    .upload(`${imageName}`, newCabin.image);
-
-  // 3. Delete the cabin if there was an error uploading the image
-  if (storageError) {
-    await supabase.from("cabins").delete().eq("id", data[0].id);
-    console.error(storageError);
-    throw new Error("Cabins could not be created");
-  }
+    const url = id ? `${BASE_URL}/cabins/${id}` : `${BASE_URL}/cabins`
+    const res = await fetch(url, {
+        method: id ? 'PATCH' : 'POST',
+        body: JSON.stringify(newCabin),
+    })
 }
 
 export async function deleteCabin(id) {
-  const { data, error } = await supabase.from("cabins").delete().eq("id", id);
+    const res = await fetch(`${BASE_URL}/cabins/${id}`, {
+        method: 'DELETE',
+    })
+}
 
-  if (error) {
-    console.error(error);
-    throw new Error("Cabins could not be deleted");
-  }
+export async function createEditResource(newResource, id) {
+    try {
+        const auth = getStoredAuth()
+        if (!auth?.token) throw new Error('未登录')
 
-  return data;
+        const formData = new FormData()
+        Object.keys(newResource).forEach((key) => {
+            if (key === 'file' && newResource[key]) {
+                formData.append('file', newResource[key])
+            } else {
+                formData.append(key, newResource[key])
+            }
+        })
+
+        const url = id ? `${BASE_URL}/resources/${id}` : `${BASE_URL}/resources`
+
+        const res = await fetch(url, {
+            method: id ? 'PATCH' : 'POST',
+            headers: {
+                Authorization: `Bearer ${auth.token}`,
+            },
+            body: formData,
+        })
+
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || '无法创建/更新资源')
+
+        return data.data.resource
+    } catch (error) {
+        console.error(error)
+        throw new Error('无法创建/更新资源')
+    }
+}
+
+export async function deleteResource(id) {
+    try {
+        const auth = getStoredAuth()
+        if (!auth?.token) throw new Error('未登录')
+
+        const res = await fetch(`${BASE_URL}/resources/${id}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${auth.token}`,
+            },
+        })
+
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || '无法删除资源')
+
+        return data.data
+    } catch (error) {
+        console.error(error)
+        throw new Error('无法删除资源')
+    }
 }

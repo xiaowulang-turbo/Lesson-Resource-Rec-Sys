@@ -1,78 +1,130 @@
-import supabase, { supabaseUrl } from "./supabase";
+import { BASE_URL, ENDPOINTS } from './apiConfig'
 
-// signup
-export async function signup({ fullName, email, password }) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { data: { fullName, avatar: "" } },
-  });
-
-  if (error) throw new Error(error.message);
-
-  return data;
+// 辅助函数：获取存储的认证信息
+function getStoredAuth() {
+    const auth = localStorage.getItem('auth')
+    return auth ? JSON.parse(auth) : null
 }
 
+// 辅助函数：存储认证信息
+function storeAuth(auth) {
+    localStorage.setItem('auth', JSON.stringify(auth))
+}
+
+// 辅助函数：清除认证信息
+function clearAuth() {
+    localStorage.removeItem('auth')
+}
+
+// 注册
+export async function signup({ name, email, password }) {
+    try {
+        const res = await fetch(`${BASE_URL}${ENDPOINTS.AUTH.SIGNUP}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name, email, password }),
+        })
+
+        const data = await res.json()
+
+        if (!res.ok) throw new Error(data.message || '注册失败')
+
+        // 存储认证信息
+        storeAuth(data)
+        return data
+    } catch (error) {
+        throw new Error(error.message)
+    }
+}
+
+// 登录
 export async function login({ email, password }) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: email,
-    password: password,
-  });
+    try {
+        const res = await fetch(`${BASE_URL}${ENDPOINTS.AUTH.LOGIN}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+        })
 
-  if (error) throw new Error(error.message);
+        const data = await res.json()
 
-  return data;
+        if (!res.ok) throw new Error(data.message || '登录失败')
+
+        // 存储认证信息
+        storeAuth(data)
+        return data
+    } catch (error) {
+        throw new Error(error.message)
+    }
 }
 
+// 获取当前用户信息
 export async function getCurrentUser() {
-  const { data: session } = await supabase.auth.getSession();
+    try {
+        const auth = getStoredAuth()
+        if (!auth?.token) return null
 
-  if (!session.session) return null;
+        const res = await fetch(`${BASE_URL}${ENDPOINTS.USERS.ME}`, {
+            headers: {
+                Authorization: `Bearer ${auth.token}`,
+            },
+        })
 
-  const { data, error } = await supabase.auth.getUser();
+        if (!res.ok) {
+            clearAuth()
+            return null
+        }
 
-  if (error) throw new Error(error.message);
-
-  return data?.user;
+        const data = await res.json()
+        return data.data.user
+    } catch (error) {
+        clearAuth()
+        return null
+    }
 }
 
+// 登出
 export async function logout() {
-  const { error } = await supabase.auth.signOut();
-
-  if (error) throw new Error(error.message);
+    clearAuth()
 }
 
-export async function updateCurrentUser({ password, fullName, avatar }) {
-  // 1. Update password OR fullName
-  let updateDate;
-  if (password) updateDate = { password };
-  if (fullName) updateDate = { data: { fullName } };
+// 更新当前用户信息
+export async function updateCurrentUser({ password, name }) {
+    try {
+        const auth = getStoredAuth()
+        if (!auth?.token) throw new Error('未登录')
 
-  const { data, error } = await supabase.auth.updateUser(updateDate);
+        const res = await fetch(`${BASE_URL}${ENDPOINTS.USERS.UPDATE_ME}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${auth.token}`,
+            },
+            body: JSON.stringify({ name, password }),
+        })
 
-  if (error) throw new Error(error.message);
-  if (!avatar) return data;
+        const data = await res.json()
 
-  // 2. Upload avatar
-  const fileName = `avatar-${data.user.id}-${Math.random()}`;
+        if (!res.ok) throw new Error(data.message || '更新失败')
 
-  const { error: storageError } = await supabase.storage
-    .from("avatars")
-    .upload(fileName, avatar, {
-      upsert: true, // if the file already exists, it will be overwritten
-    });
+        // 更新存储的用户信息
+        const currentAuth = getStoredAuth()
+        storeAuth({
+            ...currentAuth,
+            data: {
+                user: {
+                    ...currentAuth.data.user,
+                    ...data.data.user,
+                },
+            },
+        })
 
-  if (storageError) throw new Error(storageError.message);
-
-  // 3. Update avatar in the user
-  const { data: updatedUser, error: authError } =
-    await supabase.auth.updateUser({
-      data: {
-        avatar: `${supabaseUrl}/storage/v1/object/public/avatars/${fileName}`,
-      },
-    });
-
-  if (authError) throw new Error(authError.message);
-
-  return updatedUser;
+        return data
+    } catch (error) {
+        throw new Error(error.message)
+    }
 }
