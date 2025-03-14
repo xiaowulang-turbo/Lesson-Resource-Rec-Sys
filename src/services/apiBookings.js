@@ -1,131 +1,197 @@
-import { PAGE_SIZE } from "../utils/constants";
-import { getToday } from "../utils/helpers";
-import supabase from "./supabase";
+import { PAGE_SIZE } from '../utils/constants'
+import { getToday } from '../utils/helpers'
+import { BASE_URL } from './apiConfig'
+
+function getStoredAuth() {
+    const auth = localStorage.getItem('auth')
+    return auth ? JSON.parse(auth) : null
+}
 
 export async function getBookings({ filter, sortBy, page }) {
-  let query = supabase.from("bookings").select("*, cabins(*), guests(*)", {
-    count: "exact",
-  });
+    try {
+        const auth = getStoredAuth()
+        if (!auth?.token) throw new Error('未登录')
 
-  // 1.Filter
-  if (filter) query = query.eq(filter.field, filter.value);
+        let url = new URL(`${BASE_URL}/resources`)
 
-  // 2. sortBy
-  if (sortBy) {
-    query = query.order(sortBy.field, {
-      ascending: sortBy.direction === "asc",
-    });
-  }
+        // 1. Filter
+        if (filter) {
+            url.searchParams.append(filter.field, filter.value)
+        }
 
-  // 3. Pagination
-  if (page) {
-    // starts from 0
-    const from = PAGE_SIZE * (page - 1);
-    const to = from + PAGE_SIZE - 1;
-    query = query.range(from, to);
-  }
+        // 2. Sort
+        if (sortBy) {
+            url.searchParams.append(
+                'sort',
+                `${sortBy.direction === 'desc' ? '-' : ''}${sortBy.field}`
+            )
+        }
 
-  const { data, error, count } = await query;
+        // 3. Pagination
+        if (page) {
+            url.searchParams.append('page', page)
+            url.searchParams.append('limit', PAGE_SIZE)
+        }
 
-  if (error) {
-    console.error(error);
-    throw new Error("Bookings could not get loaded");
-  }
+        const res = await fetch(url, {
+            headers: {
+                Authorization: `Bearer ${auth.token}`,
+            },
+        })
 
-  return { data, count };
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || '无法加载资源')
+
+        return {
+            data: data.data.resources,
+            count: data.data.total,
+        }
+    } catch (error) {
+        console.error(error)
+        throw new Error('无法加载资源')
+    }
 }
 
 export async function getBooking(id) {
-  const { data, error } = await supabase
-    .from("bookings")
-    .select("*, cabins(*), guests(*)")
-    .eq("id", id)
-    .single();
+    try {
+        const auth = getStoredAuth()
+        if (!auth?.token) throw new Error('未登录')
 
-  if (error) {
-    console.error(error);
-    throw new Error("Booking not found");
-  }
+        const res = await fetch(`${BASE_URL}/resources/${id}`, {
+            headers: {
+                Authorization: `Bearer ${auth.token}`,
+            },
+        })
 
-  return data;
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || '无法找到资源')
+
+        return data.data.resource
+    } catch (error) {
+        console.error(error)
+        throw new Error('无法找到资源')
+    }
 }
 
 // Returns all BOOKINGS that are were created after the given date. Useful to get bookings created in the last 30 days, for example.
 // date: ISOString
 export async function getBookingsAfterDate(date) {
-  const { data, error } = await supabase
-    .from("bookings")
-    .select("created_at, totalPrice, extrasPrice")
-    .gte("created_at", date)
-    .lte("created_at", getToday({ end: true }));
+    try {
+        const auth = getStoredAuth()
+        if (!auth?.token) throw new Error('未登录')
 
-  if (error) {
-    console.error(error);
-    throw new Error("Bookings could not get loaded");
-  }
+        const url = new URL(`${BASE_URL}/resources`)
+        url.searchParams.append('createdAfter', date)
+        url.searchParams.append('createdBefore', getToday({ end: true }))
 
-  return data;
+        const res = await fetch(url, {
+            headers: {
+                Authorization: `Bearer ${auth.token}`,
+            },
+        })
+
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || '无法加载资源')
+
+        return data.data.resources
+    } catch (error) {
+        console.error(error)
+        throw new Error('无法加载资源')
+    }
 }
 
 // Returns all STAYS that are were created after the given date
 export async function getStaysAfterDate(date) {
-  const { data, error } = await supabase
-    .from("bookings")
-    .select("*, guests(fullName)")
-    .gte("startDate", date)
-    .lte("startDate", getToday());
+    try {
+        const auth = getStoredAuth()
+        if (!auth?.token) throw new Error('未登录')
 
-  if (error) {
-    console.error(error);
-    throw new Error("Bookings could not get loaded");
-  }
+        const url = new URL(`${BASE_URL}/resources`)
+        url.searchParams.append('startDate[gte]', date)
+        url.searchParams.append('startDate[lte]', getToday())
 
-  return data;
+        const res = await fetch(url, {
+            headers: {
+                Authorization: `Bearer ${auth.token}`,
+            },
+        })
+
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || '无法加载资源')
+
+        return data.data.resources
+    } catch (error) {
+        console.error(error)
+        throw new Error('无法加载资源')
+    }
 }
 
 // Activity means that there is a check in or a check out today
 export async function getStaysTodayActivity() {
-  const { data, error } = await supabase
-    .from("bookings")
-    .select("*, guests(fullName, nationality, countryFlag)")
-    .or(
-      `and(status.eq.unconfirmed,startDate.eq.${getToday()}),and(status.eq.checked-in,endDate.eq.${getToday()})`
-    )
-    .order("created_at");
+    try {
+        const auth = getStoredAuth()
+        if (!auth?.token) throw new Error('未登录')
 
-  // Equivalent to this. But by querying this, we only download the data we actually need, otherwise we would need ALL bookings ever created
-  // (stay.status === 'unconfirmed' && isToday(new Date(stay.startDate))) ||
-  // (stay.status === 'checked-in' && isToday(new Date(stay.endDate)))
+        const url = new URL(`${BASE_URL}/resources/today-activity`)
 
-  if (error) {
-    console.error(error);
-    throw new Error("Bookings could not get loaded");
-  }
-  return data;
+        const res = await fetch(url, {
+            headers: {
+                Authorization: `Bearer ${auth.token}`,
+            },
+        })
+
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || '无法加载今日活动')
+
+        return data.data.resources
+    } catch (error) {
+        console.error(error)
+        throw new Error('无法加载今日活动')
+    }
 }
 
 export async function updateBooking(id, obj) {
-  const { data, error } = await supabase
-    .from("bookings")
-    .update(obj)
-    .eq("id", id)
-    .select()
-    .single();
+    try {
+        const auth = getStoredAuth()
+        if (!auth?.token) throw new Error('未登录')
 
-  if (error) {
-    console.error(error);
-    throw new Error("Booking could not be updated");
-  }
-  return data;
+        const res = await fetch(`${BASE_URL}/resources/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${auth.token}`,
+            },
+            body: JSON.stringify(obj),
+        })
+
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || '无法更新资源')
+
+        return data.data.resource
+    } catch (error) {
+        console.error(error)
+        throw new Error('无法更新资源')
+    }
 }
 
 export async function deleteBooking(id) {
-  // REMEMBER RLS POLICIES
-  const { data, error } = await supabase.from("bookings").delete().eq("id", id);
+    try {
+        const auth = getStoredAuth()
+        if (!auth?.token) throw new Error('未登录')
 
-  if (error) {
-    console.error(error);
-    throw new Error("Booking could not be deleted");
-  }
-  return data;
+        const res = await fetch(`${BASE_URL}/resources/${id}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${auth.token}`,
+            },
+        })
+
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || '无法删除资源')
+
+        return data.data
+    } catch (error) {
+        console.error(error)
+        throw new Error('无法删除资源')
+    }
 }
