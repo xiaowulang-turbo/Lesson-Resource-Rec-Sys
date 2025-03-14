@@ -11,7 +11,24 @@ export class MongoDBAdapter extends DataServiceInterface {
 
     // 用户相关
     async createUser(userData) {
-        const user = await User.create(userData)
+        // 如果密码已经是加密的，直接使用
+        if (userData.password.startsWith('$2a$')) {
+            const user = await User.create(userData)
+            return {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            }
+        }
+
+        // 如果密码是明文，先加密
+        const salt = await bcrypt.genSalt(12)
+        const hashedPassword = await bcrypt.hash(userData.password, salt)
+        const user = await User.create({
+            ...userData,
+            password: hashedPassword,
+        })
         return {
             id: user._id,
             name: user.name,
