@@ -1,9 +1,9 @@
 import mongoose from 'mongoose'
 
 const bookingSchema = new mongoose.Schema({
-    cabinId: {
+    resourceId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Cabin',
+        ref: 'Resource',
         required: true,
     },
     userId: {
@@ -19,28 +19,28 @@ const bookingSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
-    numNights: {
+    duration: {
         type: Number,
         required: true,
     },
-    numGuests: {
+    participantsCount: {
         type: Number,
         required: true,
     },
-    totalPrice: {
+    totalPoints: {
         type: Number,
         required: true,
     },
     status: {
         type: String,
-        enum: ['unconfirmed', 'confirmed', 'checked-in', 'checked-out'],
-        default: 'unconfirmed',
+        enum: ['pending', 'approved', 'in-progress', 'completed', 'canceled'],
+        default: 'pending',
     },
-    hasBreakfast: {
+    includesMaterials: {
         type: Boolean,
         default: false,
     },
-    observations: String,
+    notes: String,
     isPaid: {
         type: Boolean,
         default: false,
@@ -52,7 +52,7 @@ const bookingSchema = new mongoose.Schema({
 })
 
 // 添加索引以提高查询性能
-bookingSchema.index({ cabinId: 1, startDate: 1, endDate: 1 })
+bookingSchema.index({ resourceId: 1, startDate: 1, endDate: 1 })
 bookingSchema.index({ userId: 1, status: 1 })
 
 const Booking = mongoose.model('Booking', bookingSchema)
