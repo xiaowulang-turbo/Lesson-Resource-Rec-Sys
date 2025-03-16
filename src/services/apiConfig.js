@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://localhost:3000/api/v1'
+export const BASE_URL = 'http://localhost:5000/api/v1'
 
 export const ENDPOINTS = {
     AUTH: {
@@ -14,5 +14,10 @@ export const ENDPOINTS = {
     RESOURCES: {
         BASE: '/resources',
         RATINGS: (id) => `/resources/${id}/ratings`,
+    },
+    BOOKINGS: {
+        BASE: '/bookings',
+        SINGLE: (id) => `/bookings/${id}`,
+        STATUS: (id) => `/bookings/${id}/status`,
     },
 }
