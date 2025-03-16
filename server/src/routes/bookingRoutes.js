@@ -6,6 +6,7 @@ import {
     updateBooking,
     deleteBooking,
     updateBookingStatus,
+    getTodayActivity,
 } from '../controllers/bookingController.js'
 import { protect, restrictTo } from '../middlewares/authMiddleware.js'
 
@@ -13,6 +14,9 @@ const router = express.Router()
 
 // 所有预订路由都需要认证
 router.use(protect)
+
+// 获取今日活动路由
+router.get('/today-activity', getTodayActivity)
 
 router
     .route('/')
