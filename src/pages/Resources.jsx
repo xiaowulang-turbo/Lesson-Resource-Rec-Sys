@@ -133,7 +133,7 @@ function Resources() {
 
             <StyledResources>
                 <Description>
-                    这里展示各类学习资源，包括电子教材、视频课程和实践项目等。您可以通过筛选和搜索找到适合您的学习资源。
+                    这里展示各类学习资源，包括电子教材、实践项目和练习题库等。您可以通过筛选和搜索找到适合您的学习资源。
                 </Description>
 
                 <FilterSection>

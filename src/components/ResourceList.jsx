@@ -155,7 +155,6 @@ function ResourceList({ resources }) {
     const getResourceType = (type) => {
         const typeMap = {
             308: '电子教材',
-            309: '视频课程',
             310: '实践项目',
             311: '练习题库',
             312: '参考资料',
