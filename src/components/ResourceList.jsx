@@ -3,7 +3,8 @@ import Empty from '../ui/Empty'
 
 const ResourceGrid = styled.div`
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    /* grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); */
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     gap: 2.4rem;
     margin-bottom: 2.4rem;
 `
