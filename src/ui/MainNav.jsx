@@ -60,7 +60,7 @@ function MainNav() {
     return (
         <nav>
             <NavList>
-                <li>
+                {/* <li>
                     <StyledNavLink to="/dashboard">
                         <HiOutlineHome />
                         Home
@@ -77,7 +77,7 @@ function MainNav() {
                         <HiOutlineHomeModern />
                         cabins
                     </StyledNavLink>
-                </li>
+                </li> */}
                 <li>
                     <StyledNavLink to="/courses">
                         <HiOutlineAcademicCap />
@@ -96,7 +96,7 @@ function MainNav() {
                         个人中心
                     </StyledNavLink>
                 </li>
-                <li>
+                {/* <li>
                     <StyledNavLink to="/users">
                         <HiOutlineUsers />
                         users
@@ -107,7 +107,7 @@ function MainNav() {
                         <HiOutlineCog6Tooth />
                         settings
                     </StyledNavLink>
-                </li>
+                </li> */}
             </NavList>
         </nav>
     )

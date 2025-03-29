@@ -17,7 +17,7 @@ const StyleSidebar = styled.div`
 function Sidebar() {
     return (
         <StyleSidebar>
-            <Logo />
+            {/* <Logo /> */}
             <MainNav />
 
             {/* <Uploader /> */}
