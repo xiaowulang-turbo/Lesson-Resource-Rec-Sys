@@ -15,7 +15,7 @@ const StyledContainer = styled.div`
 
 const CourseGrid = styled.div`
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 1.6rem;
     margin-top: 1.6rem;
 `
