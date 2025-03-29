@@ -136,6 +136,13 @@ export class MongoDBAdapter extends DataServiceInterface {
             tags: resource.tags,
             ratings: resource.ratings,
             averageRating: resource.averageRating,
+            cover: resource.cover,
+            price: resource.price,
+            originalPrice: resource.originalPrice,
+            authors: resource.authors,
+            publisher: resource.publisher,
+            enrollCount: resource.enrollCount,
+            studyAvatars: resource.studyAvatars,
         }))
     }
 
