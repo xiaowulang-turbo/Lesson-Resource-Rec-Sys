@@ -4405,5 +4405,239 @@
                 "chapter_duration_hours": 10
             }
         ]
+    },
+    {
+        "course_id": "78",
+        "course_title": "Algorithms",
+        "course_organization": "Stanford University",
+        "course_Certificate_type": "SPECIALIZATION",
+        "course_rating": "4.8",
+        "course_difficulty": "Intermediate",
+        "course_students_enrolled": "150k",
+        "course_description": "学习算法设计与分析的核心概念，包括分治、贪心、动态规划等经典算法策略",
+        "course_topics": ["算法", "数据结构", "计算复杂性", "图论"],
+        "course_skills": ["算法设计", "问题分析", "编程实现", "复杂度分析"],
+        "course_language": "英语",
+        "course_prerequisites": ["基础编程能力", "离散数学基础"],
+        "course_format": ["视频讲座", "编程作业", "测验"],
+        "course_duration_hours": 60,
+        "course_updated_date": "2023-08-15",
+        "course_chapters": [
+            {
+                "chapter_id": 1,
+                "chapter_title": "分治算法",
+                "chapter_duration_hours": 15
+            },
+            {
+                "chapter_id": 2,
+                "chapter_title": "贪心算法",
+                "chapter_duration_hours": 15
+            },
+            {
+                "chapter_id": 3,
+                "chapter_title": "动态规划",
+                "chapter_duration_hours": 15
+            },
+            {
+                "chapter_id": 4,
+                "chapter_title": "图算法与NP完备性",
+                "chapter_duration_hours": 15
+            }
+        ]
+    },
+    {
+        "course_id": "242",
+        "course_title": "Algorithms for Battery Management Systems",
+        "course_organization": "University of Colorado System",
+        "course_Certificate_type": "SPECIALIZATION",
+        "course_rating": "4.8",
+        "course_difficulty": "Intermediate",
+        "course_students_enrolled": "14k",
+        "course_description": "学习电池管理系统中的算法设计与应用，包括状态估计、健康监测和优化控制",
+        "course_topics": ["电池管理", "算法", "状态估计", "控制系统"],
+        "course_skills": ["电池建模", "卡尔曼滤波", "系统识别", "优化控制"],
+        "course_language": "英语",
+        "course_prerequisites": ["控制理论基础", "编程基础"],
+        "course_format": ["视频讲座", "仿真实验", "项目"],
+        "course_duration_hours": 45,
+        "course_updated_date": "2023-07-20",
+        "course_chapters": [
+            {
+                "chapter_id": 1,
+                "chapter_title": "电池系统基础",
+                "chapter_duration_hours": 10
+            },
+            {
+                "chapter_id": 2,
+                "chapter_title": "状态估计算法",
+                "chapter_duration_hours": 12
+            },
+            {
+                "chapter_id": 3,
+                "chapter_title": "健康监测与诊断",
+                "chapter_duration_hours": 11
+            },
+            {
+                "chapter_id": 4,
+                "chapter_title": "优化控制策略",
+                "chapter_duration_hours": 12
+            }
+        ]
+    },
+    {
+        "course_id": "322",
+        "course_title": "American Contract Law I",
+        "course_organization": "Yale University",
+        "course_Certificate_type": "COURSE",
+        "course_rating": "4.9",
+        "course_difficulty": "Beginner",
+        "course_students_enrolled": "18k",
+        "course_description": "深入学习美国合同法的基本原则和应用，包括合同形成、履行和违约救济",
+        "course_topics": ["合同法", "法律", "合同形成", "合同履行"],
+        "course_skills": ["法律分析", "案例研究", "合同起草", "法律推理"],
+        "course_language": "英语",
+        "course_prerequisites": ["无特定要求"],
+        "course_format": ["视频讲座", "案例分析", "测验"],
+        "course_duration_hours": 35,
+        "course_updated_date": "2023-09-05",
+        "course_chapters": [
+            {
+                "chapter_id": 1,
+                "chapter_title": "合同法导论",
+                "chapter_duration_hours": 8
+            },
+            {
+                "chapter_id": 2,
+                "chapter_title": "要约与承诺",
+                "chapter_duration_hours": 9
+            },
+            {
+                "chapter_id": 3,
+                "chapter_title": "合同履行",
+                "chapter_duration_hours": 9
+            },
+            {
+                "chapter_id": 4,
+                "chapter_title": "违约与救济",
+                "chapter_duration_hours": 9
+            }
+        ]
+    },
+    {
+        "course_id": "159",
+        "course_title": "An Introduction to American Law",
+        "course_organization": "University of Pennsylvania",
+        "course_Certificate_type": "COURSE",
+        "course_rating": "4.8",
+        "course_difficulty": "Beginner",
+        "course_students_enrolled": "23k",
+        "course_description": "全面介绍美国法律体系，包括宪法、合同法、侵权法和刑法等核心领域",
+        "course_topics": ["美国法律", "宪法", "合同法", "侵权法"],
+        "course_skills": ["法律分析", "案例研究", "法律推理", "法律写作"],
+        "course_language": "英语",
+        "course_prerequisites": ["无特定要求"],
+        "course_format": ["视频讲座", "案例分析", "讨论"],
+        "course_duration_hours": 30,
+        "course_updated_date": "2023-06-15",
+        "course_chapters": [
+            {
+                "chapter_id": 1,
+                "chapter_title": "美国法律体系概述",
+                "chapter_duration_hours": 6
+            },
+            {
+                "chapter_id": 2,
+                "chapter_title": "宪法与公民权利",
+                "chapter_duration_hours": 8
+            },
+            {
+                "chapter_id": 3,
+                "chapter_title": "合同法与商业法",
+                "chapter_duration_hours": 8
+            },
+            {
+                "chapter_id": 4,
+                "chapter_title": "侵权法与刑法",
+                "chapter_duration_hours": 8
+            }
+        ]
+    },
+    {
+        "course_id": "265",
+        "course_title": "An Introduction to Consumer Neuroscience & Neuromarketing",
+        "course_organization": "Copenhagen Business School",
+        "course_Certificate_type": "COURSE",
+        "course_rating": "4.7",
+        "course_difficulty": "Beginner",
+        "course_students_enrolled": "69k",
+        "course_description": "探索消费者神经科学与神经营销的基础知识，了解大脑如何影响消费决策",
+        "course_topics": ["神经营销", "消费者行为", "神经科学", "市场研究"],
+        "course_skills": ["消费者洞察", "市场分析", "研究方法", "决策分析"],
+        "course_language": "英语",
+        "course_prerequisites": ["基础营销知识"],
+        "course_format": ["视频讲座", "案例研究", "实验演示"],
+        "course_duration_hours": 25,
+        "course_updated_date": "2023-10-10",
+        "course_chapters": [
+            {
+                "chapter_id": 1,
+                "chapter_title": "神经营销基础",
+                "chapter_duration_hours": 6
+            },
+            {
+                "chapter_id": 2,
+                "chapter_title": "大脑与消费决策",
+                "chapter_duration_hours": 7
+            },
+            {
+                "chapter_id": 3,
+                "chapter_title": "神经营销研究方法",
+                "chapter_duration_hours": 6
+            },
+            {
+                "chapter_id": 4,
+                "chapter_title": "应用与伦理考量",
+                "chapter_duration_hours": 6
+            }
+        ]
+    },
+    {
+        "course_id": "151",
+        "course_title": "An Introduction to Programming the Internet of Things (IOT)",
+        "course_organization": "University of California, Irvine",
+        "course_Certificate_type": "SPECIALIZATION",
+        "course_rating": "4.6",
+        "course_difficulty": "Beginner",
+        "course_students_enrolled": "270k",
+        "course_description": "学习物联网编程的基础知识，包括嵌入式系统、传感器网络和数据分析",
+        "course_topics": ["物联网", "嵌入式系统", "Arduino", "传感器网络"],
+        "course_skills": ["Arduino编程", "传感器集成", "网络通信", "数据处理"],
+        "course_language": "英语",
+        "course_prerequisites": ["基础编程知识"],
+        "course_format": ["视频讲座", "实验项目", "编程作业"],
+        "course_duration_hours": 70,
+        "course_updated_date": "2023-11-25",
+        "course_chapters": [
+            {
+                "chapter_id": 1,
+                "chapter_title": "物联网基础",
+                "chapter_duration_hours": 15
+            },
+            {
+                "chapter_id": 2,
+                "chapter_title": "Arduino编程",
+                "chapter_duration_hours": 20
+            },
+            {
+                "chapter_id": 3,
+                "chapter_title": "传感器与执行器",
+                "chapter_duration_hours": 20
+            },
+            {
+                "chapter_id": 4,
+                "chapter_title": "网络连接与数据分析",
+                "chapter_duration_hours": 15
+            }
+        ]
     }
 ]
