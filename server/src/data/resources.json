@@ -1,0 +1,292 @@
+[
+    {
+        "title": "人工智能及其航空航天应用",
+        "description": "本书是航空航天新兴领域\"十四五\"高等教育教材。人工智能时代已然来临，航空航天作为全世界最早的信息科技产业应用技术领域之一，迫切需要开设人工智能技术及其于航空航天的应用课程，为人工智能在航空航天的普及、人才的培养、学科的发展提供条件。本书重点介绍了人工智能是什么、人工智能在航空航天领域能做什么，选取线性回归、逻辑回归、神经网络、聚类、降维、异常检测、深度学习与强化学习，结合人工智能于航空航天应用的案例解释人工智能的应用，以点带面，传授人工智能的基本知识、人工智能的算法理论及其的应用方式。",
+        "type": 308,
+        "subject": "航空航天",
+        "grade": "本科及研究生",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/8393e0cb-73a8-4bc0-8251-3c67f20e8c82.png",
+        "cover": "https://mooc-image.nosdn.127.net/8393e0cb-73a8-4bc0-8251-3c67f20e8c82.png",
+        "price": 24.5,
+        "originalPrice": 35.0,
+        "authors": "王黎静",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-11-23T12:43:34.147Z",
+        "updatedAt": "2024-12-15T01:10:06.370Z",
+        "enrollCount": 76,
+        "studyAvatars": [
+            "http://mooc-image.nosdn.127.net/08B090C77696F1F2E9E612482FA17762.jpg?imageView&amp;thumbnail=155x102&amp;quality=100",
+            "https://img-ph-mirror.nosdn.127.net/to6pOnFQHaAPSg_pRLxbyQ==/2207045292489032396.jpg",
+            "http://edu-image.nosdn.127.net/7F3192E85C0E886A90EE5831E473B63E.jpg?imageView&amp;thumbnail=180y180&amp;quality=100"
+        ],
+        "tags": ["人工智能", "航空航天", "教材"],
+        "highlightContent": "本书介绍人工智能在航空航天领域的应用，结合实际案例讲解人工智能的基本理论与算法，重点涵盖线性回归、神经网络、深度学习等技术。适用于航空航天、机械等专业的本科生与研究生，也可供科研人员参考，为人工智能在航空航天领域的普及与学科发展提供支持。",
+        "averageRating": 4.5,
+        "metadata": {
+            "id": 1473948443,
+            "ycTextbookId": "P3Q8NTAJN"
+        }
+    },
+    {
+        "title": "隐私计算导论",
+        "description": "本书是大数据新兴领域\"十四五\"高等教育教材。在当今社会，数据已经晋升为与传统土地、劳动力、资本和技术并列的\"第五生产要素\"。凭借其可共享、可复制的独特属性，数据对经济增长产生了倍增效应。然而，这些特征也进一步凸显了平衡数据价值与安全的重要性，以确保其能够持续发挥关键作用。因此，围绕数据隐私和隐私计算技术的研究已成为数据科学领域的热点议题。隐私计算技术正是为了在确保数据隐私的前提下，实现数据的协同处理、分析和应用，即实现\"数据可用不可见\"。",
+        "type": 308,
+        "subject": "数据科学",
+        "grade": "本科及研究生",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/5e28b0ce-ae67-43bc-b3c9-40cbf496fac3.png",
+        "cover": "https://mooc-image.nosdn.127.net/5e28b0ce-ae67-43bc-b3c9-40cbf496fac3.png",
+        "price": 27.3,
+        "originalPrice": 39.0,
+        "authors": "陈岑 高明 王延昊 王磊",
+        "publisher": "高等教育出版社",
+        "createdAt": "2025-01-11T14:39:39.426Z",
+        "updatedAt": "2025-01-14T23:08:14.601Z",
+        "enrollCount": 24,
+        "studyAvatars": [
+            "http://edu-image.nosdn.127.net/ADE69F0E8E843566B784D8A47DDB3D7B.jpeg?imageView&amp;thumbnail=180y180&amp;quality=100",
+            "https://img-ph-mirror.nosdn.127.net/_eldH2llzUnG378E3YIb2g==/6597744866796371021.jpg",
+            "https://img5.ph.126.net/3OvCH58rntdmY1bBVjM4Lw==/6597805339935825725.jpeg"
+        ],
+        "tags": ["隐私计算", "数据科学", "人工智能"],
+        "highlightContent": "作为一门交叉学科，隐私计算横跨了人工智能、密码学、数据科学等多个领域。本教材力求全面而系统地介绍数据隐私和隐私计算的基本概念，并深入阐述主流技术手段，包括安全多方计算、可信执行环境、联邦学习、差分隐私以及数据匿名化等。同时，本教材还结合了丰富的应用场景实例，将理论知识与实践应用紧密结合，旨在满足从本科生到研究生不同层次学习者的需求。",
+        "averageRating": 4.3,
+        "metadata": {
+            "id": 1474376445,
+            "ycTextbookId": "F3J4DQ7MN"
+        }
+    },
+    {
+        "title": "电推进智能控制",
+        "description": "《电推进智能控制》是航空航天新兴领域\"十四五\"高等教育教材，专为空天智能电推进技术专业的高年级学生编写。本书覆盖了经典控制、现代控制和智能控制的理论基础与实践应用，共分为八章，内容包括绪论、经典控制实例、状态空间分析法、智能控制、多旋翼飞行器控制、氢燃料电池混合动力系统控制、离子风飞行器动力装置控制以及电推进智能控制前沿。",
+        "type": 308,
+        "subject": "航空航天",
+        "grade": "本科高年级",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/6da575dc-0957-412e-8df0-6f8171d0b675.png",
+        "cover": "https://mooc-image.nosdn.127.net/6da575dc-0957-412e-8df0-6f8171d0b675.png",
+        "price": 24.5,
+        "originalPrice": 35.0,
+        "authors": "漆明净",
+        "publisher": "高等教育出版社",
+        "createdAt": "2025-01-11T14:39:30.216Z",
+        "updatedAt": "2025-01-14T22:38:49.320Z",
+        "enrollCount": 7,
+        "studyAvatars": [
+            "http://nos.netease.com/edu-image/2612B8ACAF93E503AAEB32518A60924C.jpg?imageView&thumbnail=120y120&quality=100",
+            "https://edu-image.nosdn.127.net/4C739B9B27D44E00F7A176AADD09E5FE.jpg?imageView&thumbnail=120y120&quality=100",
+            "https://img-ph-mirror.nosdn.127.net/MIrRnC-xfrRmjVkjo6ORaA==/6597226996820873270.jpg"
+        ],
+        "tags": ["电推进", "智能控制", "航空航天"],
+        "highlightContent": "《电推进智能控制》作为 \"十四五\" 高等教育教材，专为空天智能电推进技术专业高年级学生打造。它涵盖经典、现代及智能控制理论与应用，借多个空天典型案例，融合控制学与电推进技术，培养学生实践能力，适用于相关专业本硕教学。",
+        "averageRating": 4.6,
+        "metadata": {
+            "id": 1474376441,
+            "ycTextbookId": "P37FDMAAE"
+        }
+    },
+    {
+        "title": "信息技术",
+        "description": "本教材依据教育部最新发布的《高等职业教育专科信息技术课程标准》及《全国高等学校计算机水平考试大纲》编写。本教材以行业企业用人需求为导向，落实立德树人根本任务，培养学生通过信息技术解决实际问题的能力。本教材分为信息素养与社会责任、信息检索技术、文档处理技术、电子表格处理、演示文稿制作、数字媒体技术、信息安全技术、新一代信息技术等8个模块，每个模块都以信息技术在生活、工作中的实际应用来设计导入任务。",
+        "type": 308,
+        "subject": "信息技术",
+        "grade": "专科",
+        "difficulty": 3,
+        "url": "https://mooc-image.nosdn.127.net/51b4ad86-63e0-4de2-9d1e-8e06d506a241.png",
+        "cover": "https://mooc-image.nosdn.127.net/51b4ad86-63e0-4de2-9d1e-8e06d506a241.png",
+        "price": 32.55,
+        "originalPrice": 46.5,
+        "authors": "陈捷",
+        "publisher": "高等教育出版社",
+        "createdAt": "2025-01-11T14:39:51.329Z",
+        "updatedAt": "2025-01-14T23:43:42.783Z",
+        "enrollCount": 11,
+        "studyAvatars": [
+            "https://pandapub.nosdn.127.net/pr_albs9koxaqqjn611estwyw==/2_1656318213_624.png?imageView&thumbnail=28y28&quality=100",
+            "http://edu-image.nosdn.127.net/E9D3506983325F81CFC34D38477BBEE9.jpg?imageView&amp;thumbnail=180y180&amp;quality=100",
+            "http://nos.netease.com/edu-image/71FBFBDB4CECDC13C0653DD64A55E386.jpg?imageView&amp;thumbnail=310y301&amp;quality=100"
+        ],
+        "tags": ["信息技术", "计算机基础", "职业教育"],
+        "highlightContent": "这本教材紧扣行业用人需求，聚焦培养学生信息技术实操力。8 大模块以实际应用导入，内容丰富新颖。搭配多样数字化资源，兼具融媒体特性。无论是高职相关课程教学、计算机等级考试备考，还是从业者与爱好者自学，都极为适用。",
+        "averageRating": 4.4,
+        "metadata": {
+            "id": 1474376450,
+            "ycTextbookId": "PKTJBNAK4"
+        }
+    },
+    {
+        "title": "无人机集群技术——智能组网与协同",
+        "description": "本书是航空航天战略性新兴领域\"十四五\"高等教育教材体系建设规划项目的研究成果，书中紧密结合无人机集群技术最新发展趋势，按照\"网联化\"与\"智能化\"两条主线组织内容，注重理论与实践相结合。全书共分为8章，包括绪论、无人机集群网络体系结构与协同控制结构、无人机集群通信物理层技术、无人机集群信道接入技术、无人机集群路由技术、无人机集群航迹规划和无人机集群虚拟仿真实验。",
+        "type": 308,
+        "subject": "航空航天",
+        "grade": "本科",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/b83d242e-2f0a-46ed-a69e-d366f48d66e6.png",
+        "cover": "https://mooc-image.nosdn.127.net/b83d242e-2f0a-46ed-a69e-d366f48d66e6.png",
+        "price": 24.5,
+        "originalPrice": 35.0,
+        "authors": "雷磊，宋晓勤",
+        "publisher": "高等教育出版社",
+        "createdAt": "2025-01-11T14:39:37.239Z",
+        "updatedAt": "2025-01-14T22:52:45.561Z",
+        "enrollCount": 2,
+        "studyAvatars": [
+            "http://nos.netease.com/edu-image/CA8B501D06B35DF18F758F8A52B2E0E3.jpg?imageView&thumbnail=310y307&quality=100",
+            "http://edu-image.nosdn.127.net/5151E863F79DE5EDB857AAFF988A6A17.JPG?imageView&thumbnail=180y180&quality=100",
+            "https://img5.ph.126.net/3OvCH58rntdmY1bBVjM4Lw==/6597805339935825725.jpeg"
+        ],
+        "tags": ["无人机", "智能组网", "航空航天"],
+        "highlightContent": "这本 \"十四五\" 航空航天教材，紧扣无人机集群技术发展，依 \"网联化\"\"智能化\" 构建内容。8 章涵盖体系结构、通信技术、航迹规划等，理论实践结合。数字版含视频、虚拟实验，适用于高校教学，也是无人机领域工程人员的实用参考。",
+        "averageRating": 4.7,
+        "metadata": {
+            "id": 1474376444,
+            "ycTextbookId": "FKCSDK9TR4"
+        }
+    },
+    {
+        "title": "智能终端产品技术服务",
+        "description": "本书以项目引领、教学一体化为特色，根据高职高专教学的基本要求，结合岗位技能职业标准，在保证知识体系完整的基础上，以智能终端产品项目案例为主线，以案例实际工作流程为任务，以技能培养为编写宗旨，是全国高等职业院校智能产品开发与应用专业国家级教学资源库配套教材。",
+        "type": 308,
+        "subject": "电子信息",
+        "grade": "高职高专",
+        "difficulty": 3,
+        "url": "https://mooc-image.nosdn.127.net/5fd76267-d761-4599-9ee5-5a436ca5d1e5.png",
+        "cover": "https://mooc-image.nosdn.127.net/5fd76267-d761-4599-9ee5-5a436ca5d1e5.png",
+        "price": 34.8,
+        "originalPrice": 49.8,
+        "authors": "李翠，侯海亭",
+        "publisher": "高等教育出版社",
+        "createdAt": "2025-01-11T14:40:05.565Z",
+        "updatedAt": "2025-01-14T23:18:06.358Z",
+        "enrollCount": 0,
+        "studyAvatars": [
+            "http://nos.netease.com/edu-image/C84CB1487FCDAE7A2B034E0306A89082.jpg?imageView&thumbnail=180y180&quality=100",
+            "http://edu-image.nosdn.127.net/947121BF2959BA52CD25C0818885D90F.jpg?imageView&amp;thumbnail=120y120&amp;quality=100",
+            "http://nos.netease.com/edu-image/2612B8ACAF93E503AAEB32518A60924C.jpg?imageView&thumbnail=120y120&quality=100"
+        ],
+        "tags": ["智能终端", "技术服务", "职业教育"],
+        "highlightContent": "本教材以项目引领、教学一体为特色，依岗位技能标准编写，是国家级教学资源库配套教材。5 大项目含多样案例，按实际流程分任务，搭配实训与习题。适配多专业教学，也为智能终端维修等人员提供实用参考 。",
+        "averageRating": 4.2,
+        "metadata": {
+            "id": 1474376456,
+            "ycTextbookId": "P32XCKCA4"
+        }
+    },
+    {
+        "title": "智能通信终端产品检测与维修",
+        "description": "本书主要内容包括业务受理与产品检测、软件安装与产品调试、产品拆装与屏幕维修、电路识图与故障维修。各项目以智能通信终端产品维修工程师的实际岗位工作过程为依据进行编写。本书是高等职业教育融媒体、交互式、智能化数字教材。配有相关的微课视频、图片、在线测试等丰富的数字化教学资源，读者可在教材中直接点击浏览、操作、学习。",
+        "type": 308,
+        "subject": "电子信息",
+        "grade": "高职高专",
+        "difficulty": 3,
+        "url": "https://mooc-image.nosdn.127.net/daae6073-4d6f-493d-a350-c90f6af50f1e.png",
+        "cover": "https://mooc-image.nosdn.127.net/daae6073-4d6f-493d-a350-c90f6af50f1e.png",
+        "price": 32.7,
+        "originalPrice": 46.8,
+        "authors": "侯海亭，王翠萍",
+        "publisher": "高等教育出版社",
+        "createdAt": "2025-01-11T14:40:03.537Z",
+        "updatedAt": "2025-01-14T23:15:58.756Z",
+        "enrollCount": 1,
+        "studyAvatars": [
+            "http://edu-image.nosdn.127.net/5151E863F79DE5EDB857AAFF988A6A17.JPG?imageView&thumbnail=180y180&quality=100",
+            "https://img5.ph.126.net/3OvCH58rntdmY1bBVjM4Lw==/6597805339935825725.jpeg",
+            "http://edu-image.nosdn.127.net/D104E3BEB551AFBC35CA4362AAD9B459.jpg?imageView&thumbnail=180y180&quality=100"
+        ],
+        "tags": ["智能通信", "产品检测", "产品维修"],
+        "highlightContent": "这本高等职业教育数字教材聚焦智能通信终端维修。依岗位工作过程编写，涵盖业务受理到故障维修多项目。作为融媒体教材，配备丰富数字化资源。以易懂项目串联知识点，适用于高职多专业教学，也是技能评价、大赛及社会培训的优质之选 。",
+        "averageRating": 4.5,
+        "metadata": {
+            "id": 1474376455,
+            "ycTextbookId": "F3DAJ3JA4"
+        }
+    },
+    {
+        "title": "线性代数",
+        "description": "本书主要内容包括矩阵及其初等变换、行列式、n维向量空间、特征值与特征向量、二次型、线性空间与线性变换等。前5章内容自成体系，满足教育部高等学校大学数学课程教学指导委员会制订的工科类线性代数相关方面教学要求；第6章线性空间与线性变换供教学要求较高的学校选用。",
+        "type": 308,
+        "subject": "数学",
+        "grade": "本科",
+        "difficulty": 3,
+        "url": "https://mooc-image.nosdn.127.net/9443e521-4a33-4168-ab27-60b855f02db0.png",
+        "cover": "https://mooc-image.nosdn.127.net/9443e521-4a33-4168-ab27-60b855f02db0.png",
+        "price": 47.6,
+        "originalPrice": 68.0,
+        "authors": "黄廷祝",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-12-23T03:59:18.170Z",
+        "updatedAt": "2024-12-25T05:42:37.620Z",
+        "enrollCount": 1060,
+        "studyAvatars": [
+            "http://edu-image.nosdn.127.net/C14D868D608BB3FE1384272CEE92E7B8.jpg?imageView&amp;thumbnail=155y100&amp;quality=100",
+            "http://img6.ph.126.net/SEiVzVEbBZevulWdZ1voqA==/6597221499263037086.jpg",
+            "https://edu-image.nosdn.127.net/3A41AF829B26F24D6CA8737A8E1D5C81.jpg?imageView&thumbnail=180y180&quality=100"
+        ],
+        "tags": ["线性代数", "数学基础", "工科"],
+        "highlightContent": "特别是，代数与几何的结合，将矩阵的初等变换作为贯穿全书的计算和重要的理论推导工具，注重不同知识点与重要理论的内在本质联系，将几何空间、n维向量空间到抽象线性空间概念的建立从特殊到一般进行铺垫，在理论体系的处理上科学简洁、深入浅出、可读性强、易教易学；除了传统的应用实例，精心设计了一批与课程内容紧密贴合，反映人工智能、大数据等新工科前沿科技的应用实例（如，图像处理、电影推荐、Google搜索引擎、北斗卫星导航系统等)，为大学一年级新生搭建起跨越数学基础课与前沿信息科技鸿沟的桥梁。",
+        "averageRating": 4.8,
+        "metadata": {
+            "id": 1473946467,
+            "ycTextbookId": "FKKW68JS2"
+        }
+    },
+    {
+        "title": "智能税费申报与管理",
+        "description": "本书是贯彻落实职业教育提质培优行动计划中校企双元合作教材建设任务的项目成果之一，也是在线开放课程的配套教材。本书根据企业税务工作人员的岗位任职要求与各项财经法规进行编写，全书依照税制分类，划分为3个模块。模块一主要介绍征纳管理方面的各项规定，是企业涉税业务的起点；模块二以单个税种的纳税工作作为一个项目进行编排，以项目案例驱动，围绕案例所需知识点与技能点展开，以项目案例的实施工作成果作为学习的成果；模块三介绍大数据技术在税费申报与管理中的运用，包括财务共享中的税务管理和机器人在税务领域中的运用。",
+        "type": 308,
+        "subject": "财税",
+        "grade": "高职高专",
+        "difficulty": 3,
+        "url": "https://mooc-image.nosdn.127.net/625e2db8-d688-4b05-858c-2cf19807fe11.png",
+        "cover": "https://mooc-image.nosdn.127.net/625e2db8-d688-4b05-858c-2cf19807fe11.png",
+        "price": 29.4,
+        "originalPrice": 42.0,
+        "authors": "胡冬 袁敏",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-12-20T06:14:46.474Z",
+        "updatedAt": "2024-12-26T00:09:35.546Z",
+        "enrollCount": 77,
+        "studyAvatars": [
+            "https://img-ph-mirror.nosdn.127.net/HAC4bfQMLr1-gdQwM44t9A==/6630586179608738205.jpg",
+            "http://edu-image.nosdn.127.net/947121BF2959BA52CD25C0818885D90F.jpg?imageView&amp;thumbnail=120y120&amp;quality=100",
+            "http://img4.ph.126.net/bJwlPIsFQYWuqyGVFFvw7Q==/6597675597563688644.jpg"
+        ],
+        "tags": ["智能税费", "财务管理", "大数据应用"],
+        "highlightContent": "本书是校企合作编写的职业教育教材，围绕企业税务岗位需求设计，涵盖征纳管理、单税种纳税项目案例及大数据技术在税务中的应用。教材内容丰富，形式灵活，注重职业能力培养，可用于教学与探究性学习。适合作为职业教育税务课程的教材，也可供税务从业者参考。",
+        "averageRating": 4.3,
+        "metadata": {
+            "id": 1473916444,
+            "ycTextbookId": "P3Q2ZT6VM"
+        }
+    },
+    {
+        "title": "无人机组装与调试",
+        "description": "无人机是依托无线电控制、聚焦低空飞行领域的无人飞行器。人工智能技术的不断成熟与信息网络化的应用为无人机的发展增添了技术支持。目前在我国，无人机不仅仅是一个新兴的技术领域，更是经济发展、军事探测、环境保护、航空摄影等多领域与智慧城市、数字中国等多主题相配合的物质载体。本教材以项目任务式架构，展开对无人机装配技术的介绍。教材包括无人机结构与选型、无人机动力系统调试、无人机通信与导航控制系统装调、无人机飞行控制系统装调、无人机载荷系统认知、无人机发射回收系统认知6个项目。",
+        "type": 308,
+        "subject": "航空航天",
+        "grade": "职业院校",
+        "difficulty": 3,
+        "url": "https://mooc-image.nosdn.127.net/02d1dd64-ef76-469b-8b86-35bc6631cf6c.png",
+        "cover": "https://mooc-image.nosdn.127.net/02d1dd64-ef76-469b-8b86-35bc6631cf6c.png",
+        "price": 27.16,
+        "originalPrice": 38.8,
+        "authors": "高月辉 殷镜波",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-12-20T12:37:47.847Z",
+        "updatedAt": "2024-12-26T00:05:14.652Z",
+        "enrollCount": 115,
+        "studyAvatars": [
+            "http://mooc-image.nosdn.127.net/08B090C77696F1F2E9E612482FA17762.jpg?imageView&amp;thumbnail=155x102&amp;quality=100",
+            "//nos.netease.com/edu-image/4A446310D8CF14CA93E6AFE75B32E155.JPG?imageView&thumbnail=120y120&quality=100",
+            "http://edu-image.nosdn.127.net/4730131CF4548560352CD29FBA435294.JPG?imageView&amp;thumbnail=180y180&amp;quality=100"
+        ],
+        "tags": ["无人机", "组装", "调试", "人工智能"],
+        "highlightContent": "随着人工智能和信息网络化的快速发展，无人机已成为经济、军事、环境保护等领域的重要技术工具。教材适用于高职院校无人机应用技术、中职学校无人机操控与维护等专业，也可供无人机爱好者和培训机构参考。",
+        "averageRating": 4.6,
+        "metadata": {
+            "id": 1473934458,
+            "ycTextbookId": "F3UFRU7FH"
+        }
+    }
+]
