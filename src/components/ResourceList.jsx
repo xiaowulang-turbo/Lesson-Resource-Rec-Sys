@@ -1,6 +1,9 @@
 import styled from 'styled-components'
 import Empty from '../ui/Empty'
 
+// 更换为可用的占位图片URL
+const PLACEHOLDER_IMAGE = 'https://picsum.photos/400/180?blur=2'
+
 const ResourceGrid = styled.div`
     display: grid;
     /* grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); */
@@ -182,7 +185,13 @@ function ResourceList({ resources }) {
                     key={resource._id || resource.id || resource.metadata?.id}
                 >
                     <ResourceImage>
-                        <img src={resource.url} alt={resource.title} />
+                        <img
+                            src={resource.url || PLACEHOLDER_IMAGE}
+                            alt={resource.title}
+                            onError={(e) => {
+                                e.target.src = PLACEHOLDER_IMAGE
+                            }}
+                        />
                     </ResourceImage>
                     <ResourceContent>
                         <ResourceTitle>{resource.title}</ResourceTitle>
