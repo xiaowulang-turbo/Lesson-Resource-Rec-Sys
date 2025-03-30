@@ -18,6 +18,7 @@ import DashBoard from './pages/Dashboard'
 import PageNotFound from './pages/PageNotFound'
 import Settings from './pages/Settings'
 import Users from './pages/Users'
+import ApiTest from './pages/ApiTest'
 import GlobalStyles from './styles/GlobalStyles'
 import AppLayout from './ui/AppLayout'
 import { Toaster } from 'react-hot-toast'
@@ -78,6 +79,7 @@ function App() {
                                     element={<Resources />}
                                 />
                                 <Route path="profile" element={<Profile />} />
+                                <Route path="api-test" element={<ApiTest />} />
                             </Route>
                             <Route path="login" element={<Login />} />
                             <Route path="/" element={<Home />} />
