@@ -1,91 +1,110 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
+import {
+    HiOutlineAcademicCap,
+    HiOutlineBookOpen,
+    HiOutlineUserGroup,
+    HiOutlineWifi,
+} from 'react-icons/hi2'
+import { getSystemStats } from '../services/statsService'
 import Heading from '../ui/Heading'
 import Row from '../ui/Row'
+import StatsCard from '../components/StatsCard'
+import ResourceDistributionChart from '../components/ResourceDistributionChart'
+import MonthlyActiveUsersChart from '../components/MonthlyActiveUsersChart'
+import Spinner from '../ui/Spinner'
 
-const StyledHome = styled.main`
-    padding: 4rem 2.4rem;
-    max-width: 120rem;
-    margin: 0 auto;
-`
-
-const FeaturesGrid = styled.div`
+const StatsContainer = styled.div`
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2.4rem;
-    margin-top: 4rem;
+    margin-bottom: 3.2rem;
 `
 
-const FeatureCard = styled(Link)`
-    background-color: var(--color-grey-0);
-    border-radius: var(--border-radius-md);
-    padding: 2.4rem;
-    text-decoration: none;
-    color: inherit;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s;
+const ChartsContainer = styled.div`
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.4rem;
+    margin-bottom: 3.2rem;
 
-    &:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-md);
+    @media (max-width: 1200px) {
+        grid-template-columns: 1fr;
     }
 `
 
-const FeatureTitle = styled.h3`
-    font-size: 2rem;
-    font-weight: 600;
-    margin-bottom: 1.2rem;
-    color: var(--color-grey-800);
-`
-
-const FeatureDescription = styled.p`
-    font-size: 1.6rem;
-    color: var(--color-grey-500);
-    line-height: 1.6;
-`
-
-const SubHeading = styled.p`
-    font-size: 1.8rem;
-    color: var(--color-grey-500);
-    text-align: center;
-    max-width: 80rem;
-    margin: 0 auto 4rem auto;
-`
-
 function Home() {
+    const [stats, setStats] = useState(null)
+    const [isLoading, setIsLoading] = useState(true)
+    const [error, setError] = useState(null)
+
+    useEffect(() => {
+        async function fetchStats() {
+            try {
+                setIsLoading(true)
+                const data = await getSystemStats()
+                setStats(data)
+            } catch (err) {
+                setError('获取统计数据失败')
+                console.error(err)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        fetchStats()
+    }, [])
+
+    if (isLoading) return <Spinner />
+
+    if (error) return <p>{error}</p>
+
     return (
-        <StyledHome>
-            <Row>
-                <Heading as="h1" type="h4">
-                    欢迎使用学习资源推荐系统
-                </Heading>
-                <SubHeading>发现优质课程，提升学习效率</SubHeading>
+        <>
+            <Row type="horizontal">
+                <Heading as="h1">系统概览</Heading>
             </Row>
 
-            <FeaturesGrid>
-                <FeatureCard to="/courses">
-                    <FeatureTitle>课程中心</FeatureTitle>
-                    <FeatureDescription>
-                        浏览和搜索各类优质课程，找到最适合你的学习资源
-                    </FeatureDescription>
-                </FeatureCard>
+            <StatsContainer>
+                <StatsCard
+                    title="课程总数"
+                    value={stats?.courseCount || 0}
+                    icon={<HiOutlineAcademicCap />}
+                    color="blue"
+                />
+                <StatsCard
+                    title="资源总数"
+                    value={stats?.resourceCount || 0}
+                    icon={<HiOutlineBookOpen />}
+                    color="green"
+                />
+                <StatsCard
+                    title="用户总数"
+                    value={stats?.userCount || 0}
+                    icon={<HiOutlineUserGroup />}
+                    color="indigo"
+                />
+                <StatsCard
+                    title="当前在线"
+                    value={stats?.onlineCount || 0}
+                    icon={<HiOutlineWifi />}
+                    color="yellow"
+                    subtitle="人数"
+                />
+            </StatsContainer>
 
-                <FeatureCard to="/resources">
-                    <FeatureTitle>学习资源</FeatureTitle>
-                    <FeatureDescription>
-                        获取丰富的学习资料，包括文档、视频和练习题
-                    </FeatureDescription>
-                </FeatureCard>
+            <ChartsContainer>
+                <ResourceDistributionChart
+                    data={stats?.resourceDistribution || []}
+                    title="资源类型分布"
+                />
+                <ResourceDistributionChart
+                    data={stats?.difficultyDistribution || []}
+                    title="难度等级分布"
+                />
+            </ChartsContainer>
 
-                <FeatureCard to="/profile">
-                    <FeatureTitle>个人中心</FeatureTitle>
-                    <FeatureDescription>
-                        管理你的学习进度，查看学习历史和个性化推荐
-                    </FeatureDescription>
-                </FeatureCard>
-            </FeaturesGrid>
-        </StyledHome>
+            <MonthlyActiveUsersChart data={stats?.monthlyActiveUsers || []} />
+        </>
     )
 }
 
