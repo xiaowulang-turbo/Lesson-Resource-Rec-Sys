@@ -8,7 +8,7 @@ import {
     HiOutlineBookOpen,
     HiOutlineUserCircle,
 } from 'react-icons/hi2'
-import { HiOutlineCalendar } from 'react-icons/hi2'
+import { HiOutlineCalendar, HiOutlineBeaker } from 'react-icons/hi'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -127,6 +127,12 @@ function MainNav({ isHorizontal = false }) {
                     <StyledNavLink to="/profile" isHorizontal={isHorizontal}>
                         <HiOutlineUserCircle />
                         个人中心
+                    </StyledNavLink>
+                </li>
+                <li>
+                    <StyledNavLink to="/api-test" isHorizontal={isHorizontal}>
+                        <HiOutlineBeaker />
+                        API测试
                     </StyledNavLink>
                 </li>
                 {/* <li>
