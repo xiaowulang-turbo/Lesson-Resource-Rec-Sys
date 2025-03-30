@@ -549,5 +549,121 @@
             "id": 1474030458,
             "ycTextbookId": "F3JL5YQ3N"
         }
+    },
+    {
+        "title": "机器学习及其在航空航天工程中的应用",
+        "description": "本书是航空航天战略性新兴领域\"十四五\"高等教育教材体系建设规划项目的研究成果，以航空航天相关应用场景为牵引，讲解数值计算和机器学习的基本算法和核心思想，并给出其在实际工程和科研中的应用例子。全书分为四个部分。第一部分为第一至三章，建立基本概念，提供Python基础知识，为后续编程实践打好基础。第二部分为第四至十章，介绍数值分析方法，包括方程求解，求微分、解微分方程、插值、拟合、寻优等，这些内容也是航空航天领域算法工程师必须掌握的。第三部分为第十一至十六章，介绍基本机器学习方法，包括K近邻、K均值、支持向量机和神经网络等算法。第四部分为第十七章至二十三章，我们进入一个更\"实战\"的层次，通过数字孪生模型、寿命预测、空间目标分类等例子，将读者代入一个个航空航天工程场景中，体会所学算法的威力，培养同学将复杂工程问题抽象为机器学习算法模型的能力。在编写过程中，贯彻\"空谈无益，动手实践\"这一教学理念。除了剖析各算法数学结构，还给出核心实现的示例代码。在课后作业中，同学将亲自动手，对示例代码进行一定的拓展，切实培养实践能力，获得更多探索的乐趣。本书可作为高等学校高等院校飞行器动力工程、空天智能电推进技术等专业本科生的教材或参考书，也可供航空航天工业部门设计、研究人员参考。",
+        "type": 308,
+        "subject": "航空航天",
+        "grade": "本科",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/15dc7c8b-2f52-4659-9e3d-3574b87a62c3.png",
+        "cover": "https://mooc-image.nosdn.127.net/15dc7c8b-2f52-4659-9e3d-3574b87a62c3.png",
+        "price": 28.0,
+        "originalPrice": 40.0,
+        "authors": "范雨，张浩鹏",
+        "publisher": "高等教育出版社",
+        "createdAt": "2025-01-13T06:37:54.690Z",
+        "updatedAt": "2025-04-18T07:34:09.439Z",
+        "enrollCount": 11,
+        "studyAvatars": [
+            "http://edu-image.nosdn.127.net/5151E863F79DE5EDB857AAFF988A6A17.JPG?imageView&thumbnail=180y180&quality=100",
+            "https://img-ph-mirror.nosdn.127.net/bz-_vkO8c3d7nmMLtUehVg==/1359524137530361292.jpg",
+            "http://nos.netease.com/edu-image/E1170BB8B36E304DD91ADE2AD8CA126D.jpg?imageView&thumbnail=180y180&quality=100"
+        ],
+        "tags": ["机器学习", "航空航天", "数值计算"],
+        "highlightContent": "以实际应用场景为线索，深入讲解数值计算与机器学习算法。从基础概念到实战案例，涵盖全面，代码示例与拓展作业助你提升实操能力，是相关专业学生和业内人士不可多得的优质读物。",
+        "averageRating": 4.6,
+        "metadata": {
+            "id": 1473991460,
+            "ycTextbookId": "P373WU432"
+        }
+    },
+    {
+        "title": "空间机器人技术",
+        "description": "本书为高端装备制造战略性新兴领域\"十四五\"高等教育教材之一。本书基于课题组多年来承担航天领域重大项目及其他国家级项目过程中取得的研究成果，内容涵盖了从空间机器人研究现状、机械臂建模、机械系统设计，到驱动系统、传动系统、传感与控制系统的各个方面。此外，还深入探讨了空间环境对机械臂适应性的要求，并详细介绍了空间机器人地面测试与实验的相关技术。通过详细的理论分析和丰富的实例应用，读者可以系统掌握空间机器人技术的基础知识和前沿进展。书中包含大量图表和实际工程案例，帮助读者更直观地理解复杂的概念和模型。此外，本书还特别关注最新的技术发展，及时融入了当前国内外空间机器人领域的最新研究成果和实践经验。本书是一本系统全面介绍空间机器人领域核心技术的专业教材，主要面向高等院校相关专业的研究生、高年级本科生，以及从事航天工程、机器人技术、自动化控制等领域的科研人员和工程师。",
+        "type": 308,
+        "subject": "航空航天",
+        "grade": "本科及研究生",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/26d00344-42c8-43da-b13e-53842ecdfb5f.png",
+        "cover": "https://mooc-image.nosdn.127.net/26d00344-42c8-43da-b13e-53842ecdfb5f.png",
+        "price": 21.0,
+        "originalPrice": 30.0,
+        "authors": "刘阳 刘伊威",
+        "publisher": "高等教育出版社",
+        "createdAt": "2025-01-11T13:33:03.989Z",
+        "updatedAt": "2025-01-14T22:37:19.724Z",
+        "enrollCount": 5,
+        "studyAvatars": [
+            "http://edu-image.nosdn.127.net/9BB70DFBCAE9393A948CDAA954479434.JPG?imageView&amp;thumbnail=120y120&amp;quality=100",
+            "http://edu-image.nosdn.127.net/4C0A19E897AAE19CDAE22630626B24D4.JPG?imageView&thumbnail=180y180&quality=100",
+            "http://edu-image.nosdn.127.net/4730131CF4548560352CD29FBA435294.JPG?imageView&amp;thumbnail=180y180&amp;quality=100"
+        ],
+        "tags": ["空间机器人", "机械臂", "航空航天", "控制系统"],
+        "highlightContent": "作为 \"十四五\" 高等教育教材，本书依托重大项目成果，系统呈现空间机器人技术。从研究现状到各系统设计，兼顾环境适应性与地面测试。含大量图表案例，融入前沿成果，是高校相关专业本硕生及航天等领域科研人员、工程师的绝佳专业参考。",
+        "averageRating": 4.7,
+        "metadata": {
+            "id": 1474376447,
+            "ycTextbookId": "FKWZ6PQFE"
+        }
+    },
+    {
+        "title": "工业机器人技术基础",
+        "description": "本教材以7个学习项目系统地介绍工业机器人各组成部分及其应用。项目1介绍工业机器人的基本概念、分类及发展，工业机器人的基本结构及典型应用。项目2首先介绍工业机器人的结构基础知识，然后在此基础上介绍六关节机器人的机械结构及关键零部件。项目3主要介绍工业机器人的控制与驱动系统。项目4介绍华数工业机器人的示教器的使用方法及手动操作方法。项目5在工业机器人示教编程概念的基础上，介绍工业机器人程序和文件管理办法以及指令系统。项目6通过几个实例，介绍华数工业机器人的典型应用。项目7介绍工业机器人的日常管理与维护技能。本教材配有在线开放课程和教学课件。本教材适合作为职业院校工业机器人技术、智能机器人技术、机电一体化技术等专业及装备制造大类其他相关专业的教材，也可供相关技术人员参考。",
+        "type": 308,
+        "subject": "机械工程",
+        "grade": "职业院校",
+        "difficulty": 3,
+        "url": "https://mooc-image.nosdn.127.net/d2479178-bee4-48e2-964c-db832cccd066.png",
+        "cover": "https://mooc-image.nosdn.127.net/d2479178-bee4-48e2-964c-db832cccd066.png",
+        "price": 28.0,
+        "originalPrice": 40.0,
+        "authors": "郑火胜 王保军 金磊",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-12-20T06:08:30.649Z",
+        "updatedAt": "2024-12-26T03:00:48.319Z",
+        "enrollCount": 85,
+        "studyAvatars": [
+            "https://img-ph-mirror.nosdn.127.net/T73n1Ujfs3fBCZl5JKYbBQ==/6598194567112600639.jpg",
+            "http://edu-image.nosdn.127.net/C14D868D608BB3FE1384272CEE92E7B8.jpg?imageView&amp;thumbnail=155y100&amp;quality=100",
+            "http://edu-image.nosdn.127.net/65B7BE619CEEFDC47186E9F9A896056E.jpg?imageView&thumbnail=180y180&quality=100"
+        ],
+        "tags": ["工业机器人", "自动化", "机电一体化"],
+        "highlightContent": "《工业机器人技术》是针对职业院校工业机器人及相关专业的教材，系统介绍工业机器人的构成、控制与应用。通过7个学习项目，涵盖了从工业机器人的基本概念、结构、驱动系统到编程、示教操作、典型应用及日常管理与维护等各方面内容。教材配有在线开放课程与教学课件，提供全面的学习资源，帮助学生掌握工业机器人技术的核心知识。适用于工业机器人技术、智能机器人技术及机电一体化等专业的学习和技术人员参考。",
+        "averageRating": 4.4,
+        "metadata": {
+            "id": 1473934449,
+            "ycTextbookId": "F3EKN24FM"
+        }
+    },
+    {
+        "title": "工业机器人现场编程",
+        "description": "本教材紧密结合全国职业院校技能大赛高职组\"工业机器人技术应用\"竞赛设备平台，贯彻落实\"岗课赛证\"综合育人理念，通过5个项目化教学模块，以\"知识+任务\"的形式深入浅出地介绍工业机器人基础知识、KEBAT70R工业机器人示教器的结构与功能、工业机器人基本操作方法、坐标系的建立与应用、编程指令功能与应用、工业机器人程序编写流程与规范、工业机器人程序调试及轨迹优化等内容。本教材为数字教材，具有丰富的数字化教学资源。教材中的知识要点与操作案例，均配套有相关的教学视频和示例程序。同时，配置了动画、图片、微课、习题库等不同类型的教学资源，充分保证了学生自主学习需求，提高了学习效率。本教材适合作为高等职业院校工业机器人技术专业及装备制造大类其他相关专业教材，也可作为相关工程技术人员参考用书和培训教材。",
+        "type": 308,
+        "subject": "机械工程",
+        "grade": "高职高专",
+        "difficulty": 3,
+        "url": "https://mooc-image.nosdn.127.net/266ccef5-e28d-4788-aa8f-5872e11f7a35.png",
+        "cover": "https://mooc-image.nosdn.127.net/266ccef5-e28d-4788-aa8f-5872e11f7a35.png",
+        "price": 31.5,
+        "originalPrice": 45.0,
+        "authors": "武昌俊 杨浩",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-12-20T03:28:18.626Z",
+        "updatedAt": "2024-12-26T08:14:01.236Z",
+        "enrollCount": 52,
+        "studyAvatars": [
+            "https://img-ph-mirror.nosdn.127.net/inG2iKS3I3-GAn4AmOyS0g==/3109172592763268140.jpeg",
+            "http://edu-image.nosdn.127.net/30E36AA1AA6C0954D80A6D885B77F139.jpg?imageView&amp;thumbnail=310x205&amp;quality=100",
+            "http://edu-image.nosdn.127.net/E9D3506983325F81CFC34D38477BBEE9.jpg?imageView&amp;thumbnail=180y180&amp;quality=100"
+        ],
+        "tags": ["工业机器人", "程序编写", "职业教育"],
+        "highlightContent": "《工业机器人技术应用》教材紧密结合全国职业院校技能大赛高职组竞赛平台，融入\"岗课赛证\"综合育人理念，采用项目化教学方式，系统介绍工业机器人基础知识、操作方法、坐标系应用、编程与调试等内容。通过丰富的数字化资源，包括教学视频、示例程序、动画和微课等，全面支持学生的自主学习，提升学习效率。适用于高职院校工业机器人技术及相关专业的教材，也可作为技术人员培训和参考书籍。",
+        "averageRating": 4.5,
+        "metadata": {
+            "id": 1473926445,
+            "ycTextbookId": "P3XSD5CRM"
+        }
     }
 ]
