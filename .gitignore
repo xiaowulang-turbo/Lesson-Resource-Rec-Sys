@@ -1,6 +1,7 @@
 ### TEAMPLATE ###
 #launch.json folder
 .vscode
+.cursor
 
 node_modules
 dist
