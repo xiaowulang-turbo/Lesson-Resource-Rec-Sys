@@ -3,7 +3,7 @@ import { createContext, useContext, useState } from 'react'
 const LayoutContext = createContext()
 
 function LayoutProvider({ children }) {
-    const [isNavbarOnTop, setIsNavbarOnTop] = useState(false)
+    const [isNavbarOnTop, setIsNavbarOnTop] = useState(true)
 
     function toggleNavbarPosition() {
         setIsNavbarOnTop((position) => !position)
