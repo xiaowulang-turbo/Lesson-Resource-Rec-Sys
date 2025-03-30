@@ -53,9 +53,9 @@ function App() {
                         >
                             <Route
                                 index
-                                element={<Navigate replace to="dashboard" />}
+                                element={<Navigate replace to="home" />}
                             />
-                            <Route path="dashboard" element={<DashBoard />} />
+                            <Route path="dashboard" element={<Home />} />
                             <Route path="bookings" element={<Bookings />} />
                             <Route
                                 path="bookings/:bookingId"
@@ -68,6 +68,7 @@ function App() {
                             <Route path="cabins" element={<Cabins />} />
                             <Route path="account" element={<Account />} />
                             <Route path="settings" element={<Settings />} />
+                            <Route path="home" element={<Home />} />
                             <Route path="users" element={<Users />} />
                             <Route path="courses" element={<Courses />} />
                             <Route path="resources" element={<Resources />} />
