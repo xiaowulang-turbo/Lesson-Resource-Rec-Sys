@@ -7,6 +7,12 @@ const API_URL = `${BASE_URL}/stats`
 
 // 获取系统统计数据
 export const getSystemStats = async () => {
+    // 由于后端API未实现，直接使用模拟数据
+    console.log('使用模拟统计数据')
+    return generateMockStats()
+
+    // 下面的代码注释掉，避免404错误
+    /*
     try {
         // 这里假设后端有统计接口，如果没有，可以前端聚合数据
         const response = await axios.get(API_URL)
@@ -16,6 +22,7 @@ export const getSystemStats = async () => {
         // 如果后端接口不存在，我们在前端模拟一些数据
         return generateMockStats()
     }
+    */
 }
 
 // 生成模拟统计数据
