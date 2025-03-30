@@ -4,6 +4,8 @@ import { getRecommendedCourses } from '../services/courseService'
 import Spinner from '../ui/Spinner'
 import Empty from '../ui/Empty'
 import Heading from '../ui/Heading'
+import Modal from '../ui/Modal'
+import CourseDetail from './CourseDetail'
 
 const StyledContainer = styled.div`
     background-color: var(--color-grey-0);
@@ -25,6 +27,7 @@ const CourseCard = styled.div`
     border-radius: var(--border-radius-md);
     padding: 1.6rem;
     transition: all 0.3s;
+    cursor: pointer;
 
     &:hover {
         transform: translateY(-2px);
@@ -103,6 +106,7 @@ function RecommendedCourses() {
     const [courses, setCourses] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [selectedCourseId, setSelectedCourseId] = useState(null)
 
     useEffect(() => {
         const fetchRecommendedCourses = async () => {
@@ -120,47 +124,82 @@ function RecommendedCourses() {
         fetchRecommendedCourses()
     }, [])
 
+    useEffect(() => {
+        if (selectedCourseId) {
+            console.log('RecommendedCourses - 选中的课程ID:', selectedCourseId)
+        }
+    }, [selectedCourseId])
+
+    const handleCourseSelect = (courseId) => {
+        console.log('点击推荐课程卡片，课程ID类型:', typeof courseId)
+        console.log('点击推荐课程卡片，课程ID值:', courseId)
+        setSelectedCourseId(courseId)
+    }
+
     if (loading) return <Spinner />
     if (error) return <p>{error}</p>
     if (!courses.length) return <Empty resource={'recommended courses'} />
 
     return (
-        <StyledContainer>
-            <Heading as="h2">推荐课程</Heading>
+        <Modal>
+            <StyledContainer>
+                <Heading as="h2">推荐课程</Heading>
 
-            <CourseGrid>
-                {courses.map((course, index) => (
-                    <CourseCard key={`${course.course_id}-${index}`}>
-                        <CourseTitle>{course.course_title}</CourseTitle>
-                        <CourseOrganization>
-                            {course.course_organization}
-                        </CourseOrganization>
-
-                        <CourseInfo>
-                            <Rating>
-                                <CourseRating>
-                                    {course.course_rating}
-                                </CourseRating>
-                                <span>★</span>
-                            </Rating>
-
-                            <Label
-                                type="difficulty"
-                                value={course.course_difficulty}
+                <CourseGrid>
+                    {courses.map((course, index) => (
+                        <Modal.Open
+                            key={`${course.course_id}-${index}`}
+                            opens="recommended-course-detail"
+                        >
+                            <CourseCard
+                                onClick={() =>
+                                    handleCourseSelect(course.course_id)
+                                }
                             >
-                                {course.course_difficulty}
-                            </Label>
+                                <CourseTitle>{course.course_title}</CourseTitle>
+                                <CourseOrganization>
+                                    {course.course_organization}
+                                </CourseOrganization>
 
-                            <Label type="students">
-                                {course.course_students_enrolled} 学生
-                            </Label>
-                        </CourseInfo>
+                                <CourseInfo>
+                                    <Rating>
+                                        <CourseRating>
+                                            {course.course_rating}
+                                        </CourseRating>
+                                        <span>★</span>
+                                    </Rating>
 
-                        <Description>{course.course_description}</Description>
-                    </CourseCard>
-                ))}
-            </CourseGrid>
-        </StyledContainer>
+                                    <Label
+                                        type="difficulty"
+                                        value={course.course_difficulty}
+                                    >
+                                        {course.course_difficulty}
+                                    </Label>
+
+                                    <Label type="students">
+                                        {course.course_students_enrolled} 学生
+                                    </Label>
+                                </CourseInfo>
+
+                                <Description>
+                                    {course.course_description}
+                                </Description>
+                            </CourseCard>
+                        </Modal.Open>
+                    ))}
+                </CourseGrid>
+            </StyledContainer>
+
+            <Modal.Window name="recommended-course-detail">
+                <CourseDetail
+                    courseId={selectedCourseId}
+                    onCloseModal={() => {
+                        console.log('关闭推荐课程详情模态框')
+                        setSelectedCourseId(null)
+                    }}
+                />
+            </Modal.Window>
+        </Modal>
     )
 }
 
