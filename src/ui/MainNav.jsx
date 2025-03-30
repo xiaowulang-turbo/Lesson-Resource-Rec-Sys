@@ -60,6 +60,12 @@ function MainNav() {
     return (
         <nav>
             <NavList>
+                <li>
+                    <StyledNavLink to="/home">
+                        <HiOutlineHome />
+                        首页
+                    </StyledNavLink>
+                </li>
                 {/* <li>
                     <StyledNavLink to="/dashboard">
                         <HiOutlineHome />
