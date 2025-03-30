@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 
 // 限制请求
 const limiter = rateLimit({
-    max: 100,
+    max: 200,
     windowMs: 15 * 60 * 1000,
     message: '来自此IP的请求过多，请稍后再试',
 })
