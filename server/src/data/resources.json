@@ -288,5 +288,266 @@
             "id": 1473934458,
             "ycTextbookId": "F3UFRU7FH"
         }
+    },
+    {
+        "title": "智能导航原理与方法",
+        "description": "本书是航空航天战略性新兴领域\"十四五\"高等教育教材，可作为航空航天类无人驾驶航空器系统工程专业教材。本书从导航技术概念开始，讲解导航技术的发展和趋势，引出智能导航的概念内涵、系统架构和软硬件组成；进一步围绕智能导航相关技术展开介绍。在深入讲解智能导航基本原理、核心技术、重要工具的基础上，每章节内容均安排有相关技术的实践探索环节，帮助学生在动手实践过程中学以致用。同时，教材结合当前大模型、通用人工智能等前沿技术，讲解智能导航方法的新方向，了解智能导航在认知技术、仿生技术、协同技术等方向的新进展，为学生从事相关研究工作奠定基础，更强调系统思维对学生未来创新思维的促进作用。",
+        "type": 308,
+        "subject": "航空航天",
+        "grade": "本科",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/f24596d6-3691-4ff7-900b-f7689ecbd21a.png",
+        "cover": "https://mooc-image.nosdn.127.net/f24596d6-3691-4ff7-900b-f7689ecbd21a.png",
+        "price": 28.0,
+        "originalPrice": 40.0,
+        "authors": "杨毅 宋文杰",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-12-23T03:49:37.747Z",
+        "updatedAt": "2024-12-15T01:45:55.516Z",
+        "enrollCount": 25,
+        "studyAvatars": [
+            "http://img6.ph.126.net/3xu1ruQqSNadBjc4qYEdNQ==/6597993356424133586.jpg",
+            "http://nos.netease.com/edu-image/76055219BF02A0414203BF6552FDB9FA-1444803269528?imageView&thumbnail=180y180&quality=100",
+            "http://nos.netease.com/edu-image/51449463ADB280A7973CF1A8851151E8.jpg?imageView&thumbnail=120y120&quality=100"
+        ],
+        "tags": ["智能导航", "航空航天", "人工智能"],
+        "highlightContent": "同时，教材结合当前大模型、通用人工智能等前沿技术，讲解智能导航方法的新方向，了解智能导航在认知技术、仿生技术、协同技术等方向的新进展，为学生从事相关研究工作奠定基础，更强调系统思维对学生未来创新思维的促进作用。",
+        "averageRating": 4.5,
+        "metadata": {
+            "id": 1473946456,
+            "ycTextbookId": "PKQ76G4KN"
+        }
+    },
+    {
+        "title": "飞行器智能设计技术",
+        "description": "本书是高等学校航空航天专业飞行器设计方向的核心专业课教材全面系统阐述人工智能在飞行设计中的应用。全书共八章，主要包括飞行器的智能设计技术体系、体系智能设计、总体智能设计、气动智能设计、结构智能设计、控制智能设计、机电智能设计等内容。本书可作为高等学院校航空宇航科学与技术、人工智能、控制科学与工程、计算机科学与技术等相关学科领域科研工作者、工程技术人员的参考书，相关专业研究生和高年级本科生的教科书。",
+        "type": 308,
+        "subject": "航空航天",
+        "grade": "本科及研究生",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/9eb0ce45-b525-4650-ae8e-9e2601a25a08.png",
+        "cover": "https://mooc-image.nosdn.127.net/9eb0ce45-b525-4650-ae8e-9e2601a25a08.png",
+        "price": 42.0,
+        "originalPrice": 60.0,
+        "authors": "周尧明 罗明强 刘尧龙",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-12-14T06:38:55.676Z",
+        "updatedAt": "2024-12-15T02:26:47.486Z",
+        "enrollCount": 2,
+        "studyAvatars": [
+            "http://edu-image.nosdn.127.net/65B7BE619CEEFDC47186E9F9A896056E.jpg?imageView&thumbnail=180y180&quality=100",
+            "http://edu-image.nosdn.127.net/7506E9174B91140CC28E76B89B8F4929.jpg?imageView&amp;thumbnail=180y180&amp;quality=100",
+            "https://edu-image.nosdn.127.net/E4AAF65E210D7D3D64EF7DB0BD12E4A3.jpeg?imageView&amp;thumbnail=180y180&amp;quality=100"
+        ],
+        "tags": ["飞行器设计", "智能设计", "人工智能"],
+        "highlightContent": "这本飞行器设计核心专业课教材，聚焦人工智能在飞行设计中的应用，系统梳理八大关键板块。从体系到各关键环节，都有深度讲解。它既是高校相关专业本科生、研究生的优质教科书，也是科研与工程人员不可多得的参考书。",
+        "averageRating": 4.7,
+        "metadata": {
+            "id": 1473991462,
+            "ycTextbookId": "F339WGE32"
+        }
+    },
+    {
+        "title": "汽车智能座舱技术",
+        "description": "本书是教育部战略性新兴领域\"十四五\"高等教育教材体系建设项目的研究成果，全面介绍了\"智能网联和新能源汽车\"相关专业的国内外发展现状及课程教材建设情况。新一轮科技革命与产业变革加速演进，智能网联汽车成为跨行业、多领域先进技术集成应用的载体，也将成为万物互联时代驱动智能交通、智慧能源、智慧城市深度融合发展的超级终端。智能座舱是智能汽车各类新技术的综合应用空间，能够为驾乘人员提供高安全性、舒适性与宜人性驾乘体验，是传统汽车制造业向智能汽车产业生态升级的入口，是汽车智能化、网联化、电动化与共享化的最佳交汇点。汽车由单一的出行工具向\"第三生活空间\"演进，座舱的形态、功能以及交互方式逐步发生变化，已从传统\"人适应车\"，逐步转变为\"车适应人\"，并向着未来\"人车相互适应\"的自然交互服务发展演进。",
+        "type": 308,
+        "subject": "汽车工程",
+        "grade": "本科",
+        "difficulty": 3,
+        "url": "https://mooc-image.nosdn.127.net/aec2e70c-8f52-453c-b66a-399d15bab1dd.png",
+        "cover": "https://mooc-image.nosdn.127.net/aec2e70c-8f52-453c-b66a-399d15bab1dd.png",
+        "price": 34.3,
+        "originalPrice": 49.0,
+        "authors": "高镇海 胡宏宇 赵睿",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-12-23T03:50:16.035Z",
+        "updatedAt": "2024-12-25T03:58:46.850Z",
+        "enrollCount": 14,
+        "studyAvatars": [
+            "http://edu-image.nosdn.127.net/4C0A19E897AAE19CDAE22630626B24D4.JPG?imageView&thumbnail=180y180&quality=100",
+            "http://img7.ph.126.net/e4YwqrX-vDSRK2iIQE-EdQ==/6597925186703441107.jpg",
+            "https://img-ph-mirror.nosdn.127.net/T73n1Ujfs3fBCZl5JKYbBQ==/6598194567112600639.jpg"
+        ],
+        "tags": ["智能座舱", "汽车工程", "新能源汽车"],
+        "highlightContent": "本书全面介绍智能网联与新能源汽车领域的最新发展，深入探讨智能汽车座舱技术，涵盖硬件、系统软件、多模态交互等关键技术。适用于车辆工程专业及智能座舱技术研究人员，帮助读者了解汽车智能化与未来发展趋势。",
+        "averageRating": 4.6,
+        "metadata": {
+            "id": 1473946458,
+            "ycTextbookId": "PK3QDU6KN"
+        }
+    },
+    {
+        "title": "模式识别及航空航天应用",
+        "description": "本书是航空航天战略性新兴领域\"十四五\"高等教育教材体系建设规划项目的研究成果，是模式识别领域的基础教材，包含理论、实验和应用三方面内容。理论知识以统计模式识别为主，包括线性分类器、非线性分类器、特征提取、非监督聚类、神经网络等，立足经典理论和现代方法；实验部分围绕卫星目标识别综合项目，设计了一整套层次递进的实验内容，理论支撑实践，实践深化理论。应用部分结合航空航天实际工程案例对理论进行应用分析，实现了模式识别理论与实际工程应用的深度融合。",
+        "type": 308,
+        "subject": "航空航天",
+        "grade": "本科及研究生",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/2cd9abf1-2e68-48f0-9089-691272bcfed2.png",
+        "cover": "https://mooc-image.nosdn.127.net/2cd9abf1-2e68-48f0-9089-691272bcfed2.png",
+        "price": 27.93,
+        "originalPrice": 39.9,
+        "authors": "谢凤英",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-12-23T03:50:42.430Z",
+        "updatedAt": "2024-12-15T01:29:44.026Z",
+        "enrollCount": 17,
+        "studyAvatars": [
+            "http://nos.netease.com/edu-image/CA8B501D06B35DF18F758F8A52B2E0E3.jpg?imageView&thumbnail=310y307&quality=100",
+            "https://img-ph-mirror.nosdn.127.net/e0fM9k9s3kDUHtWVR0yV_g==/6619139164049020011.png",
+            "https://mooc-image.nosdn.127.net/a86c0ef2caf2475db8efafc86a72ea82.jpg"
+        ],
+        "tags": ["模式识别", "航空航天", "人工智能"],
+        "highlightContent": "适用于空天智能、人工智能、电子信息、自动化及计算机等专业的本科生、研究生，也适合人工智能领域的研究人员和工程技术人员参考。",
+        "averageRating": 4.6,
+        "metadata": {
+            "id": 1473946460,
+            "ycTextbookId": "F3XDHUNY4"
+        }
+    },
+    {
+        "title": "航空智能电推进原理",
+        "description": "本书是航空航天新兴领域\"十四五\"高等教育教材之一，聚焦航空电推进学术前沿，注重理论和方法凝练，是该领域国内第一本教材。全书内容共14章，包括绪论、航空电推进系统总体构型、涡喷发动机、涡扇发动机、涡轴发动机、涡桨发动机、能源、功率电子、航空电机、推进器、智能控制、能量管理、性能计算与评估、系统性能优化等。",
+        "type": 308,
+        "subject": "航空航天",
+        "grade": "本科及研究生",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/e37e059f-34e8-42a7-a59f-f7d3b93c7cae.png",
+        "cover": "https://mooc-image.nosdn.127.net/e37e059f-34e8-42a7-a59f-f7d3b93c7cae.png",
+        "price": 41.3,
+        "originalPrice": 59.0,
+        "authors": "闫晓军",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-12-14T06:38:44.662Z",
+        "updatedAt": "2024-12-15T10:07:30.689Z",
+        "enrollCount": 3,
+        "studyAvatars": [
+            "https://edu-image.nosdn.127.net/3A41AF829B26F24D6CA8737A8E1D5C81.jpg?imageView&thumbnail=180y180&quality=100",
+            "http://nos.netease.com/edu-image/2612B8ACAF93E503AAEB32518A60924C.jpg?imageView&thumbnail=120y120&quality=100",
+            "https://img5.ph.126.net/3OvCH58rntdmY1bBVjM4Lw==/6597805339935825725.jpeg"
+        ],
+        "tags": ["航空电推进", "智能控制", "航空航天"],
+        "highlightContent": "国内首部航空电推进领域 \"十四五\" 高等教育教材震撼来袭！它紧密追踪学术前沿，精心凝练理论与方法。丰富内容涵盖全体系，既适合高校相关专业教学，又能为工程技术人员提供助力，是航空航天领域不可多得的专业宝典。",
+        "averageRating": 4.7,
+        "metadata": {
+            "id": 1473991461,
+            "ycTextbookId": "PKAQFUE3N"
+        }
+    },
+    {
+        "title": "智能电动汽车试验学",
+        "description": "智能电动汽车是未来汽车科技的战略制高点，而科学完善的试验体系是智能电动汽车研发与规模化应用的基础。本书汇聚国内《汽车试验学》课程的众多优秀教学团队，结合行业最新前沿技术，系统介绍了智能电动汽车试验的基本原理、基本方法和典型技术。全书共七章，第一章为概述；第二至四章阐明了汽车试验基础理论与方法、试验数据处理与分析方法，介绍了典型汽车试验设备与设施；第五章简要讲述了整车基本性能试验方法；第六章详细讲解了电动汽车及关键零部件性能试验方法；第七章系统讲述了智能汽车及关键系统性能试验方法。",
+        "type": 308,
+        "subject": "汽车工程",
+        "grade": "本科",
+        "difficulty": 3,
+        "url": "https://mooc-image.nosdn.127.net/a05040a9-eef2-4b87-8b9c-7918779e361a.png",
+        "cover": "https://mooc-image.nosdn.127.net/a05040a9-eef2-4b87-8b9c-7918779e361a.png",
+        "price": 21.0,
+        "originalPrice": 30.0,
+        "authors": "朱冰",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-12-14T06:39:25.063Z",
+        "updatedAt": "2024-12-15T12:19:09.049Z",
+        "enrollCount": 2,
+        "studyAvatars": [
+            "http://edu-image.nosdn.127.net/1544ACF531D3EE5FF1626A488CF9FF13.jpg?imageView&amp;thumbnail=180y180&amp;quality=100",
+            "https://mooc-image.nosdn.127.net/492cabaadbda41a386b44cfe4726c009.jpg",
+            "https://edu-image.nosdn.127.net/2854CCB51700C8938BAAD087AEE33211.jpg?imageView&amp;thumbnail=180y180&amp;quality=100"
+        ],
+        "tags": ["电动汽车", "智能汽车", "试验学"],
+        "highlightContent": "《智能电动汽车试验》由众多优秀教学团队合力打造，紧扣行业前沿。全书七章，系统阐述试验原理、方法与技术，从基础理论到整车、电动汽车及智能汽车关键系统性能试验一应俱全。是高校车辆专业教材，也是行业从业者的得力技术参考。",
+        "averageRating": 4.5,
+        "metadata": {
+            "id": 1474016461,
+            "ycTextbookId": "F3NEDRY32"
+        }
+    },
+    {
+        "title": "高等学校航空航天类新兴领域专业人才培养研究报告暨核心课程体系",
+        "description": "本书是\"智能+航空航天\"战略性新兴领域\"十四五\"高等教育教材体系建设规划项目的研究成果，全面介绍了\"智能+航空航天\"相关专业的国内外发展现状及课程教材建设情况，内容包括\"智能+航空航天\"教材建设的研究报告、建设方案、支撑专业、配套课程四个部分。第一部分为航空航天类新兴领域教材研究与实践项目研究报告，调研并分析了国内外航空航天专业人才培养需求、专业设置情况、课程与教材建设情况等；第二部分为航空航天类战略性新兴领域教材建设方案，阐述了\"智能+航空航天\"战略性新兴领域教材体系的建设目标、建设基础、建设计划与教材规划；第三部分为航空航天类战略性新兴领域教材支撑专业，梳理了北京航空航天大学、南京航空航天大学、沈阳航空航天大学相关专业的培养方案；第四部分为航空航天类战略性新兴领域核心课程教学大纲，介绍了\"智能+航空航天\"战略性新兴领域教材体系重点支撑的20门核心课程的知识体系。",
+        "type": 308,
+        "subject": "航空航天",
+        "grade": "高等教育",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/5dfe0992-b112-46f3-92e9-f1b389f9354b.png",
+        "cover": "https://mooc-image.nosdn.127.net/5dfe0992-b112-46f3-92e9-f1b389f9354b.png",
+        "price": 34.3,
+        "originalPrice": 49.0,
+        "authors": "陶智",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-12-23T03:47:21.883Z",
+        "updatedAt": "2024-12-15T01:10:19.758Z",
+        "enrollCount": 24,
+        "studyAvatars": [
+            "http://edu-image.nosdn.127.net/4F5EEB17AA148427B1F046449D12100E.jpg?imageView&amp;thumbnail=180y180&amp;quality=100",
+            "http://nos.netease.com/edu-image/ABE2968CD1AA7D9B9EF4F27D21CDCAF9.JPG?imageView&amp;thumbnail=180y180&amp;quality=100",
+            "http://edu-image.nosdn.127.net/7F3192E85C0E886A90EE5831E473B63E.jpg?imageView&amp;thumbnail=180y180&amp;quality=100"
+        ],
+        "tags": ["航空航天", "智能技术", "教育研究"],
+        "highlightContent": "本书全面介绍了\"智能+航空航天\"领域的发展现状与教材建设，涵盖教材研究报告、建设方案、支撑专业和核心课程教学大纲，为航空航天类课程教学与课程体系建设提供了理论与实践参考。适合高等院校教师及教学管理部门使用。",
+        "averageRating": 4.5,
+        "metadata": {
+            "id": 1473946447,
+            "ycTextbookId": "P32L5GEKN"
+        }
+    },
+    {
+        "title": "区域轨道交通协同运输与服务",
+        "description": "本书是由西南交通大学翟婉明院士牵头的教育部战略性新兴领域\"十四五\"高等教育教材体系建设项目成果之一，以典型区域的多制式轨道交通复合网络为研究对象，探索安全、畅通、便捷、合理的区域轨道交通发展模式。内容共10章：绪论，区域轨道交通协同运输与服务需求，区域轨道交通多网融合规划，区域轨道交通协同运输组织模式，区域轨道交通运输计划，区域轨道交通网络运输能力，区域轨道交通协同调度指挥，区域轨道交通联程运输服务，区域轨道交通协同安全保障，区域轨道交通协同运输与服务质量评估。",
+        "type": 308,
+        "subject": "交通运输",
+        "grade": "本科及研究生",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/68d1b77a-14f7-444c-ba37-45b4a5d5f972.png",
+        "cover": "https://mooc-image.nosdn.127.net/68d1b77a-14f7-444c-ba37-45b4a5d5f972.png",
+        "price": 31.5,
+        "originalPrice": 45.0,
+        "authors": "彭其渊 刘岭 鲁工圆",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-12-14T06:38:09.422Z",
+        "updatedAt": "2024-12-15T10:00:50.095Z",
+        "enrollCount": 4,
+        "studyAvatars": [
+            "https://img-ph-mirror.nosdn.127.net/TTyvw1N7lpzERXev5nNKhQ==/6597555750797459015.jpg",
+            "http://nos.netease.com/edu-image/E1170BB8B36E304DD91ADE2AD8CA126D.jpg?imageView&thumbnail=180y180&quality=100",
+            "http://nos.netease.com/edu-image/2612B8ACAF93E503AAEB32518A60924C.jpg?imageView&thumbnail=120y120&quality=100"
+        ],
+        "tags": ["轨道交通", "协同运输", "智慧交通"],
+        "highlightContent": "这本由翟婉明院士牵头的智慧交通 \"十四五\" 高等教育教材，聚焦多制式轨道交通复合网络，深入剖析区域轨道交通从规划到运营的全流程关键环节。内容全面，兼具理论深度与实践价值，无论是高校教师教学，还是教学管理部门课程体系建设，都不容错过。",
+        "averageRating": 4.6,
+        "metadata": {
+            "id": 1474027465,
+            "ycTextbookId": "P37U5YW3N"
+        }
+    },
+    {
+        "title": "区域轨道交通网络规划理论与新经济分析方法",
+        "description": "本书为数字教材，已列入教育部战略性新兴领域\"十四五\"高等教育教材体系系列。本书从轨道交通与轨道交通产业基础特性入手，涉及新经济理论导论与轨道交通线网规划理论两大领域，主要内容包括轨道交通及轨道交通产业、新经济与产业发展升级的融合方式、轨道交通产业新经济分析、轨道交通线网规划概述、轨道交通运输需求预测理论与方法、轨道交通线网规模匡算理论与方法、轨道交通线网规划理论与方法、四网融合的区域轨道服务网络优化方法等8章。本书可作为高等学校交通运输及相关专业教材，供本科与研究生教学使用，也可供交通运输从业人员参考。",
+        "type": 308,
+        "subject": "交通运输",
+        "grade": "本科及研究生",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/559df41d-fe43-499a-8990-7a48a0cd1771.png",
+        "cover": "https://mooc-image.nosdn.127.net/559df41d-fe43-499a-8990-7a48a0cd1771.png",
+        "price": 34.3,
+        "originalPrice": 49.0,
+        "authors": "卢春房，帅斌，刘晓波",
+        "publisher": "高等教育出版社",
+        "createdAt": "2024-12-14T06:40:19.510Z",
+        "updatedAt": "2024-12-15T12:13:52.501Z",
+        "enrollCount": 3,
+        "studyAvatars": [
+            "http://img7.ph.126.net/wCP6FrdohcT2rBvROS7-Jw==/41658296571203767.jpg",
+            "https://img-ph-mirror.nosdn.127.net/TTyvw1N7lpzERXev5nNKhQ==/6597555750797459015.jpg",
+            "https://img-ph-mirror.nosdn.127.net/to6pOnFQHaAPSg_pRLxbyQ==/2207045292489032396.jpg"
+        ],
+        "tags": ["轨道交通", "网络规划", "新经济分析"],
+        "highlightContent": "这本数字教材从轨道交通基础特性切入，融合新经济理论与线网规划理论，内容丰富，涵盖产业分析、需求预测、线网规划等。适用于高校交通运输专业本硕教学，也是交通从业者的实用参考资料 。",
+        "averageRating": 4.5,
+        "metadata": {
+            "id": 1474030458,
+            "ycTextbookId": "F3JL5YQ3N"
+        }
     }
 ]
