@@ -33,7 +33,6 @@ function ResourceFilter({ onFilterChange }) {
     const typeOptions = [
         { value: 'all', label: '所有类型' },
         { value: '308', label: '电子教材' },
-        { value: '309', label: '视频课程' },
         { value: '310', label: '实践项目' },
         { value: '311', label: '练习题库' },
         { value: '312', label: '参考资料' },
