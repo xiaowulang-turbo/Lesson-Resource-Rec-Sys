@@ -1,13 +1,14 @@
 import styled from 'styled-components'
 import Empty from '../ui/Empty'
+import { useState } from 'react'
 
 // 更换为可用的占位图片URL
 const PLACEHOLDER_IMAGE = 'https://picsum.photos/400/180?blur=2'
 
 const ResourceGrid = styled.div`
     display: grid;
-    /* grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); */
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    grid-template-columns: ${({ layout }) =>
+        layout === 'grid' ? 'repeat(auto-fill, minmax(400px, 1fr))' : '1fr'};
     gap: 2.4rem;
     margin-bottom: 2.4rem;
 `
@@ -18,6 +19,8 @@ const ResourceCard = styled.div`
     overflow: hidden;
     box-shadow: var(--shadow-sm);
     transition: all 0.3s;
+    display: ${({ layout }) => (layout === 'list' ? 'flex' : 'block')};
+    align-items: ${({ layout }) => (layout === 'list' ? 'center' : 'stretch')};
 
     &:hover {
         transform: translateY(-2px);
@@ -152,7 +155,33 @@ const Tag = styled.span`
     color: var(--color-grey-600);
 `
 
+const LayoutToggle = styled.button`
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    padding: 1rem 1.5rem;
+    background-color: var(--color-grey-0);
+    border: 1px solid var(--color-grey-300);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    z-index: 1000;
+    transition: all 0.3s;
+
+    &:hover {
+        background-color: var(--color-grey-50);
+    }
+`
+
 function ResourceList({ resources }) {
+    const [layout, setLayout] = useState('grid') // 'grid' 或 'list'
+
+    const toggleLayout = () => {
+        setLayout((prev) => (prev === 'grid' ? 'list' : 'grid'))
+    }
+
     if (!resources.length) return <Empty resource={'resources'} />
 
     // 资源类型映射
@@ -179,73 +208,84 @@ function ResourceList({ resources }) {
     }
 
     return (
-        <ResourceGrid>
-            {resources.map((resource) => (
-                <ResourceCard
-                    key={resource._id || resource.id || resource.metadata?.id}
-                >
-                    <ResourceImage>
-                        <img
-                            src={resource.url || PLACEHOLDER_IMAGE}
-                            alt={resource.title}
-                            onError={(e) => {
-                                e.target.src = PLACEHOLDER_IMAGE
-                            }}
-                        />
-                    </ResourceImage>
-                    <ResourceContent>
-                        <ResourceTitle>{resource.title}</ResourceTitle>
-                        <ResourcePublisher>
-                            {resource.publisher || '未知出版社'} ·{' '}
-                            {resource.authors || '未知作者'}
-                        </ResourcePublisher>
+        <>
+            <ResourceGrid layout={layout}>
+                {resources.map((resource) => (
+                    <ResourceCard
+                        key={
+                            resource._id || resource.id || resource.metadata?.id
+                        }
+                        layout={layout}
+                    >
+                        <ResourceImage>
+                            <img
+                                src={resource.url || PLACEHOLDER_IMAGE}
+                                alt={resource.title}
+                                onError={(e) => {
+                                    e.target.src = PLACEHOLDER_IMAGE
+                                }}
+                            />
+                        </ResourceImage>
+                        <ResourceContent>
+                            <ResourceTitle>{resource.title}</ResourceTitle>
+                            <ResourcePublisher>
+                                {resource.publisher || '未知出版社'} ·{' '}
+                                {resource.authors || '未知作者'}
+                            </ResourcePublisher>
 
-                        <ResourceInfo>
-                            <Rating>
-                                <ResourceRating>
-                                    {resource.averageRating?.toFixed(1) ||
-                                        '暂无'}
-                                </ResourceRating>
-                                <span>★</span>
-                            </Rating>
+                            <ResourceInfo>
+                                <Rating>
+                                    <ResourceRating>
+                                        {resource.averageRating?.toFixed(1) ||
+                                            '暂无'}
+                                    </ResourceRating>
+                                    <span>★</span>
+                                </Rating>
 
-                            <Label
-                                type="difficulty"
-                                value={resource.difficulty}
-                            >
-                                {getDifficultyLabel(resource.difficulty)}
-                            </Label>
+                                <Label
+                                    type="difficulty"
+                                    value={resource.difficulty}
+                                >
+                                    {getDifficultyLabel(resource.difficulty)}
+                                </Label>
 
-                            <Label type="students">
-                                {resource.enrollCount || 0} 人学习
-                            </Label>
+                                <Label type="students">
+                                    {resource.enrollCount || 0} 人学习
+                                </Label>
 
-                            {resource.price > 0 && (
-                                <Label type="price">¥{resource.price}</Label>
-                            )}
-                        </ResourceInfo>
+                                {resource.price > 0 && (
+                                    <Label type="price">
+                                        ¥{resource.price}
+                                    </Label>
+                                )}
+                            </ResourceInfo>
 
-                        <Description>{resource.description}</Description>
+                            <Description>{resource.description}</Description>
 
-                        <TagContainer>
-                            <Tag>{getResourceType(resource.type)}</Tag>
-                            {resource.tags &&
-                                resource.tags.map((tag) => (
-                                    <Tag
-                                        key={`${
-                                            resource._id ||
-                                            resource.id ||
-                                            resource.metadata?.id
-                                        }-${tag}`}
-                                    >
-                                        {tag}
-                                    </Tag>
-                                ))}
-                        </TagContainer>
-                    </ResourceContent>
-                </ResourceCard>
-            ))}
-        </ResourceGrid>
+                            <TagContainer>
+                                <Tag>{getResourceType(resource.type)}</Tag>
+                                {resource.tags &&
+                                    resource.tags.map((tag) => (
+                                        <Tag
+                                            key={`${
+                                                resource._id ||
+                                                resource.id ||
+                                                resource.metadata?.id
+                                            }-${tag}`}
+                                        >
+                                            {tag}
+                                        </Tag>
+                                    ))}
+                            </TagContainer>
+                        </ResourceContent>
+                    </ResourceCard>
+                ))}
+            </ResourceGrid>
+
+            <LayoutToggle onClick={toggleLayout}>
+                {layout === 'grid' ? '切换为列表视图' : '切换为网格视图'}
+            </LayoutToggle>
+        </>
     )
 }
 
