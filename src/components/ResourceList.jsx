@@ -31,6 +31,12 @@ const ResourceCard = styled.div`
 const ResourceImage = styled.div`
     height: 180px;
     overflow: hidden;
+    ${({ layout }) =>
+        layout === 'list' &&
+        `
+        flex: 0 0 320px;
+        width: 320px;
+    `}
 
     img {
         width: 100%;
@@ -46,6 +52,12 @@ const ResourceImage = styled.div`
 
 const ResourceContent = styled.div`
     padding: 1.6rem 2rem;
+    ${({ layout }) =>
+        layout === 'list' &&
+        `
+        flex: 1;
+        overflow: hidden;
+    `}
 `
 
 const ResourceTitle = styled.h3`
@@ -217,7 +229,7 @@ function ResourceList({ resources }) {
                         }
                         layout={layout}
                     >
-                        <ResourceImage>
+                        <ResourceImage layout={layout}>
                             <img
                                 src={resource.url || PLACEHOLDER_IMAGE}
                                 alt={resource.title}
@@ -226,7 +238,7 @@ function ResourceList({ resources }) {
                                 }}
                             />
                         </ResourceImage>
-                        <ResourceContent>
+                        <ResourceContent layout={layout}>
                             <ResourceTitle>{resource.title}</ResourceTitle>
                             <ResourcePublisher>
                                 {resource.publisher || '未知出版社'} ·{' '}
