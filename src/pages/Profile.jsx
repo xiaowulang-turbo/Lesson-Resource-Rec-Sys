@@ -4,6 +4,7 @@ import Row from '../ui/Row'
 import styled from 'styled-components'
 import Button from '../ui/Button'
 import Tag from '../ui/Tag'
+import { useNavigate } from 'react-router-dom'
 import {
     HiOutlineAcademicCap,
     HiOutlineBookOpen,
@@ -179,6 +180,7 @@ const TagContainer = styled.div`
 `
 
 function Profile() {
+    const navigate = useNavigate()
     // 示例数据，实际应该从API获取
     const [activeTab, setActiveTab] = useState('uploads')
     const mockUser = {
@@ -287,6 +289,20 @@ function Profile() {
         },
     ]
 
+    const handleNavigateToTeachingTools = (tool) => {
+        // 这里可以根据工具类型跳转到不同页面或账号设置的不同选项卡
+        // 现在先简单实现，统一跳转到账号设置
+        navigate('/account')
+    }
+
+    const handleResourceClick = (resourceId, type) => {
+        // 在实际应用中，这里应该跳转到资源详情页
+        console.log(`查看${type}资源: ${resourceId}`)
+        // 示例跳转 - 实际项目中应替换为真实路由
+        // navigate(`/resources/${resourceId}`);
+        alert(`您点击了ID为${resourceId}的${type}资源`)
+    }
+
     return (
         <>
             <Row type="horizontal">
@@ -302,7 +318,11 @@ function Profile() {
                                 <HiOutlineUserCircle />
                                 <h2>个人资料</h2>
                             </SectionIcon>
-                            <Button size="small" variation="secondary">
+                            <Button
+                                size="small"
+                                variation="secondary"
+                                onClick={() => navigate('/account')}
+                            >
                                 编辑资料
                             </Button>
                         </SectionHeader>
@@ -370,7 +390,12 @@ function Profile() {
 
                         <ResourceGrid>
                             {mockRecommendations.map((resource) => (
-                                <ResourceCard key={resource.id}>
+                                <ResourceCard
+                                    key={resource.id}
+                                    onClick={() =>
+                                        handleResourceClick(resource.id, '推荐')
+                                    }
+                                >
                                     <ResourceCardTitle>
                                         {resource.title}
                                     </ResourceCardTitle>
@@ -424,7 +449,15 @@ function Profile() {
                         <ResourceGrid>
                             {activeTab === 'uploads'
                                 ? mockUploads.map((resource) => (
-                                      <ResourceCard key={resource.id}>
+                                      <ResourceCard
+                                          key={resource.id}
+                                          onClick={() =>
+                                              handleResourceClick(
+                                                  resource.id,
+                                                  '上传'
+                                              )
+                                          }
+                                      >
                                           <ResourceCardTitle>
                                               {resource.title}
                                           </ResourceCardTitle>
@@ -443,7 +476,15 @@ function Profile() {
                                       </ResourceCard>
                                   ))
                                 : mockCollections.map((resource) => (
-                                      <ResourceCard key={resource.id}>
+                                      <ResourceCard
+                                          key={resource.id}
+                                          onClick={() =>
+                                              handleResourceClick(
+                                                  resource.id,
+                                                  '收藏'
+                                              )
+                                          }
+                                      >
                                           <ResourceCardTitle>
                                               {resource.title}
                                           </ResourceCardTitle>
@@ -473,7 +514,11 @@ function Profile() {
                         </SectionHeader>
 
                         <ResourceGrid>
-                            <ResourceCard>
+                            <ResourceCard
+                                onClick={() =>
+                                    handleNavigateToTeachingTools('calendar')
+                                }
+                            >
                                 <ResourceCardTitle>
                                     <HiOutlineBookOpen /> 备课日历
                                 </ResourceCardTitle>
@@ -482,7 +527,11 @@ function Profile() {
                                 </ResourceCardMeta>
                             </ResourceCard>
 
-                            <ResourceCard>
+                            <ResourceCard
+                                onClick={() =>
+                                    handleNavigateToTeachingTools('notes')
+                                }
+                            >
                                 <ResourceCardTitle>
                                     <HiOutlineClipboardList /> 备课笔记
                                 </ResourceCardTitle>
@@ -491,7 +540,11 @@ function Profile() {
                                 </ResourceCardMeta>
                             </ResourceCard>
 
-                            <ResourceCard>
+                            <ResourceCard
+                                onClick={() =>
+                                    handleNavigateToTeachingTools('recent')
+                                }
+                            >
                                 <ResourceCardTitle>
                                     <HiOutlineClock /> 最近浏览
                                 </ResourceCardTitle>
@@ -500,7 +553,11 @@ function Profile() {
                                 </ResourceCardMeta>
                             </ResourceCard>
 
-                            <ResourceCard>
+                            <ResourceCard
+                                onClick={() =>
+                                    handleNavigateToTeachingTools('assistant')
+                                }
+                            >
                                 <ResourceCardTitle>
                                     <HiOutlineLightningBolt /> 智能助手
                                 </ResourceCardTitle>
