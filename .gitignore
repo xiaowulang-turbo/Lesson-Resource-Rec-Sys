@@ -18,3 +18,6 @@ test.js
 config.env
 
 # 日志文件
+
+# 临时文件
+temp.json
