@@ -1,4 +1,4 @@
-import AppError from '../utils/AppError.js'
+import AppError from '../utils/appError.js'
 
 // 开发环境错误处理
 const sendErrorDev = (err, res) => {
@@ -12,19 +12,22 @@ const sendErrorDev = (err, res) => {
 
 // 生产环境错误处理
 const sendErrorProd = (err, res) => {
-    // 可操作的错误：发送消息给客户端
+    // 可操作的、可信的错误：发送消息给客户端
     if (err.isOperational) {
         res.status(err.statusCode).json({
             status: err.status,
             message: err.message,
         })
     }
-    // 编程错误：不泄露错误详情
+    // 编程错误或其他未知错误：不泄露错误详情
     else {
+        // 1) 记录错误
         console.error('ERROR 💥', err)
+
+        // 2) 发送通用消息
         res.status(500).json({
             status: 'error',
-            message: '服务器内部错误',
+            message: '出现了一些问题！',
         })
     }
 }
