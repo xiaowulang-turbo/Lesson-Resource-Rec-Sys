@@ -7,6 +7,7 @@ import resourceRoutes from './routes/resourceRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import settingsRoutes from './routes/settingsRoutes.js'
 import courseRoutes from './routes/courseRoutes.js'
+import statsRoutes from './routes/statsRoutes.js'
 import rateLimit from 'express-rate-limit'
 import cookieParser from 'cookie-parser'
 import globalErrorHandler from './middlewares/errorMiddleware.js'
@@ -44,6 +45,7 @@ app.use('/api/v1/resources', resourceRoutes)
 app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/settings', settingsRoutes)
 app.use('/api/v1/courses', courseRoutes)
+app.use('/api/v1/stats', statsRoutes)
 
 // 全局错误处理
 app.use(globalErrorHandler)
