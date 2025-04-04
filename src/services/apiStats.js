@@ -115,23 +115,15 @@ async function generateMockStats() {
 
 // 获取系统统计数据
 export async function getSystemStats() {
-    // 由于后端API未实现，直接使用模拟数据
-    console.log('使用模拟统计数据')
-    return generateMockStats()
-
-    // 下面的代码注释掉，避免404错误
-    /*
     try {
         const res = await fetch(STATS_ENDPOINT)
         const data = await res.json()
 
         if (!res.ok) throw new Error(data.message || '获取系统统计数据失败')
-        
+
         return data.data
     } catch (error) {
         console.error('获取系统统计数据失败:', error)
-        // 如果后端接口不存在，我们在前端模拟一些数据
-        return generateMockStats()
+        throw error
     }
-    */
 }
