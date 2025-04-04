@@ -5,7 +5,6 @@ import helmet from 'helmet'
 import authRoutes from './routes/authRoutes.js'
 import resourceRoutes from './routes/resourceRoutes.js'
 import userRoutes from './routes/userRoutes.js'
-import bookingRoutes from './routes/bookingRoutes.js'
 import settingsRoutes from './routes/settingsRoutes.js'
 import courseRoutes from './routes/courseRoutes.js'
 import rateLimit from 'express-rate-limit'
@@ -43,7 +42,6 @@ app.use(cookieParser())
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/resources', resourceRoutes)
 app.use('/api/v1/users', userRoutes)
-app.use('/api/v1/bookings', bookingRoutes)
 app.use('/api/v1/settings', settingsRoutes)
 app.use('/api/v1/courses', courseRoutes)
 
