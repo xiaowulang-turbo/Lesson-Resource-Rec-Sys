@@ -15,11 +15,6 @@ export const ENDPOINTS = {
         BASE: '/resources',
         RATINGS: (id) => `/resources/${id}/ratings`,
     },
-    BOOKINGS: {
-        BASE: '/bookings',
-        SINGLE: (id) => `/bookings/${id}`,
-        STATUS: (id) => `/bookings/${id}/status`,
-    },
     COURSES: {
         BASE: '/courses',
         SINGLE: (id) => `/courses/${id}`,
