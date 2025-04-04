@@ -31,9 +31,7 @@ import { LayoutProvider } from './context/LayoutContext'
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            staleTime: 60 * 1000, // 1分钟
-            cacheTime: 60 * 60 * 1000, // 1小时
-            retry: 1,
+            staleTime: 0,
         },
     },
 })
@@ -59,39 +57,18 @@ function App() {
                                     element={<Navigate replace to="home" />}
                                 />
                                 <Route path="dashboard" element={<Home />} />
-                                <Route path="bookings" element={<Bookings />} />
-                                <Route
-                                    path="bookings/:bookingId"
-                                    element={<Booking />}
-                                />
-                                <Route
-                                    path="checkin/:bookingId"
-                                    element={<Checkin />}
-                                />
-                                <Route path="cabins" element={<Cabins />} />
                                 <Route path="account" element={<Account />} />
                                 <Route path="settings" element={<Settings />} />
                                 <Route path="home" element={<Home />} />
                                 <Route path="users" element={<Users />} />
                                 <Route path="courses" element={<Courses />} />
-                                <Route
-                                    path="resources"
-                                    element={<Resources />}
-                                />
-                                <Route path="profile" element={<Profile />} />
-                                <Route path="api-test" element={<ApiTest />} />
                             </Route>
-                            <Route path="login" element={<Login />} />
-                            <Route path="/" element={<Home />} />
-                            <Route path="*" element={<PageNotFound />} />
                         </Routes>
                     </Router>
                     <Toaster
                         position="top-center"
                         gutter={12}
-                        containerStyle={{
-                            margin: '8px',
-                        }}
+                        containerStyle={{ margin: '8px' }}
                         toastOptions={{
                             success: {
                                 duration: 3000,
