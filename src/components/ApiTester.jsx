@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import styled from 'styled-components'
-import { getAllCourses, getCourseById } from '../services/courseService'
+import { getAllCourses, getCourseById } from '../services/apiCourses'
 
 const Container = styled.div`
     padding: 2rem;

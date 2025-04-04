@@ -6,7 +6,7 @@ import {
     HiOutlineUserGroup,
     HiOutlineWifi,
 } from 'react-icons/hi2'
-import { getSystemStats } from '../services/statsService'
+import { getSystemStats } from '../services/apiStats'
 import Heading from '../ui/Heading'
 import Row from '../ui/Row'
 import StatsCard from '../components/StatsCard'

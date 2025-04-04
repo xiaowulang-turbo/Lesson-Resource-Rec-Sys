@@ -4,7 +4,7 @@ import Row from '../ui/Row'
 import styled from 'styled-components'
 import ResourceList from '../components/ResourceList'
 import ResourceFilter from '../components/ResourceFilter'
-import { getAllResources } from '../services/resourceService'
+import { getAllResources } from '../services/apiResources'
 import Spinner from '../ui/Spinner'
 
 const StyledResources = styled.div`

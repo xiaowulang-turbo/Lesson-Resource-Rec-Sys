@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { getRecommendedCourses } from '../services/courseService'
+import { getRecommendedCourses } from '../services/apiCourses'
 import Spinner from '../ui/Spinner'
 import Empty from '../ui/Empty'
 import Heading from '../ui/Heading'

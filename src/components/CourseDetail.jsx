@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { getCourseById } from '../services/courseService'
+import { getCourseById } from '../services/apiCourses'
 import Spinner from '../ui/Spinner'
 import {
     HiOutlineStar,
