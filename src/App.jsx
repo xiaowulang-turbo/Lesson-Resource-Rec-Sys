@@ -14,6 +14,7 @@ import Users from './pages/Users'
 import Resources from './pages/Resources'
 import Profile from './pages/Profile'
 import ApiTest from './pages/ApiTest'
+import Login from './pages/Login'
 import GlobalStyles from './styles/GlobalStyles'
 import AppLayout from './ui/AppLayout'
 import { Toaster } from 'react-hot-toast'
@@ -38,6 +39,7 @@ function App() {
                     <GlobalStyles />
                     <Router>
                         <Routes>
+                            <Route path="login" element={<Login />} />
                             <Route
                                 element={
                                     <ProtectedRoute>
