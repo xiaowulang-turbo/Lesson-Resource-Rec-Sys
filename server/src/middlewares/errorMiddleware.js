@@ -1,3 +1,5 @@
+import AppError from '../utils/AppError.js'
+
 // 开发环境错误处理
 const sendErrorDev = (err, res) => {
     res.status(err.statusCode).json({
