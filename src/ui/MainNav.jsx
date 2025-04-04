@@ -2,13 +2,12 @@
 import {
     HiOutlineCog6Tooth,
     HiOutlineHome,
-    HiOutlineHomeModern,
     HiOutlineUsers,
     HiOutlineAcademicCap,
     HiOutlineBookOpen,
     HiOutlineUserCircle,
 } from 'react-icons/hi2'
-import { HiOutlineCalendar, HiOutlineBeaker } from 'react-icons/hi'
+import { HiOutlineBeaker } from 'react-icons/hi'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -93,24 +92,6 @@ function MainNav({ isHorizontal = false }) {
                         首页
                     </StyledNavLink>
                 </li>
-                {/* <li>
-                    <StyledNavLink to="/dashboard" isHorizontal={isHorizontal}>
-                        <HiOutlineHome />
-                        Home
-                    </StyledNavLink>
-                </li>
-                <li>
-                    <StyledNavLink to="/bookings" isHorizontal={isHorizontal}>
-                        <HiOutlineCalendar />
-                        Bookings
-                    </StyledNavLink>
-                </li>
-                <li>
-                    <StyledNavLink to="/cabins" isHorizontal={isHorizontal}>
-                        <HiOutlineHomeModern />
-                        cabins
-                    </StyledNavLink>
-                </li> */}
                 <li>
                     <StyledNavLink to="/courses" isHorizontal={isHorizontal}>
                         <HiOutlineAcademicCap />
@@ -135,18 +116,6 @@ function MainNav({ isHorizontal = false }) {
                         API测试
                     </StyledNavLink>
                 </li>
-                {/* <li>
-                    <StyledNavLink to="/users" isHorizontal={isHorizontal}>
-                        <HiOutlineUsers />
-                        users
-                    </StyledNavLink>
-                </li>
-                <li>
-                    <StyledNavLink to="/settings" isHorizontal={isHorizontal}>
-                        <HiOutlineCog6Tooth />
-                        settings
-                    </StyledNavLink>
-                </li> */}
             </NavList>
         </nav>
     )
