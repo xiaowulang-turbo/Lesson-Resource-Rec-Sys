@@ -308,6 +308,135 @@ resourceSchema.index({ 'access.isPublic': 1 })
 resourceSchema.index({ tags: 1 })
 resourceSchema.index({ 'version.number': 1 })
 
+// 添加新的静态方法
+resourceSchema.statics.findPopular = async function (limit = 10) {
+    return this.aggregate([
+        {
+            $addFields: {
+                popularityScore: {
+                    $add: [
+                        { $multiply: ['$stats.views', 1] },
+                        { $multiply: ['$stats.downloads', 2] },
+                        { $multiply: ['$stats.shares', 1.5] },
+                        { $multiply: ['$stats.favorites', 3] },
+                        { $multiply: ['$averageRating', 4] },
+                    ],
+                },
+            },
+        },
+        { $sort: { popularityScore: -1 } },
+        { $limit: limit },
+    ])
+}
+
+resourceSchema.statics.findByType = async function (
+    type,
+    { sort = 'latest', page = 1, limit = 10 } = {}
+) {
+    const query = this.find({ type })
+
+    switch (sort) {
+        case 'popular':
+            query.sort({ 'stats.views': -1 })
+            break
+        case 'rating':
+            query.sort({ averageRating: -1 })
+            break
+        case 'downloads':
+            query.sort({ 'stats.downloads': -1 })
+            break
+        default:
+            query.sort({ createdAt: -1 })
+    }
+
+    return query
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .populate('tags')
+        .populate('createdBy', 'name avatar')
+}
+
+resourceSchema.statics.findBySubjectAndGrade = async function (subject, grade) {
+    return this.find({
+        subject,
+        grade,
+        'access.isPublic': true,
+    })
+        .sort({ averageRating: -1 })
+        .populate('tags')
+}
+
+resourceSchema.statics.searchByKeyword = async function (keyword) {
+    return this.find(
+        { $text: { $search: keyword } },
+        { score: { $meta: 'textScore' } }
+    )
+        .sort({ score: { $meta: 'textScore' } })
+        .populate('tags')
+        .populate('createdBy', 'name avatar')
+}
+
+resourceSchema.statics.findRecentlyViewed = async function (
+    userId,
+    limit = 10
+) {
+    return this.find({
+        'stats.views': { $gt: 0 },
+        $or: [
+            { 'access.isPublic': true },
+            { 'access.allowedUsers': userId },
+            { createdBy: userId },
+        ],
+    })
+        .sort({ 'stats.lastViewed': -1 })
+        .limit(limit)
+        .populate('tags')
+}
+
+// 添加新的实例方法
+resourceSchema.methods.isAccessibleBy = function (user) {
+    if (this.access.isPublic) return true
+    if (!user) return false
+
+    if (this.createdBy.toString() === user._id.toString()) return true
+    if (this.access.allowedUsers.includes(user._id)) return true
+    if (this.access.allowedRoles.includes(user.role)) return true
+
+    return false
+}
+
+resourceSchema.methods.incrementShare = async function () {
+    this.stats.shares += 1
+    await this.save()
+}
+
+resourceSchema.methods.toggleFavorite = async function (userId) {
+    const isFavorited = await mongoose.model('Collection').exists({
+        userId,
+        contentType: 'resource',
+        contentId: this._id,
+    })
+
+    if (isFavorited) {
+        this.stats.favorites -= 1
+        await mongoose.model('Collection').deleteOne({
+            userId,
+            contentType: 'resource',
+            contentId: this._id,
+        })
+    } else {
+        this.stats.favorites += 1
+        await mongoose.model('Collection').create({
+            userId,
+            contentType: 'resource',
+            contentId: this._id,
+        })
+    }
+
+    await this.save()
+    return !isFavorited
+}
+
 const Resource = mongoose.model('Resource', resourceSchema)
 
 export default Resource

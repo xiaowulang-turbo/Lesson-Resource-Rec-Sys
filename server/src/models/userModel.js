@@ -181,6 +181,84 @@ userSchema.index({ 'teacherProfile.subjects': 1 })
 userSchema.index({ 'teacherProfile.grades': 1 })
 userSchema.index({ 'stats.lastActive': -1 })
 
+// 添加新的静态方法
+userSchema.statics.findTeachers = async function (query = {}) {
+    return this.find({
+        role: 'teacher',
+        ...query,
+    })
+        .select('-password')
+        .sort({ 'stats.averageRating': -1 })
+}
+
+userSchema.statics.findBySubjects = async function (subjects) {
+    return this.find({
+        role: 'teacher',
+        'teacherProfile.subjects': { $in: subjects },
+    }).select('-password')
+}
+
+userSchema.statics.findActiveTeachers = async function (days = 30) {
+    const date = new Date()
+    date.setDate(date.getDate() - days)
+
+    return this.find({
+        role: 'teacher',
+        'stats.lastActive': { $gte: date },
+    })
+        .select('-password')
+        .sort({ 'stats.lastActive': -1 })
+}
+
+userSchema.statics.findByPreferences = async function (preferences) {
+    const query = {}
+
+    if (preferences.subjects) {
+        query['preferences.preferredSubjects'] = {
+            $in: preferences.subjects,
+        }
+    }
+
+    if (preferences.grades) {
+        query['preferences.preferredGrades'] = {
+            $in: preferences.grades,
+        }
+    }
+
+    if (preferences.difficulty) {
+        query['preferences.preferredDifficulty'] = preferences.difficulty
+    }
+
+    return this.find(query).select('-password')
+}
+
+// 添加新的实例方法
+userSchema.methods.updateProfile = async function (profileData) {
+    const allowedFields = ['name', 'avatar', 'teacherProfile', 'preferences']
+
+    allowedFields.forEach((field) => {
+        if (profileData[field]) {
+            this[field] = profileData[field]
+        }
+    })
+
+    await this.save()
+}
+
+userSchema.methods.updateTeacherProfile = async function (profileData) {
+    if (this.role !== 'teacher') {
+        throw new Error('只有教师可以更新教师资料')
+    }
+
+    Object.assign(this.teacherProfile, profileData)
+    await this.save()
+}
+
+userSchema.methods.updatePreferences = async function (preferences) {
+    Object.assign(this.preferences, preferences)
+    await this.save()
+}
+
 const User = mongoose.model('User', userSchema)
 
 export default User

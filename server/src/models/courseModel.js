@@ -241,6 +241,68 @@ courseSchema.methods.updateStatus = async function (newStatus) {
     await this.save()
 }
 
+// 添加新的静态方法
+courseSchema.statics.findByTags = async function (tagIds) {
+    return this.find({ tags: { $in: tagIds } })
+        .populate('tags')
+        .populate('instructors.instructor_id')
+}
+
+courseSchema.statics.findByDifficulty = async function (difficulty) {
+    return this.find({ course_difficulty: difficulty }).sort({
+        course_students_enrolled_count: -1,
+    })
+}
+
+courseSchema.statics.findRecommended = async function () {
+    return this.find({
+        isRecommended: true,
+        status: 'published',
+    })
+        .populate('tags')
+        .sort({ course_students_enrolled_count: -1 })
+        .limit(10)
+}
+
+courseSchema.statics.findSimilar = async function (courseId) {
+    const course = await this.findById(courseId)
+    if (!course) return []
+
+    return this.find({
+        _id: { $ne: courseId },
+        $or: [
+            { course_topics: { $in: course.course_topics } },
+            { tags: { $in: course.tags } },
+            {
+                'targetAudience.subjects': {
+                    $in: course.targetAudience.subjects,
+                },
+            },
+        ],
+        status: 'published',
+    }).limit(5)
+}
+
+courseSchema.statics.findBySubjectAndGrade = async function (subject, grade) {
+    return this.find({
+        'targetAudience.subjects': subject,
+        'targetAudience.grades': grade,
+        status: 'published',
+    }).sort({ averageRating: -1 })
+}
+
+// 添加新的实例方法
+courseSchema.methods.updateEnrollmentCount = async function (increment = 1) {
+    this.course_students_enrolled_count += increment
+    this.course_students_enrolled =
+        this.course_students_enrolled_count.toString()
+    if (this.course_students_enrolled_count >= 1000) {
+        this.course_students_enrolled =
+            (this.course_students_enrolled_count / 1000).toFixed(1) + 'k'
+    }
+    await this.save()
+}
+
 const Course = mongoose.model('Course', courseSchema)
 
 export default Course
