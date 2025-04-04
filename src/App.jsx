@@ -11,6 +11,9 @@ import Courses from './pages/Courses'
 import Account from './pages/Account'
 import Settings from './pages/Settings'
 import Users from './pages/Users'
+import Resources from './pages/Resources'
+import Profile from './pages/Profile'
+import ApiTest from './pages/ApiTest'
 import GlobalStyles from './styles/GlobalStyles'
 import AppLayout from './ui/AppLayout'
 import { Toaster } from 'react-hot-toast'
@@ -52,6 +55,12 @@ function App() {
                                 <Route path="home" element={<Home />} />
                                 <Route path="users" element={<Users />} />
                                 <Route path="courses" element={<Courses />} />
+                                <Route
+                                    path="resources"
+                                    element={<Resources />}
+                                />
+                                <Route path="profile" element={<Profile />} />
+                                <Route path="api-test" element={<ApiTest />} />
                             </Route>
                         </Routes>
                     </Router>
