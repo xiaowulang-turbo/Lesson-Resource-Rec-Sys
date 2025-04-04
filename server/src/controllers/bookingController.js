@@ -1,6 +1,6 @@
 import Booking from '../models/bookingModel.js'
 import catchAsync from '../utils/catchAsync.js'
-import AppError from '../utils/AppError.js'
+import AppError from '../utils/appError.js'
 
 // 获取所有预订
 export const getAllBookings = catchAsync(async (req, res, next) => {
