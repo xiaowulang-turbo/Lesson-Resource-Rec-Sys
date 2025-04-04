@@ -86,24 +86,117 @@ const courseSchema = new mongoose.Schema(
                 chapter_id: Number,
                 chapter_title: String,
                 chapter_duration_hours: Number,
+                chapter_description: String,
+                learning_objectives: [String],
+                resources: [
+                    {
+                        type: mongoose.Schema.ObjectId,
+                        ref: 'Resource',
+                    },
+                ],
             },
         ],
+        targetAudience: {
+            grades: [String],
+            subjects: [String],
+            prerequisites: [String],
+        },
+        learningOutcomes: [
+            {
+                type: String,
+                trim: true,
+            },
+        ],
+        instructors: [
+            {
+                instructor_id: {
+                    type: mongoose.Schema.ObjectId,
+                    ref: 'User',
+                },
+                name: String,
+                title: String,
+                bio: String,
+            },
+        ],
+        reviews: [
+            {
+                user: {
+                    type: mongoose.Schema.ObjectId,
+                    ref: 'User',
+                },
+                rating: {
+                    type: Number,
+                    required: true,
+                    min: 1,
+                    max: 5,
+                },
+                review: String,
+                createdAt: {
+                    type: Date,
+                    default: Date.now,
+                },
+            },
+        ],
+        tags: [
+            {
+                type: mongoose.Schema.ObjectId,
+                ref: 'Tag',
+            },
+        ],
+        status: {
+            type: String,
+            enum: ['draft', 'published', 'archived'],
+            default: 'draft',
+        },
+        pricing: {
+            isFree: {
+                type: Boolean,
+                default: true,
+            },
+            price: {
+                type: Number,
+                default: 0,
+            },
+            currency: {
+                type: String,
+                default: 'CNY',
+            },
+        },
         isRecommended: {
             type: Boolean,
             default: false,
         },
+        metadata: {
+            type: Map,
+            of: mongoose.Schema.Types.Mixed,
+            default: {},
+        },
     },
     {
         timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
     }
 )
 
+// 虚拟字段：计算平均评分
+courseSchema.virtual('averageRating').get(function () {
+    if (this.reviews.length === 0) return 0
+    const sum = this.reviews.reduce((acc, review) => acc + review.rating, 0)
+    return (sum / this.reviews.length).toFixed(1)
+})
+
 // 添加索引以提高查询性能
 courseSchema.index({ course_id: 1 })
-courseSchema.index({ course_title: 1 })
+courseSchema.index({ course_title: 'text', course_description: 'text' })
 courseSchema.index({ course_difficulty: 1 })
 courseSchema.index({ isRecommended: 1 })
-courseSchema.index({ course_students_enrolled_count: -1 }) // 添加注册人数的索引，用于排序
+courseSchema.index({ course_students_enrolled_count: -1 })
+courseSchema.index({ status: 1 })
+courseSchema.index({ 'pricing.isFree': 1 })
+courseSchema.index({ 'targetAudience.grades': 1 })
+courseSchema.index({ 'targetAudience.subjects': 1 })
+courseSchema.index({ tags: 1 })
 
 // 在保存前自动计算注册人数
 courseSchema.pre('save', function (next) {
@@ -124,6 +217,28 @@ courseSchema.statics.updateAllEnrollmentCounts = async function () {
         )
         await course.save()
     }
+}
+
+// 添加新的实例方法
+courseSchema.methods.addReview = async function (userId, rating, review) {
+    this.reviews.push({
+        user: userId,
+        rating,
+        review,
+    })
+    await this.save()
+}
+
+courseSchema.methods.addTag = async function (tagId) {
+    if (!this.tags.includes(tagId)) {
+        this.tags.push(tagId)
+        await this.save()
+    }
+}
+
+courseSchema.methods.updateStatus = async function (newStatus) {
+    this.status = newStatus
+    await this.save()
 }
 
 const Course = mongoose.model('Course', courseSchema)
