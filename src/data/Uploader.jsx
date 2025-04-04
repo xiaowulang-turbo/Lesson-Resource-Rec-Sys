@@ -1,154 +1,158 @@
-import { useState } from "react";
-import { isFuture, isPast, isToday } from "date-fns";
-import supabase from "../services/supabase";
-import Button from "../ui/Button";
-import { subtractDates } from "../utils/helpers";
+import { useState } from 'react'
+import { isFuture, isPast, isToday } from 'date-fns'
+import styled from 'styled-components'
+import { Button } from '../ui/Button'
+import { guests } from './data-guests'
+import { cabins } from './data-cabins'
+import { bookings } from './data-bookings'
+import axios from 'axios'
+import { BASE_URL } from '../services/apiConfig'
 
-import { bookings } from "./data-bookings";
-import { cabins } from "./data-cabins";
-import { guests } from "./data-guests";
-
-// const originalSettings = {
-//   minBookingLength: 3,
-//   maxBookingLength: 30,
-//   maxGuestsPerBooking: 10,
-//   breakfastPrice: 15,
-// };
+const StyledUploader = styled.div`
+    margin-top: 2.5rem;
+    padding: 2.5rem;
+    background-color: var(--color-grey-0);
+    border-radius: var(--border-radius-lg);
+`
 
 async function deleteGuests() {
-  const { error } = await supabase.from("guests").delete().gt("id", 0);
-  if (error) console.log(error.message);
+    try {
+        await axios.delete(`${BASE_URL}/guests`)
+    } catch (error) {
+        console.error('Error deleting guests:', error)
+        throw error
+    }
 }
 
 async function deleteCabins() {
-  const { error } = await supabase.from("cabins").delete().gt("id", 0);
-  if (error) console.log(error.message);
+    try {
+        await axios.delete(`${BASE_URL}/cabins`)
+    } catch (error) {
+        console.error('Error deleting cabins:', error)
+        throw error
+    }
 }
 
 async function deleteBookings() {
-  const { error } = await supabase.from("bookings").delete().gt("id", 0);
-  if (error) console.log(error.message);
+    try {
+        await axios.delete(`${BASE_URL}/bookings`)
+    } catch (error) {
+        console.error('Error deleting bookings:', error)
+        throw error
+    }
 }
 
 async function createGuests() {
-  const { error } = await supabase.from("guests").insert(guests);
-  if (error) console.log(error.message);
+    try {
+        await axios.post(`${BASE_URL}/guests`, guests)
+    } catch (error) {
+        console.error('Error creating guests:', error)
+        throw error
+    }
 }
 
 async function createCabins() {
-  const { error } = await supabase.from("cabins").insert(cabins);
-  if (error) console.log(error.message);
+    try {
+        await axios.post(`${BASE_URL}/cabins`, cabins)
+    } catch (error) {
+        console.error('Error creating cabins:', error)
+        throw error
+    }
 }
 
 async function createBookings() {
-  // Bookings need a guestId and a cabinId. We can't tell Supabase IDs for each object, it will calculate them on its own. So it might be different for different people, especially after multiple uploads. Therefore, we need to first get all guestIds and cabinIds, and then replace the original IDs in the booking data with the actual ones from the DB
-  const { data: guestsIds } = await supabase
-    .from("guests")
-    .select("id")
-    .order("id");
-  const allGuestIds = guestsIds.map((cabin) => cabin.id);
-  const { data: cabinsIds } = await supabase
-    .from("cabins")
-    .select("id")
-    .order("id");
-  const allCabinIds = cabinsIds.map((cabin) => cabin.id);
+    try {
+        // Get all guests
+        const { data: guestsData } = await axios.get(`${BASE_URL}/guests`)
+        const guestsIds = guestsData.map((guest) => guest.id)
 
-  const finalBookings = bookings.map((booking) => {
-    // Here relying on the order of cabins, as they don't have and ID yet
-    const cabin = cabins.at(booking.cabinId - 1);
-    const numNights = subtractDates(booking.endDate, booking.startDate);
-    const cabinPrice = numNights * (cabin.regularPrice - cabin.discount);
-    const extrasPrice = booking.hasBreakfast
-      ? numNights * 15 * booking.numGuests
-      : 0; // hardcoded breakfast price
-    const totalPrice = cabinPrice + extrasPrice;
+        // Get all cabins
+        const { data: cabinsData } = await axios.get(`${BASE_URL}/cabins`)
+        const cabinsIds = cabinsData.map((cabin) => cabin.id)
 
-    let status;
-    if (
-      isPast(new Date(booking.endDate)) &&
-      !isToday(new Date(booking.endDate))
-    )
-      status = "checked-out";
-    if (
-      isFuture(new Date(booking.startDate)) ||
-      isToday(new Date(booking.startDate))
-    )
-      status = "unconfirmed";
-    if (
-      (isFuture(new Date(booking.endDate)) ||
-        isToday(new Date(booking.endDate))) &&
-      isPast(new Date(booking.startDate)) &&
-      !isToday(new Date(booking.startDate))
-    )
-      status = "checked-in";
+        const finalBookings = bookings.map((booking) => {
+            // Get random guestId
+            const guestId =
+                guestsIds[Math.floor(Math.random() * guestsIds.length)]
+            // Get random cabinId
+            const cabinId =
+                cabinsIds[Math.floor(Math.random() * cabinsIds.length)]
+            const numNights =
+                booking.numNights ?? Math.floor(Math.random() * 14) + 1
 
-    return {
-      ...booking,
-      numNights,
-      cabinPrice,
-      extrasPrice,
-      totalPrice,
-      guestId: allGuestIds.at(booking.guestId - 1),
-      cabinId: allCabinIds.at(booking.cabinId - 1),
-      status,
-    };
-  });
+            const cabinPrice = cabinsData.find(
+                (cabin) => cabin.id === cabinId
+            )?.regularPrice
+            const extrasPrice = booking.hasBreakfast ? 15 : 0
+            const totalPrice = (cabinPrice + extrasPrice) * numNights
 
-  console.log(finalBookings);
+            let status
+            if (
+                isPast(new Date(booking.endDate)) &&
+                !isToday(new Date(booking.endDate))
+            )
+                status = 'checked-out'
+            if (
+                isFuture(new Date(booking.startDate)) ||
+                isToday(new Date(booking.startDate))
+            )
+                status = 'unconfirmed'
+            if (
+                (isPast(new Date(booking.startDate)) ||
+                    isToday(new Date(booking.startDate))) &&
+                (isFuture(new Date(booking.endDate)) ||
+                    isToday(new Date(booking.endDate)))
+            )
+                status = 'checked-in'
 
-  const { error } = await supabase.from("bookings").insert(finalBookings);
-  if (error) console.log(error.message);
+            return {
+                ...booking,
+                numNights,
+                guestId,
+                cabinId,
+                totalPrice,
+                status,
+            }
+        })
+
+        await axios.post(`${BASE_URL}/bookings`, finalBookings)
+    } catch (error) {
+        console.error('Error creating bookings:', error)
+        throw error
+    }
 }
 
 function Uploader() {
-  const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false)
 
-  async function uploadAll() {
-    setIsLoading(true);
-    // Bookings need to be deleted FIRST
-    await deleteBookings();
-    await deleteGuests();
-    await deleteCabins();
+    async function uploadAll() {
+        setIsLoading(true)
+        try {
+            // 1. Delete all existing data
+            await deleteGuests()
+            await deleteCabins()
+            await deleteBookings()
 
-    // Bookings need to be created LAST
-    await createGuests();
-    await createCabins();
-    await createBookings();
+            // 2. Upload new data
+            await createGuests()
+            await createCabins()
+            await createBookings()
 
-    setIsLoading(false);
-  }
+            setIsLoading(false)
+        } catch (err) {
+            console.error(err)
+            setIsLoading(false)
+        }
+    }
 
-  async function uploadBookings() {
-    setIsLoading(true);
-    await deleteBookings();
-    await createBookings();
-    setIsLoading(false);
-  }
-
-  return (
-    <div
-      style={{
-        marginTop: "auto",
-        backgroundColor: "#e0e7ff",
-        padding: "8px",
-        borderRadius: "5px",
-        textAlign: "center",
-        display: "flex",
-        flexDirection: "column",
-        gap: "8px",
-      }}
-    >
-      <h3>SAMPLE DATA</h3>
-
-      <Button onClick={uploadAll} disabled={isLoading}>
-        Upload ALL
-      </Button>
-
-      <Button onClick={uploadBookings} disabled={isLoading}>
-        Upload bookings ONLY
-      </Button>
-    </div>
-  );
+    return (
+        <StyledUploader>
+            <h3>SAMPLE DATA UPLOADER</h3>
+            <Button onClick={uploadAll} disabled={isLoading}>
+                Upload All
+            </Button>
+        </StyledUploader>
+    )
 }
 
-export default Uploader;
+export default Uploader
