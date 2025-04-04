@@ -1,5 +1,15 @@
 import mongoose from 'mongoose'
 
+// 辅助函数：将带有k/K后缀的字符串转换为数字
+function parseEnrollmentCount(str) {
+    if (!str) return 0
+    str = str.toString().toLowerCase()
+    if (str.endsWith('k')) {
+        return Math.floor(parseFloat(str.slice(0, -1)) * 1000)
+    }
+    return parseInt(str) || 0
+}
+
 const courseSchema = new mongoose.Schema(
     {
         course_id: {
@@ -34,6 +44,10 @@ const courseSchema = new mongoose.Schema(
         course_students_enrolled: {
             type: String,
             default: '0',
+        },
+        course_students_enrolled_count: {
+            type: Number,
+            default: 0,
         },
         course_description: {
             type: String,
@@ -89,6 +103,28 @@ courseSchema.index({ course_id: 1 })
 courseSchema.index({ course_title: 1 })
 courseSchema.index({ course_difficulty: 1 })
 courseSchema.index({ isRecommended: 1 })
+courseSchema.index({ course_students_enrolled_count: -1 }) // 添加注册人数的索引，用于排序
+
+// 在保存前自动计算注册人数
+courseSchema.pre('save', function (next) {
+    if (this.isModified('course_students_enrolled')) {
+        this.course_students_enrolled_count = parseEnrollmentCount(
+            this.course_students_enrolled
+        )
+    }
+    next()
+})
+
+// 更新现有数据的静态方法
+courseSchema.statics.updateAllEnrollmentCounts = async function () {
+    const courses = await this.find({})
+    for (const course of courses) {
+        course.course_students_enrolled_count = parseEnrollmentCount(
+            course.course_students_enrolled
+        )
+        await course.save()
+    }
+}
 
 const Course = mongoose.model('Course', courseSchema)
 
