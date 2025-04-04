@@ -45,7 +45,7 @@ app.use('/api/v1/resources', resourceRoutes)
 app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/bookings', bookingRoutes)
 app.use('/api/v1/settings', settingsRoutes)
-app.use('/api/courses', courseRoutes)
+app.use('/api/v1/courses', courseRoutes)
 
 // 全局错误处理
 app.use(globalErrorHandler)
