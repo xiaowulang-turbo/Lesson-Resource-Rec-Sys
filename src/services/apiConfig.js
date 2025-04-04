@@ -20,4 +20,9 @@ export const ENDPOINTS = {
         SINGLE: (id) => `/bookings/${id}`,
         STATUS: (id) => `/bookings/${id}/status`,
     },
+    COURSES: {
+        BASE: '/courses',
+        SINGLE: (id) => `/courses/${id}`,
+        RECOMMENDED: '/courses/recommended',
+    },
 }
