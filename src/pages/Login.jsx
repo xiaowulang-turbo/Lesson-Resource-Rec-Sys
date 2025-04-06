@@ -16,7 +16,7 @@ const LoginLayout = styled.main`
 function Login() {
     return (
         <LoginLayout>
-            <Logo />
+            {/* <Logo /> */}
             <Heading type="h4">登录您的账户</Heading>
             <LoginForm />
         </LoginLayout>
