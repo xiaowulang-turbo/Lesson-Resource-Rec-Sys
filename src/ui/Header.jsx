@@ -14,7 +14,7 @@ import Logo from './Logo'
 const StyleHeader = styled.div`
     background-color: var(--color-grey-0);
     padding: ${(props) =>
-        props.showNavInHeader ? '1.6rem 4.8rem' : '1.2rem 4.8rem'};
+        props.$showNavInHeader ? '1.6rem 4.8rem' : '1.2rem 4.8rem'};
     border-bottom: 1px solid var(--color-grey-100);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
@@ -22,11 +22,11 @@ const StyleHeader = styled.div`
     gap: 2.4rem;
     align-items: center;
     justify-content: ${(props) =>
-        props.showNavInHeader ? 'space-between' : 'flex-end'};
+        props.$showNavInHeader ? 'space-between' : 'flex-end'};
 `
 
 const LayoutToggle = styled(ButtonIcon)`
-    margin-right: ${(props) => (props.showNavInHeader ? '0' : 'auto')};
+    margin-right: ${(props) => (props.$showNavInHeader ? '0' : 'auto')};
 `
 
 const NavContainer = styled.div`
@@ -72,7 +72,7 @@ function Header({ showNavInHeader = false }) {
     const { isNavbarOnTop, toggleNavbarPosition } = useLayout()
 
     return (
-        <StyleHeader showNavInHeader={showNavInHeader}>
+        <StyleHeader $showNavInHeader={showNavInHeader}>
             <LogoContainer>
                 <LogoImage>
                     <HiOutlineAcademicCap />
@@ -82,7 +82,7 @@ function Header({ showNavInHeader = false }) {
 
             <LayoutToggle
                 onClick={toggleNavbarPosition}
-                showNavInHeader={showNavInHeader}
+                $showNavInHeader={showNavInHeader}
             >
                 {isNavbarOnTop ? <HiOutlineMenuAlt3 /> : <HiOutlineMenuAlt1 />}
             </LayoutToggle>
