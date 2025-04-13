@@ -110,12 +110,12 @@ function MainNav({ isHorizontal = false }) {
                         个人中心
                     </StyledNavLink>
                 </li>
-                <li>
+                {/* <li>
                     <StyledNavLink to="/api-test" isHorizontal={isHorizontal}>
                         <HiOutlineBeaker />
                         API测试
                     </StyledNavLink>
-                </li>
+                </li> */}
             </NavList>
         </nav>
     )

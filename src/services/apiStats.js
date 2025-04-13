@@ -116,12 +116,16 @@ async function generateMockStats() {
 // 获取系统统计数据
 export async function getSystemStats() {
     try {
-        const res = await fetch(STATS_ENDPOINT)
-        const data = await res.json()
+        // const res = await fetch(STATS_ENDPOINT)
+        // const data = await res.json()
 
-        if (!res.ok) throw new Error(data.message || '获取系统统计数据失败')
+        // if (!res.ok) throw new Error(data.message || '获取系统统计数据失败')
 
-        return data.data
+        // return data.data
+
+        // 使用模拟数据
+        const data = await generateMockStats()
+        return data
     } catch (error) {
         console.error('获取系统统计数据失败:', error)
         throw error
