@@ -1,5 +1,5 @@
 import { HiOutlineUser, HiCloudArrowUp } from 'react-icons/hi2'
-import ButtonIcon from './ButtonIcon'
+import Button from './Button'
 import Logout from './Logout'
 import styled from 'styled-components'
 import { useNavigate } from 'react-router-dom'
@@ -7,7 +7,8 @@ import DarkModeToggle from './DarkModeToggle'
 
 const StyledHeaderMenu = styled.ul`
     display: flex;
-    gap: 0.6rem;
+    align-items: center;
+    gap: 1.2rem;
 `
 
 export default function HeaderMenu() {
@@ -21,9 +22,14 @@ export default function HeaderMenu() {
         </ButtonIcon>
       </li> */}
             <li>
-                <ButtonIcon onClick={() => navigate('/upload')}>
+                <Button
+                    size="medium"
+                    variation="primary"
+                    onClick={() => navigate('/upload')}
+                >
                     <HiCloudArrowUp />
-                </ButtonIcon>
+                    <span style={{ marginLeft: '0.6rem' }}>上传资源</span>
+                </Button>
             </li>
             <li>
                 <DarkModeToggle />
