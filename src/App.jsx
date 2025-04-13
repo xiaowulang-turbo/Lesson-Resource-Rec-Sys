@@ -6,7 +6,7 @@ import {
 } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import Home from './pages/Home'
+import Dashboard from './pages/Dashboard'
 import Courses from './pages/Courses'
 import Account from './pages/Account'
 import Settings from './pages/Settings'
@@ -53,12 +53,17 @@ function App() {
                             >
                                 <Route
                                     index
-                                    element={<Navigate replace to="home" />}
+                                    element={
+                                        <Navigate replace to="dashboard" />
+                                    }
                                 />
-                                <Route path="dashboard" element={<Home />} />
+                                <Route
+                                    path="dashboard"
+                                    element={<Dashboard />}
+                                />
                                 <Route path="account" element={<Account />} />
                                 <Route path="settings" element={<Settings />} />
-                                <Route path="home" element={<Home />} />
+                                <Route path="home" element={<Dashboard />} />
                                 <Route path="users" element={<Users />} />
                                 <Route path="courses" element={<Courses />} />
                                 <Route
