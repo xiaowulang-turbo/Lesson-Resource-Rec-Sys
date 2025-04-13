@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 // import { useQuery } from '@tanstack/react-query'
 import styled from 'styled-components'
 import Heading from '../ui/Heading'
@@ -87,6 +88,7 @@ const mockRecommendedResources = [
 
 function Dashboard() {
     const [searchQuery, setSearchQuery] = useState('')
+    const navigate = useNavigate()
 
     // // 获取推荐资源 (暂时注释掉)
     // const {
@@ -100,7 +102,10 @@ function Dashboard() {
 
     const handleSearchSubmit = (e) => {
         e.preventDefault()
-        console.log('Searching for:', searchQuery)
+        if (!searchQuery.trim()) return
+
+        // 跳转到搜索页面，并将搜索词作为查询参数
+        navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`)
     }
 
     return (
