@@ -105,13 +105,13 @@ function Dashboard() {
         if (!searchQuery.trim()) return
 
         // 跳转到搜索页面，并将搜索词作为查询参数
-        navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`)
+        navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
     }
 
     return (
         <StyledDashboard>
             <Row type="horizontal" style={{ justifyContent: 'space-between' }}>
-                <Heading as="h1">首页仪表盘</Heading>
+                {/* <Heading as="h1">首页仪表盘</Heading> */}
             </Row>
 
             <SearchContainer as="form" onSubmit={handleSearchSubmit}>
