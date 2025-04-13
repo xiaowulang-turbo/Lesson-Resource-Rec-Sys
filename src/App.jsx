@@ -15,6 +15,7 @@ import Resources from './pages/Resources'
 import Profile from './pages/Profile'
 import ApiTest from './pages/ApiTest'
 import Login from './pages/Login'
+import Search from './pages/Search'
 import GlobalStyles from './styles/GlobalStyles'
 import AppLayout from './ui/AppLayout'
 import { Toaster } from 'react-hot-toast'
@@ -63,6 +64,7 @@ function App() {
                                 />
                                 <Route path="profile" element={<Profile />} />
                                 <Route path="api-test" element={<ApiTest />} />
+                                <Route path="search" element={<Search />} />
                             </Route>
                         </Routes>
                     </Router>
