@@ -49,10 +49,47 @@ export const getResource = async (req, res) => {
 
 export const createResource = async (req, res) => {
     try {
-        const newResource = await dataService.createResource({
-            ...req.body,
-            createdBy: req.user.id, // 假设通过认证中间件设置了req.user
-        })
+        const resourceData = { ...req.body } // Get text fields from body
+
+        // Process tags if they exist (assuming comma-separated string)
+        if (resourceData.tags && typeof resourceData.tags === 'string') {
+            resourceData.tags = resourceData.tags
+                .split(',')
+                .map((tag) => tag.trim())
+                .filter(Boolean)
+            // Note: Ideally, tags should be ObjectIds referencing a Tag collection.
+            // This requires frontend changes to send ObjectIds or backend logic to find/create tags.
+            // For now, we store them as an array of strings.
+        }
+
+        // Handle file upload vs link
+        if (req.file) {
+            // If file was uploaded by multer, construct its URL
+            // Assuming uploads are served statically from /public/uploads
+            resourceData.url = `/uploads/${req.file.filename}`
+            // Optionally add file info
+            resourceData.fileInfo = {
+                size: req.file.size,
+                format: req.file.mimetype,
+                originalName: req.file.originalname,
+            }
+        } else if (resourceData.url) {
+            // If a URL was provided in the form (uploadType === 'link')
+            // Keep the provided URL. We might add validation or parsing later.
+            console.log('Using provided URL:', resourceData.url)
+        } else {
+            // Neither file nor URL provided
+            return res.status(400).json({
+                status: 'error',
+                message: '请上传文件或提供资源链接',
+            })
+        }
+
+        // Add creator information
+        resourceData.createdBy = req.user.id // Assuming protect middleware adds user to req
+
+        // Call data service to create the resource
+        const newResource = await dataService.createResource(resourceData)
 
         res.status(201).json({
             status: 'success',
@@ -61,9 +98,11 @@ export const createResource = async (req, res) => {
             },
         })
     } catch (err) {
+        // Handle potential errors (e.g., validation errors from Mongoose)
+        console.error('Error creating resource:', err)
         res.status(400).json({
             status: 'error',
-            message: err.message,
+            message: err.message || '创建资源失败',
         })
     }
 }
