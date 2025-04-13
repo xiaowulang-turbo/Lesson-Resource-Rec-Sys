@@ -5,11 +5,14 @@ import {
     HiOutlineMenuAlt1,
     HiOutlineMenuAlt3,
     HiOutlineAcademicCap,
+    HiOutlineSearch,
 } from 'react-icons/hi'
 import ButtonIcon from './ButtonIcon'
 import { useLayout } from '../context/LayoutContext'
 import MainNav from './MainNav'
 import Logo from './Logo'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const StyleHeader = styled.div`
     background-color: var(--color-grey-0);
@@ -37,10 +40,50 @@ const NavContainer = styled.div`
     justify-content: center;
 `
 
+const SearchContainer = styled.form`
+    display: flex;
+    align-items: center;
+    background-color: var(--color-grey-100);
+    border-radius: var(--border-radius-sm);
+    padding: 0.6rem 1.2rem;
+    transition: all 0.3s;
+    width: 250px;
+
+    &:focus-within {
+        background-color: var(--color-grey-0);
+        outline: 2px solid var(--color-brand-600);
+        box-shadow: 0 0 0 3px var(--color-brand-100);
+        width: 300px;
+    }
+`
+
+const SearchInput = styled.input`
+    border: none;
+    background: none;
+    color: var(--color-grey-700);
+    font-size: 1.4rem;
+    width: 100%;
+
+    &::placeholder {
+        color: var(--color-grey-500);
+    }
+
+    &:focus {
+        outline: none;
+    }
+`
+
+const SearchIcon = styled(HiOutlineSearch)`
+    width: 1.8rem;
+    height: 1.8rem;
+    color: var(--color-grey-500);
+    margin-right: 0.8rem;
+`
+
 const RightContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 2.4rem;
+    gap: 1.6rem;
 `
 
 const LogoContainer = styled.div`
@@ -70,6 +113,14 @@ const LogoImage = styled.div`
 
 function Header({ showNavInHeader = false }) {
     const { isNavbarOnTop, toggleNavbarPosition } = useLayout()
+    const [searchQuery, setSearchQuery] = useState('')
+    const navigate = useNavigate()
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault()
+        if (!searchQuery.trim()) return
+        navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+    }
 
     return (
         <StyleHeader $showNavInHeader={showNavInHeader}>
@@ -94,6 +145,16 @@ function Header({ showNavInHeader = false }) {
             )}
 
             <RightContainer>
+                <SearchContainer onSubmit={handleSearchSubmit}>
+                    <SearchIcon />
+                    <SearchInput
+                        type="text"
+                        placeholder="搜索课程或资源..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </SearchContainer>
+
                 <UserAvatar />
                 <HeaderMenu />
             </RightContainer>
