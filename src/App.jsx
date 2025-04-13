@@ -23,6 +23,8 @@ import { Toaster } from 'react-hot-toast'
 import ProtectedRoute from './ui/ProtectedRoute'
 import { DarkModeProvider } from './context/DarkModeContext'
 import { LayoutProvider } from './context/LayoutContext'
+import ResourceDetail from './pages/ResourceDetail'
+import PageNotFound from './pages/PageNotFound'
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -63,11 +65,16 @@ function App() {
                                     path="resources"
                                     element={<Resources />}
                                 />
+                                <Route
+                                    path="resources/:id"
+                                    element={<ResourceDetail />}
+                                />
                                 <Route path="profile" element={<Profile />} />
                                 <Route path="api-test" element={<ApiTest />} />
                                 <Route path="search" element={<Search />} />
                                 <Route path="upload" element={<Upload />} />
                             </Route>
+                            <Route path="*" element={<PageNotFound />} />
                         </Routes>
                     </Router>
                     <Toaster

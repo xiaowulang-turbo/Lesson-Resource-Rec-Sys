@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import Empty from '../ui/Empty'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 // 更换为可用的占位图片URL
 const PLACEHOLDER_IMAGE = 'https://picsum.photos/400/180?blur=2'
@@ -13,6 +14,12 @@ const ResourceGrid = styled.div`
     margin-bottom: 2.4rem;
 `
 
+const ResourceCardLink = styled(Link)`
+    text-decoration: none;
+    color: inherit;
+    display: block;
+`
+
 const ResourceCard = styled.div`
     background-color: var(--color-grey-0);
     border-radius: var(--border-radius-md);
@@ -22,7 +29,7 @@ const ResourceCard = styled.div`
     display: ${({ layout }) => (layout === 'list' ? 'flex' : 'block')};
     align-items: ${({ layout }) => (layout === 'list' ? 'center' : 'stretch')};
 
-    &:hover {
+    ${ResourceCardLink}:hover & {
         transform: translateY(-2px);
         box-shadow: var(--shadow-md);
     }
@@ -31,12 +38,15 @@ const ResourceCard = styled.div`
 const ResourceImage = styled.div`
     height: 180px;
     overflow: hidden;
-    ${({ layout }) =>
-        layout === 'list' &&
-        `
-        flex: 0 0 320px;
-        width: 320px;
-    `}
+    ${({ layout }) => {
+        if (layout === 'list') {
+            return `
+                flex: 0 0 320px;
+                width: 320px;
+            `
+        }
+        return ''
+    }}
 
     img {
         width: 100%;
@@ -45,7 +55,7 @@ const ResourceImage = styled.div`
         transition: transform 0.3s;
     }
 
-    ${ResourceCard}:hover & img {
+    ${ResourceCardLink}:hover & img {
         transform: scale(1.05);
     }
 `
@@ -222,80 +232,102 @@ function ResourceList({ resources }) {
     return (
         <>
             <ResourceGrid layout={layout}>
-                {resources.map((resource) => (
-                    <ResourceCard
-                        key={
-                            resource._id || resource.id || resource.metadata?.id
-                        }
-                        layout={layout}
-                    >
-                        <ResourceImage layout={layout}>
-                            <img
-                                src={resource.url || PLACEHOLDER_IMAGE}
-                                alt={resource.title}
-                                onError={(e) => {
-                                    e.target.src = PLACEHOLDER_IMAGE
-                                }}
-                            />
-                        </ResourceImage>
-                        <ResourceContent layout={layout}>
-                            <ResourceTitle>{resource.title}</ResourceTitle>
-                            <ResourcePublisher>
-                                {resource.publisher || '未知出版社'} ·{' '}
-                                {resource.authors || '未知作者'}
-                            </ResourcePublisher>
+                {resources.map((resource) => {
+                    const resourceId =
+                        resource._id || resource.id || resource.metadata?.id
+                    if (!resourceId) {
+                        console.warn('Resource missing ID:', resource)
+                        return null
+                    }
+                    return (
+                        <ResourceCardLink
+                            key={resourceId}
+                            to={`/resources/${resourceId}`}
+                        >
+                            <ResourceCard layout={layout}>
+                                <ResourceImage layout={layout}>
+                                    <img
+                                        src={
+                                            resource.coverImage ||
+                                            resource.url ||
+                                            PLACEHOLDER_IMAGE
+                                        }
+                                        alt={resource.title}
+                                        onError={(e) => {
+                                            e.target.src = PLACEHOLDER_IMAGE
+                                        }}
+                                    />
+                                </ResourceImage>
+                                <ResourceContent layout={layout}>
+                                    <ResourceTitle>
+                                        {resource.title}
+                                    </ResourceTitle>
+                                    <ResourcePublisher>
+                                        {resource.createdBy?.name ||
+                                            resource.publisher ||
+                                            '未知发布者'}
+                                    </ResourcePublisher>
 
-                            <ResourceInfo>
-                                <Rating>
-                                    <ResourceRating>
-                                        {resource.averageRating?.toFixed(1) ||
-                                            '暂无'}
-                                    </ResourceRating>
-                                    <span>★</span>
-                                </Rating>
+                                    <ResourceInfo>
+                                        <Rating>
+                                            <ResourceRating>
+                                                {(
+                                                    resource.averageRating || 0
+                                                ).toFixed(1)}
+                                            </ResourceRating>
+                                            <span>
+                                                ({resource.ratingsCount || 0}{' '}
+                                                评分)
+                                            </span>
+                                        </Rating>
+                                    </ResourceInfo>
 
-                                <Label
-                                    type="difficulty"
-                                    value={resource.difficulty}
-                                >
-                                    {getDifficultyLabel(resource.difficulty)}
-                                </Label>
-
-                                <Label type="students">
-                                    {resource.enrollCount || 0} 人学习
-                                </Label>
-
-                                {resource.price > 0 && (
-                                    <Label type="price">
-                                        ¥{resource.price}
-                                    </Label>
-                                )}
-                            </ResourceInfo>
-
-                            <Description>{resource.description}</Description>
-
-                            <TagContainer>
-                                <Tag>{getResourceType(resource.type)}</Tag>
-                                {resource.tags &&
-                                    resource.tags.map((tag) => (
-                                        <Tag
-                                            key={`${
-                                                resource._id ||
-                                                resource.id ||
-                                                resource.metadata?.id
-                                            }-${tag}`}
+                                    <ResourceInfo>
+                                        <Label
+                                            type="difficulty"
+                                            value={resource.difficulty}
                                         >
-                                            {tag}
-                                        </Tag>
-                                    ))}
-                            </TagContainer>
-                        </ResourceContent>
-                    </ResourceCard>
-                ))}
+                                            {getDifficultyLabel(
+                                                resource.difficulty
+                                            )}
+                                        </Label>
+                                        <Label type="price">
+                                            {resource.price > 0
+                                                ? `¥${resource.price.toFixed(
+                                                      2
+                                                  )}`
+                                                : '免费'}
+                                        </Label>
+                                    </ResourceInfo>
+
+                                    <Description>
+                                        {resource.description}
+                                    </Description>
+
+                                    {resource.tags &&
+                                        resource.tags.length > 0 && (
+                                            <TagContainer>
+                                                {resource.tags
+                                                    .slice(0, 5)
+                                                    .map((tag, index) => (
+                                                        <Tag key={index}>
+                                                            {tag}
+                                                        </Tag>
+                                                    ))}
+                                                {resource.tags.length > 5 && (
+                                                    <Tag>...</Tag>
+                                                )}
+                                            </TagContainer>
+                                        )}
+                                </ResourceContent>
+                            </ResourceCard>
+                        </ResourceCardLink>
+                    )
+                })}
             </ResourceGrid>
 
             <LayoutToggle onClick={toggleLayout}>
-                {layout === 'grid' ? '切换为列表视图' : '切换为网格视图'}
+                切换为 {layout === 'grid' ? '列表' : '网格'} 视图
             </LayoutToggle>
         </>
     )
