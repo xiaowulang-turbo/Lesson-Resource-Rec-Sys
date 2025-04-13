@@ -1,4 +1,4 @@
-import { HiOutlineUser } from 'react-icons/hi2'
+import { HiOutlineUser, HiCloudArrowUp } from 'react-icons/hi2'
 import ButtonIcon from './ButtonIcon'
 import Logout from './Logout'
 import styled from 'styled-components'
@@ -7,7 +7,7 @@ import DarkModeToggle from './DarkModeToggle'
 
 const StyledHeaderMenu = styled.ul`
     display: flex;
-    gap: 0.4rem;
+    gap: 0.6rem;
 `
 
 export default function HeaderMenu() {
@@ -20,6 +20,11 @@ export default function HeaderMenu() {
           <HiOutlineUser />
         </ButtonIcon>
       </li> */}
+            <li>
+                <ButtonIcon onClick={() => navigate('/upload')}>
+                    <HiCloudArrowUp />
+                </ButtonIcon>
+            </li>
             <li>
                 <DarkModeToggle />
             </li>
