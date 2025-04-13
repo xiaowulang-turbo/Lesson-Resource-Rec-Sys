@@ -11,6 +11,12 @@ import statsRoutes from './routes/statsRoutes.js'
 import rateLimit from 'express-rate-limit'
 import cookieParser from 'cookie-parser'
 import globalErrorHandler from './middlewares/errorMiddleware.js'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+// 获取 __dirname 在 ES Modules 中的等效值
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express()
 
@@ -19,6 +25,9 @@ app.use(helmet())
 app.use(cors())
 app.use(express.json({ limit: '10kb' }))
 app.use(morgan('dev'))
+
+// 添加静态文件服务中间件，用于访问上传的文件
+app.use('/public', express.static(path.join(__dirname, '..', 'public')))
 
 // 添加额外的调试日志
 app.use((req, res, next) => {
