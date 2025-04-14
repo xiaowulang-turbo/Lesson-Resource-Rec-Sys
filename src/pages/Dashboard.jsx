@@ -117,7 +117,7 @@ function Dashboard() {
             <SearchContainer as="form" onSubmit={handleSearchSubmit}>
                 <Input
                     type="search"
-                    placeholder="快速搜索备课资源..."
+                    placeholder="快速搜索资源..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     id="dashboard-search"

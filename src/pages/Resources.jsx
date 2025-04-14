@@ -128,12 +128,12 @@ function Resources() {
     return (
         <>
             <Row type="horizontal">
-                <Heading as="h1">学习资源</Heading>
+                <Heading as="h1">资源中心</Heading>
             </Row>
 
             <StyledResources>
                 <Description>
-                    这里展示各类学习资源，包括电子教材、实践项目和练习题库等。您可以通过筛选和搜索找到适合您的学习资源。
+                    在这里查找和浏览各类教学资源。您可以通过筛选和搜索找到所需的备课材料。
                 </Description>
 
                 <FilterSection>

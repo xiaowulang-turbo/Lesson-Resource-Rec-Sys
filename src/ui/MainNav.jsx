@@ -92,16 +92,16 @@ function MainNav({ isHorizontal = false }) {
                         首页
                     </StyledNavLink>
                 </li>
-                <li>
+                {/* <li>
                     <StyledNavLink to="/courses" isHorizontal={isHorizontal}>
                         <HiOutlineAcademicCap />
                         课程
                     </StyledNavLink>
-                </li>
+                </li> */}
                 <li>
                     <StyledNavLink to="/resources" isHorizontal={isHorizontal}>
                         <HiOutlineBookOpen />
-                        学习资源
+                        资源中心
                     </StyledNavLink>
                 </li>
                 <li>

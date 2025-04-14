@@ -149,7 +149,7 @@ function Header({ showNavInHeader = false }) {
                     <SearchIcon />
                     <SearchInput
                         type="text"
-                        placeholder="搜索课程或资源..."
+                        placeholder="搜索资源..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
