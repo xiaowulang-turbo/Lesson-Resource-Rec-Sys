@@ -12,10 +12,46 @@ const resourceSchema = new mongoose.Schema(
             type: String,
             required: [true, '请提供资源描述'],
         },
-        type: {
-            type: Number,
-            required: [true, '请提供资源类型'],
-            enum: [1, 2, 3, 4, 5], // 1:文档, 2:视频, 3:音频, 4:图片, 5:其他
+        pedagogicalType: {
+            type: String,
+            required: [true, '请提供资源的教学类型'],
+            enum: [
+                'courseware', // 课件 (PPT, Slides)
+                'tutorial', // 教程 (操作指南, 步骤说明)
+                'project', // 项目 (设计, 实验方案)
+                'assessment', // 测评/练习 (习题, 测验)
+                'reference', // 参考资料 (文献, 书籍章节)
+                'lesson_plan', // 教案
+                'tool', // 工具 (软件, 在线应用)
+                'link', // 外部链接 (网站, 博客文章)
+                'other', // 其他
+            ],
+            default: 'other',
+        },
+        format: {
+            type: String,
+            required: [true, '请提供资源的格式'],
+            enum: [
+                'pdf',
+                'docx',
+                'pptx',
+                'video',
+                'audio',
+                'image',
+                'zip',
+                'url',
+                'interactive', // H5P, SCORM 等
+                'software', // 需要安装的软件
+                'other', // 其他格式
+            ],
+            default: 'other',
+        },
+        contentType: {
+            // 新增字段，区分资源和课程
+            type: String,
+            required: [true, '请指定内容类型'],
+            enum: ['resource', 'course'],
+            default: 'resource', // 默认为资源
         },
         // 分类信息
         subject: {
@@ -35,7 +71,7 @@ const resourceSchema = new mongoose.Schema(
         // 资源详情
         url: {
             type: String,
-            required: [true, '请提供资源链接'],
+            default: '',
         },
         cover: {
             type: String,
@@ -65,6 +101,12 @@ const resourceSchema = new mongoose.Schema(
         },
         publisher: {
             type: String,
+            default: '',
+        },
+        organization: {
+            // 新增字段，用于存储课程组织
+            type: String,
+            trim: true,
             default: '',
         },
         // 创建和更新信息
@@ -297,7 +339,8 @@ resourceSchema.index({
     description: 'text',
     highlightContent: 'text',
 })
-resourceSchema.index({ subject: 1, grade: 1, type: 1 })
+resourceSchema.index({ subject: 1, grade: 1, pedagogicalType: 1 })
+resourceSchema.index({ format: 1 })
 resourceSchema.index({ averageRating: -1 })
 resourceSchema.index({ enrollCount: -1 })
 resourceSchema.index({ createdAt: -1 })
@@ -329,11 +372,11 @@ resourceSchema.statics.findPopular = async function (limit = 10) {
     ])
 }
 
-resourceSchema.statics.findByType = async function (
-    type,
+resourceSchema.statics.findByPedagogicalType = async function (
+    pedagogicalType,
     { sort = 'latest', page = 1, limit = 10 } = {}
 ) {
-    const query = this.find({ type })
+    const query = this.find({ pedagogicalType })
 
     switch (sort) {
         case 'popular':
