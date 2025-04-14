@@ -5,13 +5,15 @@ const dataService = new DataServiceFactory().getAdapter()
 export const getAllResources = async (req, res) => {
     try {
         const filters = req.query
-        const resources = await dataService.getAllResources(filters)
+        const result = await dataService.getAllResources(filters)
 
         res.status(200).json({
             status: 'success',
-            results: resources.length,
+            results: result.resources.length,
+            total: result.pagination.total,
+            pagination: result.pagination,
             data: {
-                resources,
+                resources: result.resources,
             },
         })
     } catch (err) {
