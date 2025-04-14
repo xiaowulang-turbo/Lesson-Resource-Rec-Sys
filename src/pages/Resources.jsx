@@ -6,6 +6,9 @@ import ResourceList from '../components/ResourceList'
 import ResourceFilter from '../components/ResourceFilter'
 import { getAllResources } from '../services/apiResources'
 import Spinner from '../ui/Spinner'
+import Pagination from '../ui/Pagination'
+import { PAGE_SIZE } from '../utils/constants'
+import { useSearchParams } from 'react-router-dom'
 
 const StyledResources = styled.div`
     padding: 2.4rem;
@@ -26,6 +29,7 @@ function Resources() {
     const [filteredResources, setFilteredResources] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [searchParams] = useSearchParams()
     const [filters, setFilters] = useState({
         search: '',
         subject: 'all',
@@ -33,6 +37,9 @@ function Resources() {
         difficulty: 'all',
         sort: 'newest',
     })
+
+    // 获取当前页码
+    const currentPage = parseInt(searchParams.get('page') || 1)
 
     useEffect(() => {
         const fetchResources = async () => {
@@ -116,7 +123,7 @@ function Resources() {
         }
 
         setFilteredResources(result)
-    }, [resources, filters])
+    }, [resources, filters, searchParams])
 
     const handleFilterChange = (filterChange) => {
         setFilters((prevFilters) => ({
@@ -124,6 +131,12 @@ function Resources() {
             [filterChange.type]: filterChange.value,
         }))
     }
+
+    // 计算当前页显示的资源
+    const paginatedResources = filteredResources.slice(
+        (currentPage - 1) * PAGE_SIZE,
+        currentPage * PAGE_SIZE
+    )
 
     return (
         <>
@@ -145,7 +158,10 @@ function Resources() {
                 ) : error ? (
                     <p>{error}</p>
                 ) : (
-                    <ResourceList resources={filteredResources} />
+                    <>
+                        <ResourceList resources={paginatedResources} />
+                        <Pagination count={filteredResources.length} />
+                    </>
                 )}
             </StyledResources>
         </>
