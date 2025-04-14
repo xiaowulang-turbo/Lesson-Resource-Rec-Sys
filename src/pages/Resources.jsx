@@ -27,9 +27,15 @@ const FilterSection = styled.div`
 function Resources() {
     const [resources, setResources] = useState([])
     const [filteredResources, setFilteredResources] = useState([])
+    const [pagination, setPagination] = useState({
+        total: 0,
+        page: 1,
+        limit: PAGE_SIZE,
+        pages: 1,
+    })
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
-    const [searchParams] = useSearchParams()
+    const [searchParams, setSearchParams] = useSearchParams()
     const [filters, setFilters] = useState({
         search: '',
         subject: 'all',
@@ -41,12 +47,20 @@ function Resources() {
     // 获取当前页码
     const currentPage = parseInt(searchParams.get('page') || 1)
 
+    // 当页码变化时重新获取数据
     useEffect(() => {
         const fetchResources = async () => {
             try {
-                const data = await getAllResources()
-                setResources(data)
-                setFilteredResources(data)
+                setLoading(true)
+                // 添加页码和每页数量到请求
+                const result = await getAllResources({
+                    page: currentPage,
+                    limit: PAGE_SIZE,
+                })
+
+                setResources(result.resources)
+                setFilteredResources(result.resources)
+                setPagination(result.pagination)
             } catch (err) {
                 setError('获取资源列表失败')
                 console.error(err)
@@ -56,8 +70,9 @@ function Resources() {
         }
 
         fetchResources()
-    }, [])
+    }, [currentPage])
 
+    // 当过滤条件改变时，应用客户端过滤
     useEffect(() => {
         if (!resources.length) return
 
@@ -123,7 +138,15 @@ function Resources() {
         }
 
         setFilteredResources(result)
-    }, [resources, filters, searchParams])
+    }, [resources, filters])
+
+    // 当过滤条件变化时，重置到第一页
+    useEffect(() => {
+        if (currentPage !== 1) {
+            searchParams.set('page', 1)
+            setSearchParams(searchParams)
+        }
+    }, [filters])
 
     const handleFilterChange = (filterChange) => {
         setFilters((prevFilters) => ({
@@ -131,12 +154,6 @@ function Resources() {
             [filterChange.type]: filterChange.value,
         }))
     }
-
-    // 计算当前页显示的资源
-    const paginatedResources = filteredResources.slice(
-        (currentPage - 1) * PAGE_SIZE,
-        currentPage * PAGE_SIZE
-    )
 
     return (
         <>
@@ -159,8 +176,8 @@ function Resources() {
                     <p>{error}</p>
                 ) : (
                     <>
-                        <ResourceList resources={paginatedResources} />
-                        <Pagination count={filteredResources.length} />
+                        <ResourceList resources={filteredResources} />
+                        <Pagination count={pagination.total} />
                     </>
                 )}
             </StyledResources>
