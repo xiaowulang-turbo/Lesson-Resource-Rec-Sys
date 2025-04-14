@@ -13,7 +13,19 @@ export async function getAllResources(filters = {}) {
 
         if (!res.ok) throw new Error(data.message || '获取资源列表失败')
 
-        return data.data.resources
+        // 返回资源和分页信息
+        return {
+            resources: data.data.resources,
+            pagination: data.pagination || {
+                total: data.total || data.data.resources.length,
+                page: parseInt(filters.page) || 1,
+                limit: parseInt(filters.limit) || 10,
+                pages: Math.ceil(
+                    (data.total || data.data.resources.length) /
+                        (parseInt(filters.limit) || 10)
+                ),
+            },
+        }
     } catch (error) {
         console.error('获取资源列表失败:', error)
         throw new Error(error.message)
