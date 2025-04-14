@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>备课资源推荐系统 - 原型 v2</title>
+        <!-- 引入 Font Awesome 图标库 -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <style>
+            :root {
+                --primary-color: #4CAF50;
+                --primary-color-dark: #45a049;
+                --text-color: #333;
+                --text-color-light: #666;
+                --border-color: #ddd;
+                --background-color: #f8f9fa;
+                --card-background: #fff;
+                --hover-background: #f1f1f1;
+                --star-color: #ffc107;
+                --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            body {
+                font-family: var(--font-family);
+                margin: 0;
+                background-color: var(--background-color);
+                color: var(--text-color);
+                line-height: 1.6;
+            }
+
+            /* Header */
+            header {
+                background-color: var(--card-background);
+                padding: 10px 30px; /* Increased padding */
+                border-bottom: 1px solid var(--border-color);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            }
+            header .logo {
+                font-size: 1.6em;
+                font-weight: 600; /* Slightly bolder */
+                color: var(--primary-color);
+            }
+            header nav a {
+                margin: 0 18px; /* Increased margin */
+                text-decoration: none;
+                color: var(--text-color);
+                cursor: pointer;
+                transition: color 0.2s ease;
+                padding: 5px 0;
+            }
+            header nav a:hover, header nav a.active {
+                color: var(--primary-color);
+                border-bottom: 2px solid var(--primary-color);
+            }
+            header .search-bar {
+                display: flex;
+                align-items: center;
+            }
+            header .search-bar input {
+                padding: 9px 12px; /* Slightly larger */
+                border: 1px solid var(--border-color);
+                border-radius: 4px 0 0 4px;
+                min-width: 250px; /* Ensure decent width */
+            }
+            header .search-bar button {
+                padding: 9px 12px;
+                border: 1px solid var(--border-color);
+                background-color: #eee;
+                border-left: none;
+                border-radius: 0 4px 4px 0;
+                cursor: pointer;
+                transition: background-color 0.2s ease;
+                color: var(--text-color-light);
+            }
+            header .search-bar button:hover {
+                background-color: #e0e0e0;
+                color: var(--text-color);
+            }
+            header .user-profile {
+                margin-left: 25px;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+            header .user-profile i { /* User icon */
+                font-size: 1.8em; /* Larger icon */
+                color: var(--text-color-light);
+                margin-right: 8px;
+            }
+            header .user-profile span {
+                font-size: 0.95em;
+            }
+             header .user-profile:hover i, header .user-profile:hover span {
+                color: var(--primary-color);
+             }
+
+            /* Main Content Area */
+            main {
+                max-width: 1200px;
+                margin: 30px auto; /* Increased top/bottom margin */
+                padding: 30px;    /* Increased padding */
+                background-color: var(--card-background);
+                border-radius: 8px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+                min-height: calc(100vh - 180px); /* Adjust based on header/footer height */
+            }
+            main > section.page-section { /* Apply only to top-level sections */
+                margin-bottom: 40px;
+                padding-bottom: 30px;
+                border-bottom: 1px dashed #eee;
+            }
+            main > section.page-section:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+            /* Nested sections shouldn't have the main border */
+            main > section.page-section > section {
+                 margin-bottom: 30px;
+                 padding-bottom: 0;
+                 border-bottom: none;
+            }
+
+            h1, h2, h3 { color: #444; font-weight: 600; }
+            h1 {
+                border-bottom: 2px solid var(--primary-color);
+                padding-bottom: 10px;
+                margin-bottom: 25px; /* Increased margin */
+                font-size: 1.8em;
+            }
+            h2 {
+                margin-top: 0;
+                margin-bottom: 20px; /* Increased margin */
+                color: #555;
+                font-size: 1.4em;
+            }
+             h3 { font-size: 1.2em; }
+
+            /* Filter Controls */
+            .filter-controls {
+                background-color: var(--background-color);
+                padding: 20px; /* Increased padding */
+                border-radius: 6px; /* Slightly more rounded */
+                margin-bottom: 25px;
+                display: flex;
+                gap: 20px; /* Increased gap */
+                flex-wrap: wrap;
+                align-items: center;
+                border: 1px solid #e9ecef;
+            }
+            .filter-controls label {
+                margin-right: 5px;
+                font-size: 0.9em;
+                color: var(--text-color-light);
+            }
+            .filter-controls select, .filter-controls input[type="text"] {
+                padding: 10px 12px; /* Increased padding */
+                border: 1px solid var(--border-color);
+                border-radius: 4px;
+                background-color: var(--card-background);
+            }
+            .filter-controls input[type="text"] { min-width: 200px; }
+
+            /* Resource List & Cards */
+            .resource-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Wider cards */
+                gap: 25px; /* Increased gap */
+            }
+            .resource-card {
+                border: 1px solid var(--border-color);
+                border-radius: 6px;
+                background-color: var(--card-background);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+                display: flex;
+                flex-direction: column;
+                overflow: hidden; /* Ensure border radius applies to image */
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+             .resource-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+             }
+             .resource-card a { text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%; }
+            .resource-card img.cover {
+                width: 100%;
+                height: 160px; /* Slightly taller */
+                object-fit: cover;
+                background-color: #eee; /* Placeholder */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #aaa;
+                font-size: 1.5em;
+            }
+            .resource-card .card-content {
+                padding: 15px;
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1; /* Allow content to grow */
+            }
+            .resource-card h3 {
+                margin-top: 0;
+                margin-bottom: 10px;
+                font-size: 1.15em; /* Slightly larger */
+                color: var(--text-color);
+                transition: color 0.2s ease;
+            }
+             .resource-card a:hover h3 { color: var(--primary-color); }
+            .resource-card p {
+                font-size: 0.9em;
+                color: var(--text-color-light);
+                margin-bottom: 15px; /* Increased spacing */
+                line-height: 1.5;
+                flex-grow: 1; /* Allow description to push tags down */
+            }
+            .resource-card .tags { margin-bottom: 10px; }
+            .resource-card .tags span {
+                background-color: #e9ecef; /* Lighter background */
+                color: #495057; /* Darker text */
+                padding: 4px 10px; /* Adjusted padding */
+                border-radius: 12px; /* More pill-like */
+                font-size: 0.75em; /* Smaller tags */
+                margin-right: 5px;
+                display: inline-block;
+                margin-bottom: 4px;
+                font-weight: 500;
+            }
+            .resource-card .details {
+                font-size: 0.85em; /* Slightly larger */
+                color: #777;
+                margin-top: auto; /* Push details to bottom */
+                padding-top: 10px;
+                border-top: 1px solid #f1f1f1; /* Subtle separator */
+            }
+             .resource-card .details .fa-star { /* Star icon */
+                color: var(--star-color);
+                margin-left: 2px;
+             }
+
+            /* Pagination */
+            .pagination {
+                text-align: center;
+                margin-top: 35px; /* Increased margin */
+            }
+            .pagination a, .pagination span {
+                margin: 0 6px; /* Increased margin */
+                padding: 8px 12px; /* Larger buttons */
+                border: 1px solid var(--border-color);
+                text-decoration: none;
+                color: var(--primary-color);
+                border-radius: 4px; /* Consistent rounding */
+                cursor: pointer;
+                transition: background-color 0.2s ease, color 0.2s ease;
+            }
+            .pagination span { /* Non-clickable spans */
+                color: var(--text-color-light);
+                cursor: default;
+                border-color: transparent;
+            }
+            .pagination .current {
+                background-color: var(--primary-color);
+                color: white;
+                border-color: var(--primary-color);
+                cursor: default;
+            }
+            .pagination a:hover {
+                background-color: #e9f5e9; /* Light green hover */
+            }
+            .pagination .disabled { /* Disabled links */
+                color: #aaa;
+                border-color: #eee;
+                cursor: not-allowed;
+                background-color: transparent;
+            }
+             .pagination .disabled:hover { background-color: transparent; }
+
+            /* Upload Form */
+            .upload-form { max-width: 700px; margin: 0 auto; /* Center form */ }
+            .upload-form label {
+                display: block;
+                margin-bottom: 6px; /* Adjusted margin */
+                font-weight: 500; /* Slightly less bold */
+                font-size: 0.95em;
+            }
+            .upload-form input[type="text"],
+            .upload-form textarea,
+            .upload-form select,
+            .upload-form input[type="url"],
+            .upload-form input[type="file"],
+            .upload-form input[type="number"] {
+                width: 100%;
+                padding: 12px; /* Increased padding */
+                margin-bottom: 18px; /* Increased margin */
+                border: 1px solid var(--border-color);
+                border-radius: 4px;
+                box-sizing: border-box;
+                background-color: var(--card-background);
+                transition: border-color 0.2s ease;
+            }
+             .upload-form input:focus, .upload-form textarea:focus, .upload-form select:focus {
+                border-color: var(--primary-color);
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+             }
+            .upload-form textarea { min-height: 120px; resize: vertical; }
+            .upload-form .form-group { margin-bottom: 18px; }
+            .upload-form button[type="submit"] {
+                background-color: var(--primary-color);
+                color: white;
+                padding: 12px 25px; /* Adjusted padding */
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 1.05em; /* Slightly larger */
+                transition: background-color 0.2s ease;
+                display: inline-flex; /* For icon alignment */
+                align-items: center;
+                gap: 8px; /* Space between text and icon */
+            }
+            .upload-form button[type="submit"]:hover { background-color: var(--primary-color-dark); }
+             .upload-form button[type="submit"] i { font-size: 0.9em; } /* Icon size */
+            .upload-form .upload-toggle { margin-bottom: 20px; padding: 10px; background-color: #f8f8f8; border-radius: 4px; }
+            .upload-form .upload-toggle label { display: inline-block; margin-right: 20px; font-weight: normal; cursor: pointer; }
+            .upload-form .upload-toggle input[type="radio"] { margin-right: 5px; vertical-align: middle; }
+            .upload-form #upload-status { font-weight: 500; font-size: 0.95em; }
+
+            /* Resource Detail Page */
+            .resource-detail .detail-header {
+                display: flex;
+                gap: 35px; /* Increased gap */
+                margin-bottom: 30px; /* Increased margin */
+                flex-wrap: wrap;
+                padding-bottom: 30px;
+                border-bottom: 1px solid #eee;
+            }
+            .resource-detail .detail-header img.cover {
+                max-width: 320px; /* Slightly larger */
+                width: 100%;
+                height: auto;
+                object-fit: cover;
+                border-radius: 6px; /* Match card */
+                background-color: #eee; /* Placeholder */
+                border: 1px solid var(--border-color);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #aaa;
+                 font-size: 2em;
+            }
+            .resource-detail .detail-info { flex: 1; min-width: 300px;}
+            .resource-detail .detail-info h2 { margin-top: 0; margin-bottom: 20px; font-size: 1.6em; }
+            .resource-detail .detail-info span { display: block; margin-bottom: 10px; color: var(--text-color-light); font-size: 0.95em;}
+            .resource-detail .detail-info strong { color: var(--text-color); min-width: 80px; display: inline-block; font-weight: 600;}
+            .resource-detail .detail-info .tags { margin-top: 15px; }
+            .resource-detail .detail-info .tags span { /* Use same style as cards */
+                 background-color: #e9ecef; color: #495057; padding: 4px 10px; border-radius: 12px; font-size: 0.75em; margin-right: 5px; display: inline-block; margin-bottom: 4px; font-weight: 500;
+            }
+             .resource-detail .detail-info .fa-star { color: var(--star-color); }
+
+            .resource-detail .description { margin-bottom: 30px; padding-top: 20px; border-top: 1px solid #eee;}
+            .resource-detail .description h2 { margin-bottom: 15px; }
+            .resource-detail .description p { line-height: 1.7; color: var(--text-color); }
+            .resource-detail .actions { margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #eee;}
+            .resource-detail .actions a, .resource-detail .actions button {
+                display: inline-flex; /* Align icon and text */
+                align-items: center;
+                gap: 8px; /* Space between icon and text */
+                margin-right: 12px;
+                margin-bottom: 10px;
+                padding: 10px 18px; /* Adjusted padding */
+                color: white;
+                text-decoration: none;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 0.95em; /* Slightly larger */
+                transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            }
+             .resource-detail .actions a { background-color: var(--primary-color); } /* Download/Link */
+             .resource-detail .actions button.favorite { background-color: #007bff; } /* Favorite */
+             .resource-detail .actions button.rate { background-color: var(--star-color); color: var(--text-color); } /* Rate */
+             .resource-detail .actions a:hover { background-color: var(--primary-color-dark); }
+             .resource-detail .actions button.favorite:hover { background-color: #0056b3; }
+             .resource-detail .actions button.rate:hover { background-color: #e0a800; }
+             /* Style for favorited state */
+             .resource-detail .actions button.favorite.favorited { background-color: #dc3545; } /* Red when favorited */
+             .resource-detail .actions button.favorite.favorited:hover { background-color: #c82333; }
+
+            .resource-detail .ratings-reviews { margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #eee;}
+            .resource-detail .ratings-reviews h2 { margin-bottom: 20px; }
+            /* Rating Form */
+            .resource-detail .rating-form { background-color: #f8f9fa; padding: 20px; border-radius: 6px; margin-top: 15px; border: 1px solid #eee; }
+            .resource-detail .rating-form h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.2em;}
+            .resource-detail .rating-form textarea { width: 100%; min-height: 80px; margin-bottom: 15px; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; }
+            .resource-detail .rating-form .stars { margin-bottom: 15px; }
+            .resource-detail .rating-form .stars label { cursor: pointer; font-size: 1.8em; color: #ccc; margin-right: 3px; transition: color 0.2s ease;}
+            .resource-detail .rating-form .stars label .fa-star { pointer-events: none; } /* Prevent icon from capturing event */
+            .resource-detail .rating-form .stars input[type="radio"] { display: none; }
+            /* Star coloring logic (CSS only) */
+            .resource-detail .rating-form .stars:hover label { color: var(--star-color); } /* Hover effect */
+            .resource-detail .rating-form .stars label:hover ~ label { color: #ccc; } /* Reset subsequent stars on hover */
+            .resource-detail .rating-form .stars input[type="radio"]:checked ~ label { color: var(--star-color); } /* Color selected stars */
+
+            .resource-detail .rating-form button { background-color: #5cb85c; color: white; padding: 8px 18px; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.2s ease; }
+            .resource-detail .rating-form button:hover { background-color: #4cae4c; }
+            /* Existing Ratings */
+            .resource-detail #ratings-list { margin-top: 25px; }
+            .resource-detail .rating { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+            .resource-detail .rating:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0;}
+            .resource-detail .rating strong { display: inline-block; margin-right: 10px; font-weight: 600; }
+            .resource-detail .rating .stars-display { color: var(--star-color); display: inline-block; font-size: 1.1em;}
+            .resource-detail .rating p { margin: 8px 0 8px 0; font-size: 0.95em; color: var(--text-color-light); }
+            .resource-detail .rating span.date { font-size: 0.8em; color: #888; display: block; margin-top: 8px;}
+
+            .resource-detail .related-resources h2 { margin-bottom: 20px; }
+
+            /* Footer */
+            footer {
+                text-align: center;
+                margin-top: 40px; /* Increased margin */
+                padding: 25px; /* Increased padding */
+                font-size: 0.9em;
+                color: #777;
+                border-top: 1px solid #eee;
+                background-color: #f1f3f5; /* Slightly different background */
+            }
+
+            /* Utility Classes */
+            .hidden { display: none !important; } /* Ensure override */
+
+            /* Loading Spinner (Simple CSS Spinner) */
+            .loading-spinner {
+                border: 4px solid #f3f3f3; /* Light grey */
+                border-top: 4px solid var(--primary-color); /* Blue */
+                border-radius: 50%;
+                width: 30px;
+                height: 30px;
+                animation: spin 1s linear infinite;
+                margin: 20px auto; /* Center spinner */
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+             /* Centered Message for Empty/Loading */
+            .centered-message {
+                text-align: center;
+                padding: 50px 20px;
+                color: var(--text-color-light);
+                font-size: 1.1em;
+            }
+             .centered-message i { /* Icon for empty message */
+                font-size: 2.5em;
+                display: block;
+                margin-bottom: 15px;
+                color: #ced4da;
+             }
+
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="logo">备课宝</div>
+            <nav>
+                <a href="#" data-target="dashboard" class="active">首页</a>
+                <a href="#" data-target="resources">资源中心</a>
+                <a href="#" data-target="upload">上传资源</a>
+            </nav>
+            <div class="search-bar">
+                <input type="text" id="header-search-input" placeholder="搜索资源标题、标签...">
+                <button type="button" id="header-search-button" title="搜索"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="user-profile" title="个人中心/退出">
+                <i class="fas fa-user-circle"></i>
+                <span>教师李明</span>
+            </div>
+        </header>
+
+        <main>
+            <!-- Loading Indicator (Initially Hidden) -->
+            <div id="loading-indicator" class="centered-message hidden">
+                <div class="loading-spinner"></div>
+                <p>正在加载...</p>
+            </div>
+
+            <!-- 1. 首页 / Dashboard Section -->
+            <section id="dashboard" class="page-section">
+                <h1>欢迎回来, 李老师!</h1>
+                <p>今天想找些什么资源来丰富您的课堂？</p>
+
+                <section>
+                    <h2><i class="fas fa-star" style="color: #ffc107; margin-right: 8px;"></i>为您推荐</h2>
+                    <div class="resource-list" id="dashboard-recommendations">
+                        <!-- JS will populate this -->
+                    </div>
+                     <div id="dashboard-recommendations-empty" class="centered-message hidden">
+                        <i class="fas fa-box-open"></i>
+                        暂无个性化推荐，多浏览和评价资源有助于我们了解您的偏好！
+                     </div>
+                </section>
+
+                 <section>
+                    <h2><i class="fas fa-history" style="color: #6c757d; margin-right: 8px;"></i>最近浏览</h2>
+                     <div class="resource-list" id="dashboard-recent">
+                        <!-- JS will populate this -->
+                     </div>
+                      <div id="dashboard-recent-empty" class="centered-message hidden">
+                         <i class="fas fa-mouse-pointer"></i>
+                         您还没有浏览任何资源。
+                     </div>
+                 </section>
+            </section>
+
+            <!-- 2. 资源列表 / Search Results Section -->
+            <section id="resources" class="page-section hidden">
+                <h1 id="resources-title">资源中心</h1>
+
+                <div class="filter-controls">
+                     <input type="text" id="filter-search" placeholder="在结果中搜索...">
+                    <div>
+                        <label for="filter-subject">学科:</label>
+                        <select id="filter-subject" name="subject">
+                            <option value="all">所有学科</option>
+                            <option value="math">数学</option>
+                            <option value="physics">物理</option>
+                            <option value="chemistry">化学</option>
+                            <option value="biology">生物</option>
+                            <option value="cs">计算机科学</option>
+                            <option value="english">英语</option>
+                            <option value="teaching">教学法</option>
+                            <option value="management">课堂管理</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filter-type">类型:</label>
+                        <select id="filter-type" name="type">
+                             <option value="all">所有类型</option>
+                             <option value="308">电子教材</option>
+                             <option value="310">实践项目</option>
+                             <option value="311">练习题库</option>
+                             <option value="312">参考资料</option>
+                             <option value="1">文档</option>
+                             <option value="2">视频</option>
+                             <option value="3">音频</option>
+                             <option value="4">图片</option>
+                             <option value="5">其他</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filter-difficulty">难度:</label>
+                        <select id="filter-difficulty" name="difficulty">
+                             <option value="all">所有难度</option>
+                             <option value="1">入门级</option>
+                             <option value="2">初级</option>
+                             <option value="3">中级</option>
+                             <option value="4">高级</option>
+                             <option value="5">专家级</option>
+                        </select>
+                    </div>
+                     <div>
+                        <label for="filter-sort">排序:</label>
+                        <select id="filter-sort" name="sort">
+                            <option value="newest">最新发布</option>
+                            <option value="rating">评分最高</option>
+                            <option value="popular">最受欢迎</option>
+                            <option value="downloads">下载最多</option>
+                        </select>
+                    </div>
+                     <button type="button" id="apply-filters-button" style="padding: 10px 15px; background-color: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;"><i class="fas fa-filter" style="margin-right: 5px;"></i>应用筛选</button>
+                </div>
+
+                <!-- Container for list or empty/loading states -->
+                <div id="resource-list-area">
+                    <div class="resource-list" id="resource-list-container">
+                        <!-- JS will populate this -->
+                    </div>
+                    <div id="resource-list-loading" class="centered-message hidden">
+                         <div class="loading-spinner"></div>
+                         <p>正在加载资源列表...</p>
+                    </div>
+                    <div id="resource-list-empty" class="centered-message hidden">
+                        <i class="fas fa-search-minus"></i>
+                        没有找到符合条件的资源，请调整筛选条件或搜索词。
+                    </div>
+                </div>
+
+                <div class="pagination" id="pagination-container">
+                     <!-- JS will populate this -->
+                </div>
+            </section>
+
+            <!-- 3. Upload Page Section -->
+            <section id="upload" class="page-section hidden">
+                <h1><i class="fas fa-cloud-upload-alt" style="margin-right: 10px; color: var(--primary-color);"></i>分享您的优质资源</h1>
+                <form class="upload-form" id="uploadResourceForm">
+                     <!-- Groups for better structure -->
+                    <fieldset style="border: 1px solid #eee; padding: 20px; border-radius: 6px; margin-bottom: 20px;">
+                        <legend style="font-weight: 600; padding: 0 10px; color: #555;">基本信息</legend>
+                        <div class="form-group">
+                            <label for="upload-title">资源标题:</label>
+                            <input type="text" id="upload-title" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="upload-description">资源描述:</label>
+                            <textarea id="upload-description" name="description" required placeholder="详细介绍资源内容、适用场景、教学目标等..."></textarea>
+                        </div>
+                         <div class="form-group">
+                             <label for="upload-coverImage">封面图片链接 (可选):</label>
+                             <input type="url" id="upload-coverImage" name="coverImage" placeholder="https://example.com/cover.jpg">
+                         </div>
+                         <div class="form-group">
+                            <label for="upload-tags">标签 (用逗号分隔):</label>
+                            <input type="text" id="upload-tags" name="tags" placeholder="例如: 互动教学, 课堂测验, PPT模板, 数学, 初中">
+                         </div>
+                     </fieldset>
+
+                     <fieldset style="border: 1px solid #eee; padding: 20px; border-radius: 6px; margin-bottom: 20px;">
+                         <legend style="font-weight: 600; padding: 0 10px; color: #555;">分类信息</legend>
+                        <div class="form-group">
+                            <label for="upload-subject">学科:</label>
+                             <select id="upload-subject" name="subject" required>
+                                <option value="" disabled selected>请选择学科</option>
+                                <option value="计算机科学">计算机科学</option>
+                                <option value="数据科学">数据科学</option>
+                                <option value="航空航天">航空航天</option>
+                                <option value="机械工程">机械工程</option>
+                                <option value="电子工程">电子工程</option>
+                                <option value="数学">数学</option>
+                                <option value="物理">物理</option>
+                                <option value="化学">化学</option>
+                                <option value="生物">生物</option>
+                                <option value="英语">英语</option>
+                                <option value="教学法">教学法</option>
+                                <option value="课堂管理">课堂管理</option>
+                             </select>
+                        </div>
+                         <div class="form-group">
+                            <label for="upload-grade">适用年级:</label>
+                             <select id="upload-grade" name="grade" required>
+                                 <option value="" disabled selected>请选择年级</option>
+                                 <option value="小学">小学</option>
+                                 <option value="初中">初中</option>
+                                 <option value="高中">高中</option>
+                                 <option value="大学">大学</option>
+                                 <option value="通用">通用</option>
+                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="upload-type">资源类型:</label>
+                             <select id="upload-type" name="type" required>
+                                <option value="" disabled selected>请选择类型</option>
+                                <option value="308">电子教材</option>
+                                <option value="310">实践项目</option>
+                                <option value="311">练习题库</option>
+                                <option value="312">参考资料</option>
+                                <option value="1">文档 (通用)</option>
+                                <option value="2">视频</option>
+                                <option value="3">音频</option>
+                                <option value="4">图片</option>
+                                <option value="5">其他</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="upload-difficulty">难度等级:</label>
+                             <select id="upload-difficulty" name="difficulty" required>
+                                <option value="" disabled selected>请选择难度</option>
+                                <option value="1">入门级</option>
+                                <option value="2">初级</option>
+                                <option value="3">中级</option>
+                                <option value="4">高级</option>
+                                <option value="5">专家级</option>
+                            </select>
+                        </div>
+                         <div class="form-group">
+                             <label for="upload-price">价格 (免费请填0):</label>
+                             <input type="number" id="upload-price" name="price" value="0" min="0" step="0.01" required>
+                         </div>
+                    </fieldset>
+
+                     <fieldset style="border: 1px solid #eee; padding: 20px; border-radius: 6px; margin-bottom: 20px;">
+                         <legend style="font-weight: 600; padding: 0 10px; color: #555;">资源文件或链接</legend>
+                         <div class="form-group upload-toggle">
+                             <input type="radio" id="uploadTypeFile" name="uploadType" value="file" checked>
+                             <label for="uploadTypeFile"><i class="fas fa-file-upload"></i> 上传文件</label>
+                             <input type="radio" id="uploadTypeLink" name="uploadType" value="link">
+                             <label for="uploadTypeLink"><i class="fas fa-link"></i> 提供链接</label>
+                         </div>
+                         <div class="form-group" id="fileInputContainer">
+                            <label for="resourceFile">选择文件:</label>
+                            <input type="file" id="resourceFile" name="resourceFile" required>
+                         </div>
+                         <div class="form-group hidden" id="linkInputContainer">
+                             <label for="resourceUrl">资源链接:</label>
+                             <input type="url" id="resourceUrl" name="url" placeholder="https://example.com/resource">
+                         </div>
+                     </fieldset>
+
+                    <button type="submit"><i class="fas fa-check"></i> 确认提交</button>
+                    <p id="upload-status" style="margin-top: 15px;"></p>
+                </form>
+            </section>
+
+            <!-- 4. Resource Detail Page Section -->
+            <section id="resource-detail" class="page-section hidden resource-detail">
+                 <h1 id="detail-title">资源详情</h1>
+                 <div class="detail-header">
+                     <img id="detail-cover" class="cover" src="#" alt="资源封面"><i class="fas fa-image"></i></img> <!-- Icon placeholder -->
+                     <div class="detail-info">
+                         <h2 id="detail-header-title">[资源标题]</h2>
+                         <span id="detail-author"><strong>作者/机构:</strong> [作者名]</span>
+                         <span id="detail-subject"><strong>学科:</strong> [学科]</span>
+                         <span id="detail-grade"><strong>年级:</strong> [年级]</span>
+                         <span id="detail-type"><strong>类型:</strong> [类型]</span>
+                         <span id="detail-difficulty"><strong>难度:</strong> [难度]</span>
+                         <span id="detail-date"><strong>发布日期:</strong> [日期]</span>
+                         <span id="detail-rating"><strong>评分:</strong> N/A</span>
+                         <div id="detail-tags" class="tags"><strong>标签:</strong> </div>
+                     </div>
+                 </div>
+                 <div class="actions">
+                     <a id="detail-link" href="#" target="_blank"><i class="fas fa-download"></i> 访问资源 / 下载</a>
+                     <button type="button" class="favorite" id="favorite-button" data-favorited="false"><i class="far fa-heart"></i> <span class="fav-text">加入收藏</span></button>
+                     <button type="button" class="rate" id="rate-button"><i class="fas fa-star"></i> 评价此资源</button>
+                 </div>
+                 <div class="description">
+                     <h2><i class="fas fa-info-circle" style="margin-right: 8px; color: #17a2b8;"></i>资源描述</h2>
+                     <p id="detail-description">[详细描述]</p>
+                 </div>
+                  <div class="ratings-reviews">
+                     <h2><i class="fas fa-comments" style="margin-right: 8px; color: #6f42c1;"></i>评价与反馈 (<span id="rating-count">0</span>)</h2>
+                     <!-- Rating Form -->
+                     <form id="rating-form" class="rating-form hidden">
+                         <h3>评价此资源</h3>
+                         <div class="stars" data-rating="0">
+                            <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star1" name="rating" value="1" required/><label for="star1" title="1 star"><i class="fas fa-star"></i></label>
+                         </div>
+                         <textarea name="review" placeholder="写下您的使用感受、建议..." required></textarea>
+                         <button type="submit"><i class="fas fa-paper-plane"></i> 提交评价</button>
+                         <p id="rating-status" style="margin-top: 10px; font-size: 0.9em;"></p>
+                     </form>
+                     <!-- Existing Ratings List -->
+                     <div id="ratings-list">
+                         <!-- JS loads ratings here -->
+                     </div>
+                      <div id="ratings-list-loading" class="centered-message hidden">
+                          <div class="loading-spinner"></div>
+                          <p>正在加载评价...</p>
+                      </div>
+                     <div id="ratings-list-empty" class="centered-message hidden">
+                         <i class="fas fa-comment-slash"></i>
+                         暂无评价，期待您的反馈！
+                     </div>
+                 </div>
+                 <div class="related-resources">
+                     <h2><i class="fas fa-lightbulb" style="margin-right: 8px; color: #fd7e14;"></i>相关资源推荐</h2>
+                      <div class="resource-list" id="related-list">
+                        <!-- JS loads related resources here -->
+                      </div>
+                       <div id="related-list-loading" class="centered-message hidden">
+                           <div class="loading-spinner"></div>
+                           <p>正在查找相关资源...</p>
+                       </div>
+                      <div id="related-list-empty" class="centered-message hidden">
+                         <i class="fas fa-unlink"></i>
+                         暂无相关资源推荐。
+                     </div>
+                 </div>
+            </section>
+
+        </main>
+
+        <footer>
+            &copy; 2024 备课宝 - 智能备课资源推荐系统. 保留所有权利。
+        </footer>
+
+        <script>
+            // --- Mock Data (More Realistic) ---
+            const mockResourcesDb = {
+                rec1: { id: 'rec1', title: '高效课堂互动技巧 (PPT)', description: '精选实用PPT模板，包含破冰、分组、抢答等多种互动小游戏和课堂管理策略，有效激发学生兴趣，提升课堂参与度。适用于各学科。', subject: '教学法', grade: '通用', type: 'PPT', difficulty: 3, rating: 4.8, ratingCount: 112, tags: ['教学法', 'PPT', '互动游戏', '课堂管理'], cover: 'https://via.placeholder.com/300x160/4CAF50/FFFFFF?text=互动技巧', url: '#', date: '2024-05-01', author: '教育资源中心', downloads: 500 },
+                rec2: { id: 'rec2', title: '初中物理力学实验视频合集', description: '高清实验视频，涵盖牛顿定律、功与能、浮力等初中力学核心内容。步骤清晰，现象明显，辅助实验教学，加深学生理解。', subject: '物理', grade: '初中', type: '视频', difficulty: 3, rating: 4.5, ratingCount: 98, tags: ['物理', '初中', '实验', '视频', '力学'], cover: 'https://via.placeholder.com/300x160/2196F3/FFFFFF?text=物理实验', url: '#', date: '2024-04-20', author: '物理教学组', downloads: 350 },
+                rec3: { id: 'rec3', title: '小学数学几何图形练习题库', description: '专项练习题库，全面覆盖小学阶段平面图形和立体图形知识点，题型多样，含详细答案解析，适合课后巩固和期末复习。', subject: '数学', grade: '小学', type: '练习题库', difficulty: 2, rating: 4.6, ratingCount: 150, tags: ['数学', '小学', '练习题', '几何'], cover: 'https://via.placeholder.com/300x160/FF9800/FFFFFF?text=几何练习', url: '#', date: '2024-05-10', author: '张老师', downloads: 800 },
+                view1: { id: 'view1', title: '高中化学方程式配平技巧', description: '系统讲解观察法、最小公倍数法、奇偶配平法、待定系数法等化学方程式配平技巧，结合实例分析常见错误，提高解题效率。', subject: '化学', grade: '高中', type: '文档', difficulty: 3, rating: 4.2, ratingCount: 75, tags: ['化学', '高中', '技巧', '方程式配平'], cover: 'https://via.placeholder.com/300x160/9C27B0/FFFFFF?text=化学配平', url: '#', date: '2024-03-15', author: '王老师', downloads: 200 },
+                view2: { id: 'view2', title: 'Python编程入门教案 (含代码)', description: '专为中小学信息技术课或编程兴趣班设计，从基础语法到简单项目实践，配有完整教案、课件PPT及代码示例，轻松上手Python。', subject: '计算机科学', grade: '通用', type: '教案', difficulty: 1, rating: 4.9, ratingCount: 205, tags: ['计算机', '编程', 'Python', '教案', '入门'], cover: 'https://via.placeholder.com/300x160/3F51B5/FFFFFF?text=Python入门', url: '#', date: '2024-04-01', author: '编程俱乐部', downloads: 1200 },
+                resA: { id: 'resA', title: '初中代数基础概念梳理 (思维导图)', description: '用思维导图形式清晰梳理初中代数的核心概念，包括整式、分式、方程等，帮助学生构建知识体系，便于复习记忆。', subject: '数学', grade: '初中', type: '文档', difficulty: 2, rating: 4.2, ratingCount: 30, tags: ['代数', '思维导图', '概念梳理'], cover: 'https://via.placeholder.com/300x160/FFC107/333333?text=代数导图', url: '#', date: '2023-11-01', author: '匿名', downloads: 150 },
+                resB: { id: 'resB', title: '高中物理电磁学重难点解析 (视频)', description: '针对高中电磁学部分的重点和难点进行深入解析，结合高考真题，提供解题思路和方法指导。', subject: '物理', grade: '高中', type: '视频', difficulty: 4, rating: 4.9, ratingCount: 55, tags: ['物理', '高中', '电磁学', '重难点', '高考'], cover: 'https://via.placeholder.com/300x160/00BCD4/FFFFFF?text=电磁学解析', url: '#', date: '2024-02-10', author: '大学物理系', downloads: 400 },
+                resC: { id: 'resC', title: '有机化学基础官能团总结表', description: '清晰总结常见有机官能团的结构、性质、命名及典型反应，表格形式，一目了然，方便查阅和记忆。', subject: '化学', grade: '高中', type: '文档', difficulty: 3, rating: 4.0, ratingCount: 20, tags: ['化学', '有机化学', '官能团', '总结表'], cover: 'https://via.placeholder.com/300x160/E91E63/FFFFFF?text=官能团总结', url: '#', date: '2023-09-05', author: '匿名', downloads: 180 },
+                // Add more diverse examples
+                resG: { id: 'resG', title: '小学英语自然拼读动画课件', description: '生动有趣的动画课件，帮助小学生掌握自然拼读规则，提升认读能力和学习兴趣。', subject: '英语', grade: '小学', type: '课件', difficulty: 1, rating: 4.7, ratingCount: 120, tags: ['英语', '小学', '自然拼读', '动画', '课件'], cover: 'https://via.placeholder.com/300x160/8BC34A/FFFFFF?text=自然拼读', url: '#', date: '2024-05-20', author: '阳光教育', downloads: 600 },
+                resH: { id: 'resH', title: '课堂管理技巧：应对调皮学生策略', description: '分享多种实用的课堂管理技巧，特别是针对注意力不集中、爱说话等行为问题的应对策略，帮助教师维持课堂秩序。', subject: '课堂管理', grade: '通用', type: '文档', difficulty: 3, rating: 4.6, ratingCount: 85, tags: ['课堂管理', '行为问题', '策略', '技巧'], cover: 'https://via.placeholder.com/300x160/607D8B/FFFFFF?text=课堂管理', url: '#', date: '2024-01-30', author: '资深班主任', downloads: 300 },
+            };
+
+            const mockRatingsDb = {
+                rec1: [{user: '王老师', rating: 5, review: '非常棒的互动模板！形式多样，学生很喜欢！', date: '2024-05-15'}, {user: '刘老师', rating: 4, review: '内容丰富，但个别动画在低版本PPT上有点卡顿。', date: '2024-05-12'}],
+                rec2: [{user: '李老师', rating: 5, review: '实验视频清晰，讲解到位，解决了我们学校实验设备不足的问题！', date: '2024-04-25'}],
+                resB: [{user: '赵老师', rating: 5, review: '讲解深入浅出，对理解电磁学帮助很大！', date: '2024-03-01'}, {user: '孙老师', rating: 4, review: '希望能增加更多例题讲解。', date: '2024-02-28'}],
+                // Add more ratings
+            };
+
+             // Simple state to track current page and potentially user favorites
+             let currentPage = 'dashboard';
+             let userFavorites = new Set(['rec2']); // Example: User has favorited rec2
+             let currentDetailResourceId = null;
+
+            // --- Helper Functions ---
+            function showLoading(elementId) {
+                const el = document.getElementById(elementId);
+                if (el) el.classList.remove('hidden');
+            }
+            function hideLoading(elementId) {
+                 const el = document.getElementById(elementId);
+                 if (el) el.classList.add('hidden');
+            }
+            function showEmpty(elementId) {
+                const el = document.getElementById(elementId);
+                if (el) el.classList.remove('hidden');
+            }
+            function hideEmpty(elementId) {
+                 const el = document.getElementById(elementId);
+                 if (el) el.classList.add('hidden');
+            }
+
+            function displayPage(targetId) {
+                currentPage = targetId;
+                document.querySelectorAll('.page-section').forEach(section => {
+                    section.classList.add('hidden');
+                });
+                document.querySelectorAll('header nav a').forEach(link => {
+                     link.classList.remove('active');
+                     if(link.dataset.target === targetId) {
+                         link.classList.add('active');
+                     }
+                });
+
+                const targetPage = document.getElementById(targetId);
+                if (targetPage) {
+                    targetPage.classList.remove('hidden');
+                     window.scrollTo(0, 0); // Scroll to top
+
+                     // --- Load data specific to the page ---
+                     if (targetId === 'dashboard') {
+                         loadDashboardData();
+                     } else if (targetId === 'resources') {
+                         loadResourceListData(); // Load initial full list or based on search
+                     } else if (targetId === 'resource-detail' && currentDetailResourceId) {
+                         // Data loading happens in loadResourceDetail function called by click handler
+                     } else if (targetId === 'upload') {
+                         // Reset form maybe?
+                         // document.getElementById('uploadResourceForm').reset(); // Consider UX
+                     }
+
+                } else {
+                     console.error("Target page not found:", targetId);
+                     displayPage('dashboard'); // Fallback to dashboard
+                }
+            }
+
+            // Updated card renderer
+            function renderResourceCard(resource) {
+                const difficultyMap = { 1: '入门级', 2: '初级', 3: '中级', 4: '高级', 5: '专家级' };
+                const ratingStars = resource.rating ? '★'.repeat(Math.round(resource.rating)) + '☆'.repeat(5 - Math.round(resource.rating)) : 'N/A';
+
+                // Create tag elements safely
+                let tagsHTML = '';
+                if (resource.tags && Array.isArray(resource.tags)) {
+                     tagsHTML += resource.tags.slice(0, 3).map(tag => `<span>${escapeHtml(tag)}</span>`).join(''); // Limit tags displayed
+                }
+                if (resource.subject) tagsHTML += `<span>${escapeHtml(resource.subject)}</span>`;
+                if (resource.grade) tagsHTML += `<span>${escapeHtml(resource.grade)}</span>`;
+
+                return `
+                    <div class="resource-card">
+                        <a href="#" data-target="resource-detail" data-resource-id="${escapeHtml(resource.id)}">
+                             <img class="cover" src="${escapeHtml(resource.cover || 'https://via.placeholder.com/300x160/cccccc/FFFFFF?text=No+Image')}" alt="${escapeHtml(resource.title)}封面">
+                             <div class="card-content">
+                                <h3>${escapeHtml(resource.title)}</h3>
+                                <p title="${escapeHtml(resource.description)}">${escapeHtml(resource.description.substring(0, 80))}${resource.description.length > 80 ? '...' : ''}</p>
+                                <div class="tags">
+                                    ${tagsHTML}
+                                </div>
+                                <div class="details">
+                                    <span title="${resource.rating ? `${resource.rating.toFixed(1)} / 5` : '暂无评分'}">
+                                        <i class="fas fa-star"></i> ${resource.rating ? resource.rating.toFixed(1) : 'N/A'}
+                                    </span> |
+                                    <span>难度: ${difficultyMap[resource.difficulty] || 'N/A'}</span> |
+                                    <span><i class="fas fa-download"></i> ${resource.downloads || 0}</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>`;
+            }
+
+            // --- Data Loading Functions ---
+            function loadDashboardData() {
+                 // Simulate API call for recommendations
+                 const recContainer = document.getElementById('dashboard-recommendations');
+                 const recEmpty = document.getElementById('dashboard-recommendations-empty');
+                 recContainer.innerHTML = ''; // Clear
+                 hideEmpty(recEmpty.id);
+                 // Mock: Show first 3 as recommendations
+                 const recKeys = Object.keys(mockResourcesDb).slice(0, 3);
+                 if (recKeys.length > 0) {
+                     recKeys.forEach(key => recContainer.innerHTML += renderResourceCard(mockResourcesDb[key]));
+                 } else {
+                     showEmpty(recEmpty.id);
+                 }
+
+                 // Simulate API call for recent views
+                 const recentContainer = document.getElementById('dashboard-recent');
+                  const recentEmpty = document.getElementById('dashboard-recent-empty');
+                 recentContainer.innerHTML = ''; // Clear
+                 hideEmpty(recentEmpty.id);
+                 // Mock: Show view1, view2 as recent
+                 const recentKeys = ['view1', 'view2'];
+                  if (recentKeys.length > 0) {
+                     recentKeys.forEach(key => {
+                         if(mockResourcesDb[key]) {
+                             recentContainer.innerHTML += renderResourceCard(mockResourcesDb[key]);
+                         }
+                     });
+                 }
+                 // Check if container is still empty after attempting to load
+                 if (recentContainer.innerHTML.trim() === '') {
+                     showEmpty(recentEmpty.id);
+                 }
+            }
+
+            function loadResourceListData(filters = {}) {
+                showLoading('resource-list-loading');
+                hideEmpty('resource-list-empty');
+                const container = document.getElementById('resource-list-container');
+                container.innerHTML = ''; // Clear previous results
+
+                // Simulate API call with filtering
+                setTimeout(() => {
+                    let results = Object.values(mockResourcesDb);
+
+                    // --- Apply Filters (Basic Mock) ---
+                    if (filters.search) {
+                        const query = filters.search.toLowerCase();
+                        results = results.filter(r =>
+                            r.title.toLowerCase().includes(query) ||
+                            r.description.toLowerCase().includes(query) ||
+                            (r.tags && r.tags.some(tag => tag.toLowerCase().includes(query)))
+                        );
+                    }
+                    if (filters.subject && filters.subject !== 'all') {
+                         results = results.filter(r => r.subject === filters.subject);
+                    }
+                      if (filters.type && filters.type !== 'all') {
+                          results = results.filter(r => String(r.type) === String(filters.type));
+                      }
+                      if (filters.difficulty && filters.difficulty !== 'all') {
+                          results = results.filter(r => String(r.difficulty) === String(filters.difficulty));
+                      }
+
+                      // --- Sorting (Basic Mock) ---
+                      switch (filters.sort) {
+                         case 'rating':
+                              results.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                              break;
+                         case 'popular': // Assuming downloads = popularity for mock
+                              results.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+                              break;
+                          case 'downloads':
+                               results.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+                              break;
+                         case 'newest':
+                         default:
+                             results.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+                             break;
+                      }
+
+
+                    hideLoading('resource-list-loading');
+                    if (results.length > 0) {
+                        results.forEach(resource => container.innerHTML += renderResourceCard(resource));
+                        renderPagination(1, Math.ceil(results.length / 10)); // Mock pagination (10 items per page)
+                    } else {
+                        showEmpty('resource-list-empty');
+                         renderPagination(0, 0); // No pages
+                    }
+                }, 800); // Simulate network delay
+            }
+
+            function renderPagination(currentPage, totalPages) {
+                const container = document.getElementById('pagination-container');
+                container.innerHTML = ''; // Clear existing
+
+                if (totalPages <= 0) return; // No pagination needed
+
+                const createLink = (page, text, isDisabled = false, isCurrent = false) => {
+                    if (isDisabled) {
+                        return `<span class="disabled">${text}</span>`;
+                    }
+                    if (isCurrent) {
+                         return `<span class="current">${text}</span>`;
+                    }
+                    return `<a href="#" data-page="${page}">${text}</a>`;
+                };
+
+                 container.innerHTML += createLink(currentPage - 1, '<i class="fas fa-chevron-left"></i> Prev', currentPage === 1);
+
+                 // Simplified pagination logic for mockup (show first, last, current, neighbors)
+                 const pagesToShow = new Set([1, totalPages, currentPage]);
+                 if (currentPage > 1) pagesToShow.add(currentPage - 1);
+                 if (currentPage < totalPages) pagesToShow.add(currentPage + 1);
+
+                 let lastPage = 0;
+                 Array.from(pagesToShow).sort((a, b) => a - b).forEach(page => {
+                    if (page > lastPage + 1 && page !== 1) { // Add ellipsis if gap exists
+                        container.innerHTML += `<span>...</span>`;
+                    }
+                     if (page > 0 && page <= totalPages) {
+                        container.innerHTML += createLink(page, page, false, page === currentPage);
+                        lastPage = page;
+                     }
+                 });
+                  if (totalPages > lastPage) {
+                     container.innerHTML += `<span>...</span>`;
+                     container.innerHTML += createLink(totalPages, totalPages, false, totalPages === currentPage);
+                 }
+
+
+                container.innerHTML += createLink(currentPage + 1, 'Next <i class="fas fa-chevron-right"></i>', currentPage === totalPages);
+            }
+
+            function loadResourceDetail(resourceId) {
+                showLoading('loading-indicator'); // Show main loading indicator
+                currentDetailResourceId = resourceId; // Store current ID
+                // Hide all pages first
+                document.querySelectorAll('.page-section').forEach(section => section.classList.add('hidden'));
+
+                setTimeout(() => { // Simulate API Call
+                    const resource = mockResourcesDb[resourceId];
+                    hideLoading('loading-indicator'); // Hide main loading
+
+                    if (!resource) {
+                        console.error("Resource not found:", resourceId);
+                        alert("抱歉，找不到该资源。");
+                        displayPage('resources'); // Go back to resource list
+                        return;
+                    }
+
+                     // --- Populate Detail Page ---
+                     const difficultyMap = { 1: '入门级', 2: '初级', 3: '中级', 4: '高级', 5: '专家级' };
+                     document.getElementById('detail-title').textContent = `资源详情: ${resource.title}`;
+                     document.getElementById('detail-header-title').textContent = resource.title;
+                     document.getElementById('detail-cover').src = resource.cover || 'https://via.placeholder.com/320x180/cccccc/FFFFFF?text=No+Image';
+                     document.getElementById('detail-author').innerHTML = `<strong>作者/机构:</strong> ${escapeHtml(resource.author || 'N/A')}`;
+                     document.getElementById('detail-subject').innerHTML = `<strong>学科:</strong> ${escapeHtml(resource.subject || 'N/A')}`;
+                     document.getElementById('detail-grade').innerHTML = `<strong>年级:</strong> ${escapeHtml(resource.grade || 'N/A')}`;
+                     document.getElementById('detail-type').innerHTML = `<strong>类型:</strong> ${escapeHtml(resource.type || 'N/A')}`;
+                     document.getElementById('detail-difficulty').innerHTML = `<strong>难度:</strong> ${difficultyMap[resource.difficulty] || 'N/A'}`;
+                     document.getElementById('detail-date').innerHTML = `<strong>发布日期:</strong> ${resource.date || 'N/A'}`;
+                     document.getElementById('detail-rating').innerHTML = `<strong>评分:</strong> ${resource.rating ? `${resource.rating.toFixed(1)} <i class="fas fa-star"></i> (${resource.ratingCount || 0} 条评价)` : '暂无评分'}`;
+                     document.getElementById('detail-description').textContent = resource.description;
+                     document.getElementById('detail-link').href = resource.url || '#';
+                     if (!resource.url || resource.url === '#') {
+                         document.getElementById('detail-link').style.opacity = '0.5';
+                         document.getElementById('detail-link').style.cursor = 'not-allowed';
+                         document.getElementById('detail-link').onclick = (e) => e.preventDefault();
+                     } else {
+                         document.getElementById('detail-link').style.opacity = '1';
+                          document.getElementById('detail-link').style.cursor = 'pointer';
+                         document.getElementById('detail-link').onclick = null;
+                     }
+
+                     const tagsContainer = document.getElementById('detail-tags');
+                     tagsContainer.innerHTML = '<strong>标签:</strong> '; // Reset tags
+                     if (resource.tags && resource.tags.length > 0) {
+                         resource.tags.forEach(tag => {
+                             const tagSpan = document.createElement('span');
+                             tagSpan.textContent = escapeHtml(tag);
+                             tagsContainer.appendChild(tagSpan);
+                         });
+                     } else {
+                          tagsContainer.innerHTML += '<span style="font-weight: normal; margin-left: 5px;">无</span>';
+                     }
+
+                     // Update favorite button state
+                     updateFavoriteButton(resourceId);
+
+                     // Display the detail page section
+                     const detailPageElement = document.getElementById('resource-detail');
+                     if (detailPageElement) {
+                         detailPageElement.classList.remove('hidden');
+                          window.scrollTo(0, 0);
+                     } else {
+                        console.error("Detail page element not found!");
+                        displayPage('dashboard'); // Fallback
+                        return;
+                     }
+
+                    // Load Ratings and Related Resources asynchronously
+                    loadRatings(resourceId);
+                    loadRelatedResources(resourceId);
+
+                 }, 500); // Simulate network delay for detail load
+            }
+
+            function loadRatings(resourceId) {
+                const ratingsList = document.getElementById('ratings-list');
+                const ratingsEmpty = document.getElementById('ratings-list-empty');
+                const ratingsLoading = document.getElementById('ratings-list-loading');
+                const ratingCountSpan = document.getElementById('rating-count');
+                ratingsList.innerHTML = ''; // Clear previous ratings
+                hideEmpty(ratingsEmpty.id);
+                showLoading(ratingsLoading.id);
+
+                setTimeout(() => { // Simulate fetching ratings
+                    hideLoading(ratingsLoading.id);
+                    const ratings = mockRatingsDb[resourceId] || [];
+                    ratingCountSpan.textContent = ratings.length;
+
+                    if (ratings.length > 0) {
+                        ratingsEmpty.classList.add('hidden');
+                        ratings.forEach(r => {
+                            const ratingDiv = document.createElement('div');
+                            ratingDiv.classList.add('rating');
+                            const starsDisplay = '<i class="fas fa-star"></i>'.repeat(r.rating) + '<i class="far fa-star"></i>'.repeat(5 - r.rating); // Use Font Awesome
+                            ratingDiv.innerHTML = `
+                                <strong>${escapeHtml(r.user)}:</strong> <span class="stars-display">${starsDisplay}</span><br>
+                                <p>${escapeHtml(r.review)}</p>
+                                <span class="date">发表于: ${r.date}</span>
+                            `;
+                            ratingsList.appendChild(ratingDiv);
+                        });
+                    } else {
+                        showEmpty(ratingsEmpty.id);
+                    }
+                }, 600); // Simulate delay
+            }
+
+            function loadRelatedResources(resourceId) {
+                const relatedListContainer = document.getElementById('related-list');
+                const relatedEmpty = document.getElementById('related-list-empty');
+                const relatedLoading = document.getElementById('related-list-loading');
+                relatedListContainer.innerHTML = ''; // Clear previous
+                hideEmpty(relatedEmpty.id);
+                showLoading(relatedLoading.id);
+
+                setTimeout(() => { // Simulate finding related resources
+                    hideLoading(relatedLoading.id);
+                    let relatedCount = 0;
+                    // Mock: Find resources with the same subject (excluding self)
+                    const currentResource = mockResourcesDb[resourceId];
+                    if (currentResource && currentResource.subject) {
+                        for (const key in mockResourcesDb) {
+                            if (key !== resourceId && mockResourcesDb[key].subject === currentResource.subject && relatedCount < 3) { // Show max 3 related
+                                relatedListContainer.innerHTML += renderResourceCard(mockResourcesDb[key]);
+                                relatedCount++;
+                            }
+                        }
+                    }
+                    // If still no related, show some random ones (excluding self)
+                    if (relatedCount === 0) {
+                        for (const key in mockResourcesDb) {
+                            if (key !== resourceId && relatedCount < 2) { // Show max 2 random
+                                relatedListContainer.innerHTML += renderResourceCard(mockResourcesDb[key]);
+                                relatedCount++;
+                            }
+                        }
+                    }
+
+                    if (relatedCount === 0) {
+                        showEmpty(relatedEmpty.id);
+                    }
+                }, 700); // Simulate delay
+            }
+
+            // Update favorite button appearance and text
+            function updateFavoriteButton(resourceId) {
+                const favButton = document.getElementById('favorite-button');
+                if (!favButton) return;
+
+                const isCurrentlyFavorited = userFavorites.has(resourceId);
+                const newFavState = !isCurrentlyFavorited;
+
+                 // Update mock state
+                if (newFavState) {
+                    userFavorites.add(resourceId);
+                } else {
+                    userFavorites.delete(resourceId);
+                }
+
+                // Update button appearance immediately
+                updateFavoriteButton(resourceId);
+
+                // Simulate API call feedback (optional)
+                 console.log(`Resource ${resourceId} favorite status set to: ${newFavState}`);
+                // Show temporary feedback? e.g., tooltip or brief message
+            }
+
+            // HTML Escaping utility
+            function escapeHtml(unsafe) {
+                if (typeof unsafe !== 'string') return unsafe;
+                return unsafe
+                     .replace(/&/g, "&amp;")
+                     .replace(/</g, "&lt;")
+                     .replace(/>/g, "&gt;")
+                     .replace(/"/g, "&quot;")
+                     .replace(/'/g, "&#039;");
+            }
+
+            // --- Event Listeners ---
+
+            // Navigation
+            document.querySelector('header nav').addEventListener('click', (e) => {
+                if (e.target.tagName === 'A' && e.target.dataset.target) {
+                    e.preventDefault();
+                    displayPage(e.target.dataset.target);
+                }
+            });
+
+            // Resource Card Clicks & Detail Page Link Clicks (Event Delegation)
+            document.querySelector('main').addEventListener('click', (e) => {
+                 const cardLink = e.target.closest('a[data-target="resource-detail"]');
+                 if (cardLink && cardLink.dataset.resourceId) {
+                     e.preventDefault();
+                     // Store ID before loading detail page
+                     currentDetailResourceId = cardLink.dataset.resourceId;
+                     loadResourceDetail(currentDetailResourceId);
+                 }
+            });
+
+            // Header Search
+            document.getElementById('header-search-button').addEventListener('click', () => {
+                const query = document.getElementById('header-search-input').value.trim();
+                document.getElementById('resources-title').textContent = query ? `搜索结果: "${query}"` : '资源中心';
+                document.getElementById('filter-search').value = query; // Populate filter search
+                // Reset other filters when doing a header search? (Optional UX decision)
+                // document.getElementById('filter-subject').value = 'all';
+                // document.getElementById('filter-type').value = 'all';
+                // ...
+                // Trigger loading resource list with the search query
+                const currentFilters = {
+                    search: query,
+                    subject: document.getElementById('filter-subject').value,
+                    type: document.getElementById('filter-type').value,
+                    difficulty: document.getElementById('filter-difficulty').value,
+                    sort: document.getElementById('filter-sort').value
+                };
+                loadResourceListData(currentFilters);
+                displayPage('resources'); // Switch to resources page
+            });
+             document.getElementById('header-search-input').addEventListener('keypress', (e) => {
+                 if (e.key === 'Enter') {
+                     e.preventDefault();
+                     document.getElementById('header-search-button').click();
+                 }
+             });
+
+             // Apply Filters Button
+             document.getElementById('apply-filters-button').addEventListener('click', () => {
+                 const filters = {
+                     search: document.getElementById('filter-search').value.trim(),
+                     subject: document.getElementById('filter-subject').value,
+                     type: document.getElementById('filter-type').value,
+                     difficulty: document.getElementById('filter-difficulty').value,
+                     sort: document.getElementById('filter-sort').value
+                 };
+                 document.getElementById('resources-title').textContent = filters.search ? `搜索结果: "${filters.search}"` : '资源中心';
+                 loadResourceListData(filters);
+             });
+              // Also allow Enter in filter search input to apply filters
+              document.getElementById('filter-search').addEventListener('keypress', (e) => {
+                 if (e.key === 'Enter') {
+                     e.preventDefault();
+                     document.getElementById('apply-filters-button').click();
+                 }
+             });
+
+            // Pagination Click Handler (Event Delegation)
+            document.getElementById('pagination-container').addEventListener('click', (e) => {
+                 if (e.target.tagName === 'A' && e.target.dataset.page) {
+                     e.preventDefault();
+                     const page = parseInt(e.target.dataset.page, 10);
+                     console.log("Navigate to page (mock):", page);
+                     // In real app, fetch data for this page with current filters
+                     // For mockup, just visually update pagination
+                     // const totalPages = 10; // Get total pages from somewhere
+                     // renderPagination(page, totalPages);
+                     alert(`跳转到第 ${page} 页 (模拟)`);
+                 } else if (e.target.closest('a[data-page]')) { // Handle clicks on icons inside <a>
+                     e.preventDefault();
+                     const link = e.target.closest('a[data-page]');
+                      const page = parseInt(link.dataset.page, 10);
+                     console.log("Navigate to page (mock):", page);
+                     alert(`跳转到第 ${page} 页 (模拟)`);
+                 }
+            });
+
+            // Upload Form: Toggle File/Link
+            const uploadTypeRadios = document.querySelectorAll('input[name="uploadType"]');
+            const fileInputContainer = document.getElementById('fileInputContainer');
+            const linkInputContainer = document.getElementById('linkInputContainer');
+            const resourceFileInput = document.getElementById('resourceFile');
+            const resourceUrlInput = document.getElementById('resourceUrl');
+            uploadTypeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const isFile = this.value === 'file';
+                    fileInputContainer.classList.toggle('hidden', !isFile);
+                    linkInputContainer.classList.toggle('hidden', isFile);
+                    resourceFileInput.required = isFile;
+                    resourceUrlInput.required = !isFile;
+                    if (!isFile) resourceFileInput.value = '';
+                    if (isFile) resourceUrlInput.value = '';
+                });
+            });
+            // Initial state based on default checked
+            document.querySelector('input[name="uploadType"]:checked').dispatchEvent(new Event('change'));
+
+            // Upload Form Submission (Mock)
+            document.getElementById('uploadResourceForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const statusP = document.getElementById('upload-status');
+                statusP.textContent = '正在提交...';
+                statusP.style.color = 'orange';
+
+                setTimeout(() => {
+                    const success = Math.random() > 0.2;
+                    if (success) {
+                        statusP.textContent = '资源上传成功！感谢您的分享。';
+                        statusP.style.color = 'green';
+                        e.target.reset();
+                        document.getElementById('uploadTypeFile').checked = true;
+                        if (document.querySelector('input[name="uploadType"]:checked')) {
+                            document.querySelector('input[name="uploadType"]:checked').dispatchEvent(new Event('change'));
+                        }
+                    } else {
+                        statusP.textContent = '上传失败，请检查网络或稍后重试。';
+                        statusP.style.color = 'red';
+                    }
+                    setTimeout(() => { statusP.textContent = ''; }, 6000);
+                }, 1500);
+            });
+
+            // Detail Page: Toggle Favorite (Mock)
+            document.getElementById('favorite-button').addEventListener('click', function() {
+                if (!currentDetailResourceId) return;
+                const isCurrentlyFavorited = this.dataset.favorited === 'true';
+                const newFavState = !isCurrentlyFavorited;
+
+                 // Update mock state
+                if (newFavState) {
+                    userFavorites.add(currentDetailResourceId);
+                } else {
+                    userFavorites.delete(currentDetailResourceId);
+                }
+
+                // Update button appearance immediately
+                updateFavoriteButton(currentDetailResourceId);
+
+                // Simulate API call feedback (optional)
+                 console.log(`Resource ${currentDetailResourceId} favorite status set to: ${newFavState}`);
+                // Show temporary feedback? e.g., tooltip or brief message
+            });
+
+            // Detail Page: Show/Hide Rating Form
+            document.getElementById('rate-button').addEventListener('click', () => {
+                document.getElementById('rating-form').classList.toggle('hidden');
+            });
+
+            // Detail Page: Rating Form Submission (Mock)
+            document.getElementById('rating-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const statusP = document.getElementById('rating-status');
+                statusP.textContent = '正在提交评价...';
+                statusP.style.color = 'orange';
+
+                // Get rating value (more robustly if needed)
+                const ratingValue = e.target.querySelector('input[name="rating"]:checked')?.value;
+                const reviewText = e.target.querySelector('textarea[name="review"]').value.trim();
+
+                if (!ratingValue) {
+                    statusP.textContent = '请选择评分星级！';
+                    statusP.style.color = 'red';
+                    return;
+                }
+                 if (!reviewText) {
+                    statusP.textContent = '请填写评价内容！';
+                    statusP.style.color = 'red';
+                    return;
+                }
+
+                setTimeout(() => {
+                    statusP.textContent = '评价提交成功！感谢您的反馈。';
+                    statusP.style.color = 'green';
+                    e.target.reset(); // Reset form
+                    e.target.classList.add('hidden'); // Hide form again
+
+                    // Mock adding the new rating to the DB and UI
+                    const newRating = { user: '当前用户', rating: parseInt(ratingValue), review: reviewText, date: new Date().toISOString().split('T')[0] };
+                    if (!mockRatingsDb[currentDetailResourceId]) {
+                        mockRatingsDb[currentDetailResourceId] = [];
+                    }
+                    mockRatingsDb[currentDetailResourceId].unshift(newRating); // Add to beginning
+                    // Reload ratings display for the current resource
+                    loadRatings(currentDetailResourceId);
+
+                    e.target.reset(); // Reset form
+                    e.target.classList.add('hidden'); // Hide form again
+                    setTimeout(() => { statusP.textContent = ''; }, 4000);
+                }, 1000);
+            });
+
+            // --- Initial Load ---
+            document.addEventListener('DOMContentLoaded', () => {
+                displayPage('dashboard'); // Show dashboard by default
+            });
+        </script>
+    </body>
+</html>
