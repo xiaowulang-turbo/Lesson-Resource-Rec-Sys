@@ -121,29 +121,65 @@ export class MongoDBAdapter extends DataServiceInterface {
     }
 
     async getAllResources(filters = {}) {
-        const query = Resource.find(filters).populate('createdBy', 'name email')
-        const resources = await query
-        return resources.map((resource) => ({
-            id: resource._id,
-            title: resource.title,
-            description: resource.description,
-            type: resource.type,
-            subject: resource.subject,
-            grade: resource.grade,
-            difficulty: resource.difficulty,
-            url: resource.url,
-            createdBy: resource.createdBy,
-            tags: resource.tags,
-            ratings: resource.ratings,
-            averageRating: resource.averageRating,
-            cover: resource.cover,
-            price: resource.price,
-            originalPrice: resource.originalPrice,
-            authors: resource.authors,
-            publisher: resource.publisher,
-            enrollCount: resource.enrollCount,
-            studyAvatars: resource.studyAvatars,
-        }))
+        try {
+            // 提取分页参数
+            const page = filters.page ? parseInt(filters.page) : 1
+            const limit = filters.limit ? parseInt(filters.limit) : 10
+            const skip = (page - 1) * limit
+
+            // 提取除分页参数外的其他过滤条件
+            const {
+                page: pageParam,
+                limit: limitParam,
+                ...otherFilters
+            } = filters
+
+            // 构建查询，计算总记录数
+            const query = Resource.find(otherFilters)
+            const total = await Resource.countDocuments(otherFilters)
+
+            // 应用分页并关联创建者
+            const resources = await query
+                .populate('createdBy', 'name email')
+                .skip(skip)
+                .limit(limit)
+
+            // 返回资源数组和分页信息
+            return {
+                resources: resources.map((resource) => ({
+                    id: resource._id,
+                    title: resource.title,
+                    description: resource.description,
+                    type: resource.type,
+                    subject: resource.subject,
+                    grade: resource.grade,
+                    difficulty: resource.difficulty,
+                    url: resource.url,
+                    createdBy: resource.createdBy,
+                    tags: resource.tags,
+                    ratings: resource.ratings,
+                    averageRating: resource.averageRating,
+                    cover: resource.cover,
+                    price: resource.price,
+                    originalPrice: resource.originalPrice,
+                    authors: resource.authors,
+                    publisher: resource.publisher,
+                    enrollCount: resource.enrollCount,
+                    studyAvatars: resource.studyAvatars,
+                    createdAt: resource.createdAt,
+                    updatedAt: resource.updatedAt,
+                })),
+                pagination: {
+                    total,
+                    page,
+                    limit,
+                    pages: Math.ceil(total / limit),
+                },
+            }
+        } catch (error) {
+            console.error('获取资源列表失败:', error)
+            throw new Error('获取资源列表失败')
+        }
     }
 
     async updateResource(id, resourceData) {
