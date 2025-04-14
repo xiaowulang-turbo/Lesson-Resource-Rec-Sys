@@ -8,7 +8,9 @@ import { getAllResources } from '../services/apiResources'
 import Spinner from '../ui/Spinner'
 import Pagination from '../ui/Pagination'
 import { PAGE_SIZE } from '../utils/constants'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import Button from '../ui/Button'
+import { HiCloudArrowUp } from 'react-icons/hi2'
 
 const StyledResources = styled.div`
     padding: 2.4rem;
@@ -25,6 +27,7 @@ const FilterSection = styled.div`
 `
 
 function Resources() {
+    const navigate = useNavigate()
     const [resources, setResources] = useState([])
     const [filteredResources, setFilteredResources] = useState([])
     const [pagination, setPagination] = useState({
@@ -159,6 +162,14 @@ function Resources() {
         <>
             <Row type="horizontal">
                 <Heading as="h1">资源中心</Heading>
+                <Button
+                    size="medium"
+                    variation="primary"
+                    onClick={() => navigate('/upload')}
+                >
+                    <HiCloudArrowUp />
+                    <span style={{ marginLeft: '0.6rem' }}>上传资源</span>
+                </Button>
             </Row>
 
             <StyledResources>
