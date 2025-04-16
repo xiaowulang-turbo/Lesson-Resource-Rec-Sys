@@ -1,0 +1,42 @@
+[
+    {
+        "name": "管理员",
+        "email": "admin@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "admin",
+        "preferred_subjects": ["数学", "物理"],
+        "preferred_difficulty": 3,
+        "preferred_resource_types": ["视频", "文档"],
+        "interests": ["数学", "物理", "编程"]
+    },
+    {
+        "name": "jonas",
+        "email": "jonas@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "admin",
+        "preferred_subjects": ["数学", "物理"],
+        "preferred_difficulty": 4,
+        "preferred_resource_types": ["视频", "文档"],
+        "interests": ["数学", "物理", "编程"]
+    },
+    {
+        "name": "教师",
+        "email": "teacher@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "teacher",
+        "preferred_subjects": ["数学", "物理"],
+        "preferred_difficulty": 3,
+        "preferred_resource_types": ["视频", "文档"],
+        "interests": ["数学", "物理", "编程"]
+    },
+    {
+        "name": "学生",
+        "email": "student@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "user",
+        "preferred_subjects": ["数学", "物理"],
+        "preferred_difficulty": 2,
+        "preferred_resource_types": ["视频", "文档"],
+        "interests": ["数学", "物理", "编程"]
+    }
+]
