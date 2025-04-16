@@ -4,11 +4,26 @@ const dataService = new DataServiceFactory().getAdapter()
 
 export const signup = async (req, res) => {
     try {
+        console.log('signup', req.body)
+
+        // 只从请求体中获取必要的字段，不再接受 role
+        const { name, email, password } = req.body
+
+        console.log('signup', name, email, password)
+
+        // 确保提供了必要的信息 (虽然 Mongoose 会验证，但提前检查更友好)
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                status: 'error',
+                message: '请提供姓名、邮箱和密码',
+            })
+        }
+
         const newUser = await dataService.createUser({
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password,
-            role: req.body.role,
+            name,
+            email,
+            password,
+            // role 将由 Mongoose schema 的默认值 'user' 自动设置
         })
 
         const token = await dataService.generateAuthToken(newUser.id)
