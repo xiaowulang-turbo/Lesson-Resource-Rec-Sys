@@ -2,18 +2,27 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { login as loginApi } from '../../services/apiAuth'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 
 export default function useLogin() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+    const { login: authContextLogin } = useAuth()
 
     const { mutate: login, isLoading } = useMutation({
         mutationFn: ({ email, password }) => loginApi({ email, password }),
 
         onSuccess: (data) => {
-            // data is an object which contains { data: { user, token } }
+            // data is the full authData object { status, token, data: { user } }
             toast.success('登录成功')
-            queryClient.setQueryData(['user'], data.data.user)
+
+            // 1. Update AuthContext state
+            authContextLogin(data)
+
+            // 2. Update React Query cache (if still needed, depends on useUser implementation)
+            // queryClient.setQueryData(['user'], data.data.user) // Keep or remove based on how useUser works
+
+            // 3. Navigate
             navigate('/dashboard', { replace: true })
         },
 
