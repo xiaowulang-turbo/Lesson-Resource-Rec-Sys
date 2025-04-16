@@ -11,8 +11,9 @@ export class MongoDBAdapter extends DataServiceInterface {
 
     // 用户相关
     async createUser(userData) {
-        // 如果密码已经是加密的，直接使用
-        if (userData.password.startsWith('$2a$')) {
+        // 移除手动加密逻辑，直接将 userData 传递给 User.create
+        // Mongoose 的 pre('save') 中间件会负责加密
+        try {
             const user = await User.create(userData)
             return {
                 id: user._id,
@@ -20,20 +21,10 @@ export class MongoDBAdapter extends DataServiceInterface {
                 email: user.email,
                 role: user.role,
             }
-        }
-
-        // 如果密码是明文，先加密
-        const salt = await bcrypt.genSalt(12)
-        const hashedPassword = await bcrypt.hash(userData.password, salt)
-        const user = await User.create({
-            ...userData,
-            password: hashedPassword,
-        })
-        return {
-            id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
+        } catch (error) {
+            // 捕获并重新抛出 Mongoose 验证错误等
+            console.error('Error creating user in adapter:', error)
+            throw error // 将错误传递给控制器处理
         }
     }
 
@@ -128,11 +119,9 @@ export class MongoDBAdapter extends DataServiceInterface {
             const skip = (page - 1) * limit
 
             // 提取除分页参数外的其他过滤条件
-            const {
-                page: pageParam,
-                limit: limitParam,
-                ...otherFilters
-            } = filters
+            const otherFilters = { ...filters } // 复制 filters 对象
+            delete otherFilters.page // 删除 page 属性
+            delete otherFilters.limit // 删除 limit 属性
 
             // 构建查询，计算总记录数
             const query = Resource.find(otherFilters)
