@@ -11,7 +11,7 @@ import Empty from '../ui/Empty'
 import ResourceList from '../components/ResourceList'
 // import { getRecommendedResources } from '../services/apiResources'
 import { fetchHomepageRecommendations } from '../services/apiRecommendations'
-import { AuthContext } from '../context/AuthContext'
+import { useAuth } from '../context/AuthContext'
 
 const StyledDashboard = styled.div`
     display: flex;
@@ -41,7 +41,7 @@ const RecommendationsContainer = styled.section`
 function Dashboard() {
     const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigate()
-    const { user, isAuthenticated } = useContext(AuthContext)
+    const { user, isAuthenticated } = useAuth()
 
     const [recommendedResources, setRecommendedResources] = useState([])
     const [isLoading, setIsLoading] = useState(true)
@@ -74,8 +74,8 @@ function Dashboard() {
     }
 
     const recommendationTitle = isAuthenticated
-        ? `${user?.username || '用户'}，为你推荐`
-        : '热门精选'
+        ? `${user?.name || '用户'}，为你推荐`
+        : '为你推荐'
 
     console.log('[Dashboard] Rendering - isLoading:', isLoading)
     console.log('[Dashboard] Rendering - error:', error)

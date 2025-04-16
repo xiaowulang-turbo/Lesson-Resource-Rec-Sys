@@ -26,7 +26,8 @@ const Avatar = styled.img`
 export default function UserAvatar() {
     const navigate = useNavigate()
     const { user } = useUser()
-    const { fullName, avatar } = user?.user_metadata || {}
+    const displayName = user?.name || 'User'
+    const avatarSrc = 'default-user.jpg'
 
     const handleAvatarClick = () => {
         navigate('/account')
@@ -34,11 +35,8 @@ export default function UserAvatar() {
 
     return (
         <StyledUserAvatar onClick={handleAvatarClick}>
-            <Avatar
-                src={avatar || 'default-user.jpg'}
-                alt={`Avatar of ${fullName}`}
-            />
-            <span>{fullName}</span>
+            <Avatar src={avatarSrc} alt={`Avatar of ${displayName}`} />
+            <span>{displayName}</span>
         </StyledUserAvatar>
     )
 }

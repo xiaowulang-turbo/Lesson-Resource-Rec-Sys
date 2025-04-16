@@ -13,6 +13,7 @@ import Users from './pages/Users'
 import Resources from './pages/Resources'
 import Profile from './pages/Profile'
 import Login from './pages/Login'
+import Register from './pages/Register'
 import Search from './pages/Search'
 import Upload from './pages/Upload'
 import GlobalStyles from './styles/GlobalStyles'
@@ -44,6 +45,7 @@ function App() {
                             <GlobalStyles />
                             <Routes>
                                 <Route path="login" element={<Login />} />
+                                <Route path="register" element={<Register />} />
                                 <Route
                                     element={
                                         <ProtectedRoute>
