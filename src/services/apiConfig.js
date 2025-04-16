@@ -14,10 +14,10 @@ export const ENDPOINTS = {
     RESOURCES: {
         BASE: '/resources',
         RATINGS: (id) => `/resources/${id}/ratings`,
+        SINGLE: (id) => `/resources/${id}`,
+        RECOMMENDED: '/resources/recommended',
     },
-    COURSES: {
-        BASE: '/courses',
-        SINGLE: (id) => `/courses/${id}`,
-        RECOMMENDED: '/courses/recommended',
+    STATS: {
+        BASE: '/stats',
     },
 }
