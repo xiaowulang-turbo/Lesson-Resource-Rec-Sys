@@ -1,4 +1,6 @@
+import mongoose from 'mongoose' // Import mongoose
 import { DataServiceFactory } from '../services/DataServiceFactory.js'
+import Resource from '../models/resourceModel.js' // Import the Resource model
 
 const dataService = new DataServiceFactory().getAdapter()
 
@@ -26,15 +28,33 @@ export const getAllResources = async (req, res) => {
 
 export const getResource = async (req, res) => {
     try {
-        const resource = await dataService.getResourceById(req.params.id)
+        const idParam = req.params.id
+        let resource = null
 
+        // 1. Check if it's a valid MongoDB ObjectId and find by _id
+        if (mongoose.Types.ObjectId.isValid(idParam)) {
+            resource = await Resource.findById(idParam)
+        }
+
+        // 2. If not found by ObjectId or if it wasn't a valid ObjectId, try finding by metadata.id (as a number)
         if (!resource) {
+            const metadataId = parseInt(idParam, 10)
+            if (!isNaN(metadataId)) {
+                // Only query if it's a valid number
+                resource = await Resource.findOne({ 'metadata.id': metadataId })
+            }
+        }
+
+        // 3. Handle final result
+        if (!resource) {
+            // If still not found after checking both ways
             return res.status(404).json({
                 status: 'error',
                 message: '未找到该资源',
             })
         }
 
+        // Found the resource
         res.status(200).json({
             status: 'success',
             data: {
@@ -42,9 +62,11 @@ export const getResource = async (req, res) => {
             },
         })
     } catch (err) {
-        res.status(400).json({
+        // General error handling for unexpected issues
+        console.error('Error in getResource:', err) // Log the actual error
+        res.status(500).json({
             status: 'error',
-            message: err.message,
+            message: err.message || '获取资源时发生错误',
         })
     }
 }
