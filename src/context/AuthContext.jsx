@@ -15,31 +15,53 @@ export function AuthProvider({ children }) {
     // 3. 尝试从 localStorage 加载初始状态
     useEffect(() => {
         try {
-            const storedToken = localStorage.getItem('jwt')
-            const storedUser = localStorage.getItem('user')
+            const storedAuth = localStorage.getItem('auth') // Read the whole auth object string
 
-            if (storedToken && storedUser) {
-                setToken(storedToken)
-                setUser(JSON.parse(storedUser))
-                setIsAuthenticated(true)
+            console.log('storedAuth', storedAuth)
+
+            if (storedAuth) {
+                const authData = JSON.parse(storedAuth) // Parse the JSON
+                if (authData.token && authData.data && authData.data.user) {
+                    setToken(authData.token) // Set token state
+                    setUser(authData.data.user) // Set user state
+                    setIsAuthenticated(true)
+                } else {
+                    // Handle cases where the stored object might be malformed
+                    console.warn(
+                        'Stored auth data is missing token or user information.'
+                    )
+                    localStorage.removeItem('auth') // Clear invalid entry
+                }
             }
         } catch (error) {
             console.error('Failed to load auth state from localStorage', error)
             // Clear potentially corrupted storage
-            localStorage.removeItem('jwt')
-            localStorage.removeItem('user')
+            localStorage.removeItem('auth')
+            // No longer storing 'user' separately
         } finally {
             setIsLoading(false) // Finished loading initial state
         }
     }, [])
 
-    // 4. 登录函数
-    const login = (userData, authToken) => {
+    // 4. 登录函数 - Now accepts the whole auth object
+    const login = (authData) => {
         try {
-            localStorage.setItem('jwt', authToken)
-            localStorage.setItem('user', JSON.stringify(userData))
-            setToken(authToken)
-            setUser(userData)
+            if (
+                !authData ||
+                !authData.token ||
+                !authData.data ||
+                !authData.data.user
+            ) {
+                console.error(
+                    'Invalid authData provided to login function',
+                    authData
+                )
+                return // Exit if data is incomplete
+            }
+            localStorage.setItem('auth', JSON.stringify(authData)) // Store the whole object
+            // No longer storing 'user' separately
+            setToken(authData.token)
+            setUser(authData.data.user)
             setIsAuthenticated(true)
         } catch (error) {
             console.error('Failed to save auth state to localStorage', error)
@@ -49,8 +71,8 @@ export function AuthProvider({ children }) {
     // 5. 登出函数
     const logout = () => {
         try {
-            localStorage.removeItem('jwt')
-            localStorage.removeItem('user')
+            localStorage.removeItem('auth') // Only remove the 'auth' key
+            // No longer removing 'user' separately
             setToken(null)
             setUser(null)
             setIsAuthenticated(false)
