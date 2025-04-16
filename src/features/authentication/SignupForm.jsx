@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 import Button from '../../ui/Button'
 import Form from '../../ui/Form'
 import FormRow from '../../ui/FormRow'
@@ -10,6 +11,7 @@ import useSignup from './useSignup'
 function SignupForm() {
     const { register, formState, getValues, handleSubmit, reset } = useForm()
     const { errors } = formState
+    const navigate = useNavigate()
 
     const { signup, isLoading } = useSignup()
 
@@ -82,8 +84,11 @@ function SignupForm() {
             </FormRow>
 
             <FormRow>
-                {/* type is an HTML attribute! */}
-                <Button variation="secondary" type="reset" disabled={isLoading}>
+                <Button
+                    variation="secondary"
+                    disabled={isLoading}
+                    onClick={() => navigate('/login')}
+                >
                     Cancel
                 </Button>
                 <Button disabled={isLoading}>Create new user</Button>
