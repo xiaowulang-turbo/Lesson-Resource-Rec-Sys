@@ -17,14 +17,14 @@ function clearAuth() {
 }
 
 // 注册
-export async function signup({ name, email, password }) {
+export async function signup({ fullName, email, password }) {
     try {
         const res = await fetch(`${BASE_URL}${ENDPOINTS.AUTH.SIGNUP}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ name, email, password }),
+            body: JSON.stringify({ name: fullName, email, password }),
         })
 
         const data = await res.json()
