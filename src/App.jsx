@@ -7,13 +7,11 @@ import {
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import Dashboard from './pages/Dashboard'
-import Courses from './pages/Courses'
 import Account from './pages/Account'
 import Settings from './pages/Settings'
 import Users from './pages/Users'
 import Resources from './pages/Resources'
 import Profile from './pages/Profile'
-import ApiTest from './pages/ApiTest'
 import Login from './pages/Login'
 import Search from './pages/Search'
 import Upload from './pages/Upload'
@@ -25,6 +23,7 @@ import { DarkModeProvider } from './context/DarkModeContext'
 import { LayoutProvider } from './context/LayoutContext'
 import ResourceDetail from './pages/ResourceDetail'
 import PageNotFound from './pages/PageNotFound'
+import { AuthProvider } from './context/AuthContext'
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -36,75 +35,87 @@ const queryClient = new QueryClient({
 
 function App() {
     return (
-        <DarkModeProvider>
-            <LayoutProvider>
-                <QueryClientProvider client={queryClient}>
-                    <ReactQueryDevtools initialIsOpen={false} />
-                    <GlobalStyles />
-                    <Router>
-                        <Routes>
-                            <Route path="login" element={<Login />} />
-                            <Route
-                                element={
-                                    <ProtectedRoute>
-                                        <AppLayout />
-                                    </ProtectedRoute>
-                                }
-                            >
+        <Router>
+            <AuthProvider>
+                <DarkModeProvider>
+                    <LayoutProvider>
+                        <QueryClientProvider client={queryClient}>
+                            <ReactQueryDevtools initialIsOpen={false} />
+                            <GlobalStyles />
+                            <Routes>
+                                <Route path="login" element={<Login />} />
                                 <Route
-                                    index
                                     element={
-                                        <Navigate replace to="dashboard" />
+                                        <ProtectedRoute>
+                                            <AppLayout />
+                                        </ProtectedRoute>
                                     }
-                                />
-                                <Route
-                                    path="dashboard"
-                                    element={<Dashboard />}
-                                />
-                                <Route path="account" element={<Account />} />
-                                <Route path="settings" element={<Settings />} />
-                                <Route path="home" element={<Dashboard />} />
-                                <Route path="users" element={<Users />} />
-                                <Route path="courses" element={<Courses />} />
-                                <Route
-                                    path="resources"
-                                    element={<Resources />}
-                                />
-                                <Route
-                                    path="resources/:id"
-                                    element={<ResourceDetail />}
-                                />
-                                <Route path="profile" element={<Profile />} />
-                                <Route path="api-test" element={<ApiTest />} />
-                                <Route path="search" element={<Search />} />
-                                <Route path="upload" element={<Upload />} />
-                            </Route>
-                            <Route path="*" element={<PageNotFound />} />
-                        </Routes>
-                    </Router>
-                    <Toaster
-                        position="top-center"
-                        gutter={12}
-                        containerStyle={{ margin: '8px' }}
-                        toastOptions={{
-                            success: {
-                                duration: 3000,
-                            },
-                            error: {
-                                duration: 5000,
-                            },
-                            style: {
-                                fontSize: '16px',
-                                maxWidth: '500px',
-                                padding: '16px 24px',
-                                backgroundColor: 'var(--color-grey-0)',
-                                color: 'var(--color-grey-700)',
-                            },
-                        }}
-                    />
-                </QueryClientProvider>
-            </LayoutProvider>
-        </DarkModeProvider>
+                                >
+                                    <Route
+                                        index
+                                        element={
+                                            <Navigate replace to="dashboard" />
+                                        }
+                                    />
+                                    <Route
+                                        path="dashboard"
+                                        element={<Dashboard />}
+                                    />
+                                    <Route
+                                        path="account"
+                                        element={<Account />}
+                                    />
+                                    <Route
+                                        path="settings"
+                                        element={<Settings />}
+                                    />
+                                    <Route
+                                        path="home"
+                                        element={<Dashboard />}
+                                    />
+                                    <Route path="users" element={<Users />} />
+                                    <Route
+                                        path="resources"
+                                        element={<Resources />}
+                                    />
+                                    <Route
+                                        path="resources/:id"
+                                        element={<ResourceDetail />}
+                                    />
+                                    <Route
+                                        path="profile"
+                                        element={<Profile />}
+                                    />
+                                    <Route path="search" element={<Search />} />
+                                    <Route path="upload" element={<Upload />} />
+                                </Route>
+                                <Route path="*" element={<PageNotFound />} />
+                            </Routes>
+                            <Toaster
+                                position="top-center"
+                                gutter={12}
+                                containerStyle={{ margin: '8px' }}
+                                toastOptions={{
+                                    success: {
+                                        duration: 3000,
+                                    },
+                                    error: {
+                                        duration: 5000,
+                                    },
+                                    style: {
+                                        fontSize: '16px',
+                                        maxWidth: '500px',
+                                        padding: '16px 24px',
+                                        backgroundColor: 'var(--color-grey-0)',
+                                        color: 'var(--color-grey-700)',
+                                    },
+                                }}
+                            />
+                        </QueryClientProvider>
+                    </LayoutProvider>
+                </DarkModeProvider>
+            </AuthProvider>
+        </Router>
     )
 }
 

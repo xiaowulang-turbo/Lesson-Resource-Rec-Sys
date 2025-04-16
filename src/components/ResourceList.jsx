@@ -3,8 +3,9 @@ import Empty from '../ui/Empty'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-// 更换为可用的占位图片URL
-const PLACEHOLDER_IMAGE = 'https://picsum.photos/400/180?blur=2'
+// Revert to a reliable placeholder service as Unsplash Source seems unreliable
+// Use Lorem Picsum as a potentially better placeholder for China access
+const PLACEHOLDER_IMAGE = 'https://picsum.photos/400/180?random=1'
 
 const ResourceGrid = styled.div`
     display: grid;
@@ -38,6 +39,7 @@ const ResourceCard = styled.div`
 const ResourceImage = styled.div`
     height: 180px;
     overflow: hidden;
+    background-color: var(--color-grey-100); // Background for placeholder
     ${({ layout }) => {
         if (layout === 'list') {
             return `
@@ -78,18 +80,23 @@ const ResourceTitle = styled.h3`
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    height: 3.2em;
+    height: 3.2em; // Approx 2 lines
+    line-height: 1.6em;
 `
 
 const ResourcePublisher = styled.p`
     font-size: 1.4rem;
     color: var(--color-grey-500);
     margin-bottom: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 `
 
 const ResourceInfo = styled.div`
     display: flex;
     align-items: center;
+    flex-wrap: wrap; // Allow wrapping if needed
     gap: 1.2rem;
     margin-bottom: 1.2rem;
 `
@@ -105,16 +112,19 @@ const ResourceRating = styled.span`
     font-weight: 600;
 `
 
+// Updated Label component styling logic based on difficulty strings
 const Label = styled.span`
     font-size: 1.2rem;
     font-weight: 600;
     padding: 0.4rem 0.8rem;
     border-radius: var(--border-radius-sm);
-    text-transform: uppercase;
+    text-transform: capitalize; // Capitalize difficulty
 
     ${(props) =>
         props.type === 'difficulty' &&
-        props.value <= 2 &&
+        (String(props.value)?.toLowerCase() === 'beginner' ||
+            String(props.value)?.toLowerCase() === '入门' ||
+            String(props.value)?.toLowerCase() === '初级') &&
         `
       background-color: var(--color-green-100);
       color: var(--color-green-700);
@@ -122,34 +132,39 @@ const Label = styled.span`
 
     ${(props) =>
         props.type === 'difficulty' &&
-        props.value > 2 &&
-        props.value <= 4 &&
+        (String(props.value)?.toLowerCase() === 'intermediate' ||
+            String(props.value)?.toLowerCase() === '中级') &&
         `
       background-color: var(--color-blue-100);
       color: var(--color-blue-700);
     `}
-    
+
     ${(props) =>
         props.type === 'difficulty' &&
-        props.value > 4 &&
+        (String(props.value)?.toLowerCase() === 'advanced' ||
+            String(props.value)?.toLowerCase() === '高级') &&
         `
-      background-color: var(--color-yellow-100);
-      color: var(--color-yellow-700);
+      background-color: var(--color-orange-100);
+      color: var(--color-orange-700);
     `}
-  
+
+    ${(props) =>
+        props.type === 'difficulty' &&
+        (String(props.value)?.toLowerCase() === 'expert' ||
+            String(props.value)?.toLowerCase() === '专家' ||
+            String(props.value)?.toLowerCase() === 'mixed') && // Treat Mixed as expert for now
+        `
+      background-color: var(--color-red-100);
+      color: var(--color-red-700);
+    `}
+
+    // Add other types if needed, like price or students enrolled
     ${(props) =>
         props.type === 'students' &&
         `
-      background-color: var(--color-grey-100);
-      color: var(--color-grey-700);
-    `}
-    
-    ${(props) =>
-        props.type === 'price' &&
-        `
-      background-color: var(--color-indigo-100);
-      color: var(--color-indigo-700);
-    `}
+        background-color: var(--color-grey-100);
+        color: var(--color-grey-700);
+      `}
 `
 
 const Description = styled.p`
@@ -160,7 +175,8 @@ const Description = styled.p`
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    height: 4.2em;
+    height: 4.2em; // Approx 3 lines
+    line-height: 1.4em;
 `
 
 const TagContainer = styled.div`
@@ -198,47 +214,57 @@ const LayoutToggle = styled.button`
 `
 
 function ResourceList({ resources }) {
-    const [layout, setLayout] = useState('grid') // 'grid' 或 'list'
+    const [layout, setLayout] = useState('grid') // 'grid' or 'list'
 
     const toggleLayout = () => {
         setLayout((prev) => (prev === 'grid' ? 'list' : 'grid'))
     }
 
-    if (!resources.length) return <Empty resource={'resources'} />
-
-    // 资源类型映射
-    const getResourceType = (type) => {
-        const typeMap = {
-            308: '电子教材',
-            310: '实践项目',
-            311: '练习题库',
-            312: '参考资料',
-        }
-        return typeMap[type] || '其他资源'
+    if (!resources || !resources.length) {
+        console.log('[ResourceList] No resources to display.')
+        return <Empty resourceName="推荐内容" />
     }
 
-    // 难度等级映射
-    const getDifficultyLabel = (level) => {
-        const difficultyMap = {
-            1: '入门',
-            2: '初级',
-            3: '中级',
-            4: '高级',
-            5: '专家',
+    // Helper to safely parse rating
+    const parseRating = (ratingStr) => {
+        const rating = parseFloat(ratingStr)
+        return isNaN(rating) ? 0 : rating
+    }
+
+    // Difficulty mapping remains useful for display text, but label uses string directly
+    const getDifficultyText = (levelString) => {
+        // Check if levelString is truthy AND a string before capitalizing
+        if (levelString && typeof levelString === 'string') {
+            return levelString.charAt(0).toUpperCase() + levelString.slice(1)
         }
-        return difficultyMap[level] || `${level}级`
+        // If it's a truthy non-string (like a number), or a falsy value, handle it.
+        if (typeof levelString === 'number') {
+            return String(levelString) // Display number as string
+        }
+        // Fallback for null, undefined, '', false, etc.
+        return '未知'
     }
 
     return (
         <>
             <ResourceGrid layout={layout}>
-                {resources.map((resource) => {
-                    const resourceId =
-                        resource._id || resource.id || resource.metadata?.id
+                {resources.map((resource, index) => {
+                    const resourceId = resource.id
                     if (!resourceId) {
-                        console.warn('Resource missing ID:', resource)
-                        return null
+                        console.error(
+                            'Resource missing a unique identifier (id):',
+                            resource
+                        )
+                        return (
+                            <div key={`missing-id-${index}`}>
+                                Resource data is incomplete
+                            </div>
+                        )
                     }
+
+                    const displayRating = parseRating(resource.averageRating)
+                    const tagsToDisplay = resource.tags || []
+
                     return (
                         <ResourceCardLink
                             key={resourceId}
@@ -247,12 +273,8 @@ function ResourceList({ resources }) {
                             <ResourceCard layout={layout}>
                                 <ResourceImage layout={layout}>
                                     <img
-                                        src={
-                                            resource.coverImage ||
-                                            resource.url ||
-                                            PLACEHOLDER_IMAGE
-                                        }
-                                        alt={resource.title}
+                                        src={PLACEHOLDER_IMAGE}
+                                        alt={resource.title || '课程封面'}
                                         onError={(e) => {
                                             e.target.src = PLACEHOLDER_IMAGE
                                         }}
@@ -260,65 +282,56 @@ function ResourceList({ resources }) {
                                 </ResourceImage>
                                 <ResourceContent layout={layout}>
                                     <ResourceTitle>
-                                        {resource.title}
+                                        {resource.title || '无标题'}
                                     </ResourceTitle>
                                     <ResourcePublisher>
-                                        {resource.createdBy?.name ||
-                                            resource.publisher ||
-                                            '未知发布者'}
+                                        {resource.organization || '未知机构'}
                                     </ResourcePublisher>
 
                                     <ResourceInfo>
                                         <Rating>
                                             <ResourceRating>
-                                                {(
-                                                    resource.averageRating || 0
-                                                ).toFixed(1)}
+                                                {displayRating.toFixed(1)}
                                             </ResourceRating>
-                                            <span>
-                                                ({resource.ratingsCount || 0}{' '}
-                                                评分)
-                                            </span>
                                         </Rating>
-                                    </ResourceInfo>
 
-                                    <ResourceInfo>
-                                        <Label
-                                            type="difficulty"
-                                            value={resource.difficulty}
-                                        >
-                                            {getDifficultyLabel(
-                                                resource.difficulty
-                                            )}
-                                        </Label>
-                                        <Label type="price">
-                                            {resource.price > 0
-                                                ? `¥${resource.price.toFixed(
-                                                      2
-                                                  )}`
-                                                : '免费'}
-                                        </Label>
+                                        {resource.difficulty && (
+                                            <Label
+                                                type="difficulty"
+                                                value={resource.difficulty}
+                                            >
+                                                {getDifficultyText(
+                                                    resource.difficulty
+                                                )}
+                                            </Label>
+                                        )}
+                                        {resource.enrollCount && (
+                                            <Label type="students">
+                                                {resource.enrollCount}
+                                            </Label>
+                                        )}
                                     </ResourceInfo>
 
                                     <Description>
-                                        {resource.description}
+                                        {resource.description || '无描述'}
                                     </Description>
 
-                                    {resource.tags &&
-                                        resource.tags.length > 0 && (
-                                            <TagContainer>
-                                                {resource.tags
-                                                    .slice(0, 5)
-                                                    .map((tag, index) => (
-                                                        <Tag key={index}>
-                                                            {tag}
-                                                        </Tag>
-                                                    ))}
-                                                {resource.tags.length > 5 && (
-                                                    <Tag>...</Tag>
-                                                )}
-                                            </TagContainer>
-                                        )}
+                                    {tagsToDisplay.length > 0 && (
+                                        <TagContainer>
+                                            {tagsToDisplay
+                                                .slice(0, 4)
+                                                .map((tag, index) => (
+                                                    <Tag
+                                                        key={`${resourceId}-tag-${index}`}
+                                                    >
+                                                        {tag}
+                                                    </Tag>
+                                                ))}
+                                            {tagsToDisplay.length > 4 && (
+                                                <Tag>...</Tag>
+                                            )}
+                                        </TagContainer>
+                                    )}
                                 </ResourceContent>
                             </ResourceCard>
                         </ResourceCardLink>
@@ -326,9 +339,10 @@ function ResourceList({ resources }) {
                 })}
             </ResourceGrid>
 
-            <LayoutToggle onClick={toggleLayout}>
+            {/* Keep Layout Toggle if needed */}
+            {/* <LayoutToggle onClick={toggleLayout}>
                 切换为 {layout === 'grid' ? '列表' : '网格'} 视图
-            </LayoutToggle>
+            </LayoutToggle> */}
         </>
     )
 }

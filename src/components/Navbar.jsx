@@ -46,13 +46,6 @@ const Navbar = () => {
                         </Button>
                         <Button
                             component={RouterLink}
-                            to="/courses"
-                            sx={{ my: 2, color: 'white', display: 'block' }}
-                        >
-                            课程
-                        </Button>
-                        <Button
-                            component={RouterLink}
                             to="/resources"
                             sx={{ my: 2, color: 'white', display: 'block' }}
                         >
