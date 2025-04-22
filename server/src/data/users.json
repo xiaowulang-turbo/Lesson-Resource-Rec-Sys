@@ -388,5 +388,168 @@
                 "date_completed": "2023-11-20"
             }
         ]
+    },
+    {
+        "user_id": "admin1",
+        "username": "管理员",
+        "email": "admin@example.com",
+        "teaching_subject": "数据科学",
+        "grade_level": "大学",
+        "years_experience": 10,
+        "interests": ["机器学习", "深度学习", "大数据", "云计算"],
+        "preferred_subjects": ["数据科学", "人工智能", "计算机科学"],
+        "preferred_difficulty": 4,
+        "preferred_learning_style": "视频讲座",
+        "preferred_language": "中文",
+        "course_interactions": [
+            {
+                "course_id": "1474376445",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "watch_time_minutes": 1450,
+                "notes": "隐私计算是大数据时代的重要技术",
+                "date_completed": "2023-12-15"
+            },
+            {
+                "course_id": "1474376450",
+                "rating": 4,
+                "completion_percentage": 85,
+                "favorite": true,
+                "watch_time_minutes": 1200,
+                "notes": "信息技术基础教材讲解清晰",
+                "date_completed": "2023-11-20"
+            }
+        ]
+    },
+    {
+        "user_id": "jonas1",
+        "username": "jonas",
+        "email": "jonas@example.com",
+        "teaching_subject": "航空航天",
+        "grade_level": "研究生",
+        "years_experience": 8,
+        "interests": ["无人机", "智能控制", "电推进", "人工智能"],
+        "preferred_subjects": ["航空航天", "电子信息", "机械工程"],
+        "preferred_difficulty": 5,
+        "preferred_learning_style": "项目式学习",
+        "preferred_language": "中文",
+        "course_interactions": [
+            {
+                "course_id": "1473948443",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "watch_time_minutes": 1800,
+                "notes": "人工智能在航空航天领域的应用非常实用",
+                "date_completed": "2023-10-05"
+            },
+            {
+                "course_id": "1474376441",
+                "rating": 5,
+                "completion_percentage": 95,
+                "favorite": true,
+                "watch_time_minutes": 1650,
+                "notes": "电推进智能控制教材对研究很有帮助",
+                "date_completed": "2023-12-20"
+            },
+            {
+                "course_id": "1474376444",
+                "rating": 4,
+                "completion_percentage": 80,
+                "favorite": true,
+                "watch_time_minutes": 1400,
+                "notes": "无人机集群技术是我的研究方向",
+                "date_completed": "2023-11-15"
+            }
+        ]
+    },
+    {
+        "user_id": "teacher1",
+        "username": "教师",
+        "email": "teacher@example.com",
+        "teaching_subject": "物理",
+        "grade_level": "高中",
+        "years_experience": 12,
+        "interests": ["教学方法", "教育技术", "学科教育", "STEM教育"],
+        "preferred_subjects": ["数学", "物理", "化学"],
+        "preferred_difficulty": 3,
+        "preferred_learning_style": "实验与实践",
+        "preferred_language": "中文",
+        "course_interactions": [
+            {
+                "course_id": "1474376450",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "watch_time_minutes": 1250,
+                "notes": "信息技术教材对教学很有帮助",
+                "date_completed": "2023-09-10"
+            },
+            {
+                "course_id": "1474376456",
+                "rating": 4,
+                "completion_percentage": 90,
+                "favorite": false,
+                "watch_time_minutes": 1100,
+                "notes": "智能终端产品技术对STEM教育有参考价值",
+                "date_completed": "2023-10-25"
+            }
+        ]
+    },
+    {
+        "user_id": "xiaowu1",
+        "username": "学生",
+        "email": "xiaowu@example.com",
+        "grade_level": "本科",
+        "years_experience": 2,
+        "interests": ["Web开发", "移动应用", "编程入门", "UI设计"],
+        "preferred_subjects": ["信息技术", "编程语言", "软件工程"],
+        "preferred_difficulty": 2,
+        "preferred_learning_style": "视频教程",
+        "preferred_language": "中文",
+        "course_interactions": [
+            {
+                "course_id": "1474376450",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "watch_time_minutes": 1350,
+                "notes": "信息技术基础对我的学习很有帮助",
+                "date_completed": "2023-11-05"
+            },
+            {
+                "course_id": "1474376456",
+                "rating": 4,
+                "completion_percentage": 75,
+                "favorite": true,
+                "watch_time_minutes": 950,
+                "notes": "智能终端产品技术服务课程很实用",
+                "date_completed": "2023-12-10"
+            }
+        ]
+    },
+    {
+        "user_id": "newstudent1",
+        "username": "新学生",
+        "email": "newstudent@example.com",
+        "grade_level": "MBA",
+        "years_experience": 1,
+        "interests": ["创业", "金融", "商业分析", "项目管理"],
+        "preferred_subjects": ["经济学", "管理学", "市场营销"],
+        "preferred_difficulty": 3,
+        "preferred_learning_style": "案例分析",
+        "preferred_language": "中文",
+        "course_interactions": [
+            {
+                "course_id": "1474376445",
+                "rating": 4,
+                "completion_percentage": 85,
+                "favorite": true,
+                "watch_time_minutes": 1100,
+                "notes": "隐私计算对商业数据分析很重要",
+                "date_completed": "2023-10-15"
+            }
+        ]
     }
 ]
