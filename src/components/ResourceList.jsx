@@ -10,7 +10,7 @@ const PLACEHOLDER_IMAGE = 'https://picsum.photos/400/180?random=1'
 const ResourceGrid = styled.div`
     display: grid;
     grid-template-columns: ${({ layout }) =>
-        layout === 'grid' ? 'repeat(auto-fill, minmax(400px, 1fr))' : '1fr'};
+        layout === 'grid' ? 'repeat(2, 1fr)' : '1fr'};
     gap: 2.4rem;
     margin-bottom: 2.4rem;
 `
@@ -27,9 +27,8 @@ const ResourceCard = styled.div`
     overflow: hidden;
     box-shadow: var(--shadow-sm);
     transition: all 0.3s;
-    display: ${({ layout }) => (layout === 'list' ? 'flex' : 'block')};
-    align-items: ${({ layout }) =>
-        layout === 'list' ? 'flex-start' : 'stretch'};
+    display: flex;
+    align-items: flex-start;
 
     ${ResourceCardLink}:hover & {
         transform: translateY(-2px);
@@ -38,19 +37,11 @@ const ResourceCard = styled.div`
 `
 
 const ResourceImage = styled.div`
-    height: 180px;
     overflow: hidden;
     background-color: var(--color-grey-100); // Background for placeholder
-    ${({ layout }) => {
-        if (layout === 'list') {
-            return `
-                flex: 0 0 240px;
-                width: 240px;
-                height: 360px;
-            `
-        }
-        return ''
-    }}
+    flex: 0 0 240px;
+    width: 240px;
+    height: 180px;
 
     img {
         width: 100%;
@@ -66,13 +57,9 @@ const ResourceImage = styled.div`
 
 const ResourceContent = styled.div`
     padding: 1.6rem 2rem;
-    ${({ layout }) =>
-        layout === 'list' &&
-        `
-        flex: 1;
-        overflow: hidden;
-        padding-left: 2.4rem;
-    `}
+    flex: 1;
+    overflow: hidden;
+    padding-left: 2.4rem;
 `
 
 const ResourceTitle = styled.h3`
@@ -187,7 +174,6 @@ const TagContainer = styled.div`
     flex-wrap: wrap;
     gap: 0.8rem;
 `
-
 const Tag = styled.span`
     font-size: 1.2rem;
     padding: 0.2rem 0.8rem;
@@ -217,7 +203,7 @@ const LayoutToggle = styled.button`
 `
 
 function ResourceList({ resources }) {
-    const [layout, setLayout] = useState('list') // Changed default to 'list' from 'grid'
+    const [layout, setLayout] = useState('grid') // Changed back to 'grid' as default
 
     // EDUWEBDEVICE=87cd2566a4df449f80f9a4b14f41f499'                     'Content-Type':
     // 'application/x-www-form-urlencoded;charset=UTF-8',
@@ -291,8 +277,8 @@ function ResourceList({ resources }) {
                             key={resourceId}
                             to={`/resources/${resourceId}`}
                         >
-                            <ResourceCard layout={layout}>
-                                <ResourceImage layout={layout}>
+                            <ResourceCard>
+                                <ResourceImage>
                                     <img
                                         src={
                                             resource.cover || PLACEHOLDER_IMAGE
@@ -303,7 +289,7 @@ function ResourceList({ resources }) {
                                         }}
                                     />
                                 </ResourceImage>
-                                <ResourceContent layout={layout}>
+                                <ResourceContent>
                                     <ResourceTitle>
                                         {resource.title || '无标题'}
                                     </ResourceTitle>
