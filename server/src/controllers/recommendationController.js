@@ -37,7 +37,23 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
     let currentUser = null
     let usedAlgorithm = 'unknown'
 
-    console.log(req.headers, 'req.headers')
+    // console.log(req.headers, 'req.headers')
+
+    // fetch(
+    //     'https://www.icourse163.org/web/j/mocSearchBean.searchCourse.rpc?csrfKey=fba6bd9e19744ab0b9092da379ef375d',
+    //     {
+    //         method: 'POST',
+    //         headers: {
+    //             Cookie: 'NTESSTUDYSI=fba6bd9e19744ab0b9092da379ef375d; EDUWEBDEVICE=87cd2566a4df449f80f9a4b14f41f499',
+    //             'Content-Type':
+    //                 'application/x-www-form-urlencoded;charset=UTF-8',
+    //         },
+    //         body: 'mocCourseQueryVo={"keyword":"人工智能","pageIndex":1,"highlight":true,"orderBy":0,"stats":30,"pageSize":20,"prodectType":5}',
+    //     }
+    // )
+    //     .then((response) => response.json())
+    //     .then((data) => console.log(data.result.list, 'data'))
+    //     .catch((error) => console.error('Error:', error))
 
     // 1. 检查是否存在 token 并验证
     let token
