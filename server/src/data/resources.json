@@ -7861,5 +7861,1008 @@
             ]
         },
         "id": 1120
+    },
+    {
+        "id": 1121,
+        "title": "面向对象的C++和Windows编程",
+        "description": "课程是以面向对象的C++语言为主要内容，以C++语言- API Windows编程- MFC Windows编程为主线。主要讲授面向对象程序设计的编程方法、C++语言的基本特性、使用Visual Studio进行可视化程序设计。本课程注重C++语言的实践与应用，在课程中穿插了生动案例和编程练习，培养学生解决实际问题的能力。",
+        "contentType": "resource",
+        "pedagogicalType": "courseware",
+        "format": "video",
+        "subject": "计算机科学",
+        "grade": "本科",
+        "difficulty": 3,
+        "url": "http://nos.netease.com/edu-image/e718ef9e1e8243ac8061f9e6f4f92747.jpg",
+        "cover": "http://nos.netease.com/edu-image/e718ef9e1e8243ac8061f9e6f4f92747.jpg",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "谢颂华",
+        "publisher": "武汉理工大学",
+        "organization": "武汉理工大学",
+        "createdAt": "2023-05-28T14:34:49.742Z",
+        "updatedAt": "2024-06-22T08:12:32.827Z",
+        "enrollCount": 1096,
+        "studyAvatars": [
+            "https://mooc-image.nosdn.127.net/02bcfef0954349989b94d33886473fd9.png"
+        ],
+        "tags": ["C++", "面向对象编程", "Windows编程", "MFC"],
+        "highlightContent": "课程以面向对象的C++语言为主要内容，涵盖C++语言基础、API Windows编程和MFC Windows编程，注重实践与应用，通过生动案例和编程练习，培养学生解决实际问题的能力。",
+        "averageRating": 4.5,
+        "metadata": {
+            "id": 1002463008,
+            "courseId": 1002463008
+        }
+    },
+    {
+        "id": 1122,
+        "title": "可编程控制器原理及应用",
+        "description": "《可编程控制器原理及应用》是工科类、特别是机电类专业学生的重要专业课程，课程教学、互动讨论是促进其工程实践能力提升的重要平台。在课堂教学中增加自动控制背后的哲学思想讲授，帮助学生形成正确的世界观、人生观、价值观，养成科学思维和创新习惯，切实提高具有工匠精神新工科人才的培养质量。",
+        "contentType": "resource",
+        "pedagogicalType": "courseware",
+        "format": "video",
+        "subject": "自动化",
+        "grade": "本科",
+        "difficulty": 3,
+        "url": "http://edu-image.nosdn.127.net/E50A5E037F7672605C3E7F922B77C46B.JPG?imageView&thumbnail=510y288&quality=100",
+        "cover": "http://edu-image.nosdn.127.net/E50A5E037F7672605C3E7F922B77C46B.JPG?imageView&thumbnail=510y288&quality=100",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "胥军,吴敬兵,郭钧",
+        "publisher": "武汉理工大学",
+        "organization": "武汉理工大学",
+        "createdAt": "2023-12-23T09:47:19.489Z",
+        "updatedAt": "2024-06-22T10:28:36.652Z",
+        "enrollCount": 155,
+        "studyAvatars": [
+            "https://nos.netease.com/edu-image/2c50d78ca2734e79babc4c4dc196367e.JPG",
+            "http://edu-image.nosdn.127.net/A2B32DB1CDA33DE83C355C08C5B16C10.jpg?imageView&thumbnail=582y582&quality=100"
+        ],
+        "tags": ["可编程控制器", "PLC", "自动控制", "工程实践"],
+        "highlightContent": "本课程是机电类专业的重要专业课程，通过课堂教学和互动讨论，促进学生工程实践能力提升，同时融入哲学思想，培养学生正确的价值观和科学思维习惯，提高具有工匠精神的新工科人才培养质量。",
+        "averageRating": 4.3,
+        "metadata": {
+            "id": 1461881161,
+            "courseId": 1461881161
+        }
+    },
+    {
+        "id": 1123,
+        "title": "电器控制与可编程序控制器",
+        "description": "可编程序控制器（PLC）是现代工业自动化的三大支柱之一。通过本课程的学习，同学们将熟悉常用电器、学习IEC电气制图标准、了解PLC硬件知识、谙熟IEC61131编程语言、人机界面HMI和SCADA系统，掌握基于PLC的现代工业自动控制系统的设计步骤和方法，并通过实践让一个自动化工业控制系统在你手中诞生！",
+        "contentType": "resource",
+        "pedagogicalType": "courseware",
+        "format": "video",
+        "subject": "自动化",
+        "grade": "本科",
+        "difficulty": 3,
+        "url": "http://edu-image.nosdn.127.net/2C2F2C26CBB5A28901BA631D04371305.jpg?imageView&thumbnail=510y288&quality=100",
+        "cover": "http://edu-image.nosdn.127.net/2C2F2C26CBB5A28901BA631D04371305.jpg?imageView&thumbnail=510y288&quality=100",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "傅剑",
+        "publisher": "武汉理工大学",
+        "organization": "武汉理工大学",
+        "createdAt": "2023-10-09T00:00:00.000Z",
+        "updatedAt": "2024-06-22T11:15:16.652Z",
+        "enrollCount": 0,
+        "studyAvatars": [
+            "http://edu-image.nosdn.127.net/4FA935661CA89B0EB1960E6805366495.jpg?imageView&amp;thumbnail=180y180&amp;quality=100"
+        ],
+        "tags": ["PLC", "电器控制", "自动化控制", "SCADA系统"],
+        "highlightContent": "本课程介绍PLC作为现代工业自动化三大支柱之一的应用，内容包括常用电器、IEC电气制图标准、PLC硬件知识、IEC61131编程语言、HMI和SCADA系统，学生将掌握现代工业自动控制系统的设计方法，并通过实践创建自己的自动化工业控制系统。",
+        "averageRating": 4.2,
+        "metadata": {
+            "id": 1206807807,
+            "courseId": 1206807807
+        }
+    },
+    {
+        "id": 1124,
+        "title": "Python编程基础",
+        "description": "在本课程的讲授中，每一个知识点都提供了相关程序实例，希望大家能通过这些具体实例更好地掌握Python程序的编写方法。本课程的目标是使大家具备Python基础编程能力，并基本具备应用Python解决实际应用问题的能力，同时也为后继Python相关的更深入学习打下良好基础。",
+        "contentType": "resource",
+        "pedagogicalType": "tutorial",
+        "format": "video",
+        "subject": "计算机科学",
+        "grade": "入门级",
+        "difficulty": 2,
+        "url": "https://mooc-image.nosdn.127.net/5e28b0ce-ae67-43bc-b3c9-40cbf496fac3.png",
+        "cover": "https://mooc-image.nosdn.127.net/5e28b0ce-ae67-43bc-b3c9-40cbf496fac3.png",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "南开大学",
+        "publisher": "南开大学",
+        "organization": "南开大学",
+        "createdAt": "2024-03-15T00:00:00.000Z",
+        "updatedAt": "2024-06-22T13:45:22.783Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["Python", "编程基础", "实例教学"],
+        "highlightContent": "本课程通过丰富的程序实例讲解Python编程知识点，帮助学生掌握Python基础编程能力，培养解决实际应用问题的能力，并为更深入学习Python相关知识奠定基础。",
+        "averageRating": 4.7,
+        "metadata": {
+            "id": 1205696807,
+            "courseId": 1205696807
+        }
+    },
+    {
+        "id": 1125,
+        "title": "小白零基础编程-3小时入门C语言",
+        "description": "C语言-小白零基础编程-3小时入门，适用人群：编程小白。本课程通过简明易懂的讲解和大量实例，帮助零基础学习者快速入门C语言编程，掌握基本语法和编程思想。",
+        "contentType": "resource",
+        "pedagogicalType": "tutorial",
+        "format": "video",
+        "subject": "计算机科学",
+        "grade": "入门级",
+        "difficulty": 1,
+        "url": "https://mooc-image.nosdn.127.net/5fd76267-d761-4599-9ee5-5a436ca5d1e5.png",
+        "cover": "https://mooc-image.nosdn.127.net/5fd76267-d761-4599-9ee5-5a436ca5d1e5.png",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "国家精品",
+        "publisher": "国家精品",
+        "organization": "",
+        "createdAt": "2024-01-15T00:00:00.000Z",
+        "updatedAt": "2024-06-22T14:35:16.358Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["C语言", "零基础", "编程入门", "快速入门"],
+        "highlightContent": "本课程专为编程小白设计，通过3小时的精简内容快速入门C语言编程，无需任何编程基础，即可轻松掌握C语言基础知识，开启编程之旅。",
+        "averageRating": 4.2,
+        "metadata": {
+            "id": 1461179181,
+            "courseId": 1461179181
+        }
+    },
+    {
+        "id": 1126,
+        "title": "小白零基础编程-4小时入门JAVA",
+        "description": "Java 小白零基础编程，4小时入门，适用编程小白。本课程通过简洁明了的讲解和丰富的实例，帮助零基础学习者快速入门Java编程，掌握基本语法和面向对象编程思想。",
+        "contentType": "resource",
+        "pedagogicalType": "tutorial",
+        "format": "video",
+        "subject": "计算机科学",
+        "grade": "入门级",
+        "difficulty": 1,
+        "url": "https://mooc-image.nosdn.127.net/b83d242e-2f0a-46ed-a69e-d366f48d66e6.png",
+        "cover": "https://mooc-image.nosdn.127.net/b83d242e-2f0a-46ed-a69e-d366f48d66e6.png",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "国家精品",
+        "publisher": "国家精品",
+        "organization": "",
+        "createdAt": "2024-01-20T00:00:00.000Z",
+        "updatedAt": "2024-06-22T15:12:26.357Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["Java", "零基础", "编程入门", "快速入门"],
+        "highlightContent": "本课程专为编程小白设计，通过4小时的精简内容快速入门Java编程，无需任何编程基础，即可轻松掌握Java基础知识和面向对象概念，开启Java编程之旅。",
+        "averageRating": 4.3,
+        "metadata": {
+            "id": 1461174190,
+            "courseId": 1461174190
+        }
+    },
+    {
+        "id": 1127,
+        "title": "机械制造工程实训B",
+        "description": "本课程是高等工科院校机械类专业和近机械类专业必修的实践性技术基础课。机电类（大类招生）、材料科学与工程、材料成型及控制工程、车辆类（大类招生）、交通运输、工商管理、企业管理、国贸、船舶与海洋工程、轮机工程、能源与动力、油气储运、物流工程、给排水等机械类和近机械类各专业。",
+        "contentType": "resource",
+        "pedagogicalType": "project",
+        "format": "video",
+        "subject": "机械工程",
+        "grade": "本科",
+        "difficulty": 3,
+        "url": "http://edu-image.nosdn.127.net/2C2F2C26CBB5A28901BA631D04371305.jpg?imageView&thumbnail=510y288&quality=100",
+        "cover": "http://edu-image.nosdn.127.net/2C2F2C26CBB5A28901BA631D04371305.jpg?imageView&thumbnail=510y288&quality=100",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "武汉理工大学",
+        "publisher": "武汉理工大学",
+        "organization": "武汉理工大学",
+        "createdAt": "2024-02-15T00:00:00.000Z",
+        "updatedAt": "2024-06-22T16:22:16.352Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["机械制造", "工程实训", "机电"],
+        "highlightContent": "本课程是机械类专业必修的实践性技术基础课，适用于机电类、材料科学与工程、车辆类等多个专业，通过实践教学培养学生的工程实践能力和技术应用能力。",
+        "averageRating": 4.1,
+        "metadata": {
+            "id": 1207532804,
+            "courseId": 1207532804
+        }
+    },
+    {
+        "id": 1128,
+        "title": "Spark编程基础",
+        "description": "本课程属于进阶级大数据课程，由全国高校知名大数据教师厦门大学林子雨老师主讲，采用林子雨等编著的《Spark编程基础（Scala版，第2版）》作为课程教材。课程内容包括大数据技术概述、Scala语言基础、Spark的设计与运行原理、Spark环境搭建和使用方法、RDD编程、Spark SQL、Spark Streaming和Spark MLlib等。",
+        "contentType": "resource",
+        "pedagogicalType": "courseware",
+        "format": "video",
+        "subject": "大数据",
+        "grade": "本科高年级",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/6da575dc-0957-412e-8df0-6f8171d0b675.png",
+        "cover": "https://mooc-image.nosdn.127.net/6da575dc-0957-412e-8df0-6f8171d0b675.png",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "林子雨",
+        "publisher": "厦门大学",
+        "organization": "厦门大学",
+        "createdAt": "2024-02-20T00:00:00.000Z",
+        "updatedAt": "2024-06-22T16:45:36.352Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["Spark", "大数据", "Scala", "数据处理"],
+        "highlightContent": "本课程是由厦门大学林子雨老师主讲的进阶级大数据课程，内容涵盖Scala语言基础、Spark设计原理、RDD编程、Spark SQL、Spark Streaming和Spark MLlib等，为学习者提供系统的Spark编程技术知识。",
+        "averageRating": 4.8,
+        "metadata": {
+            "id": 1205811805,
+            "courseId": 1205811805
+        }
+    },
+    {
+        "id": 1129,
+        "title": "Web编程技术",
+        "description": "西安交通大学推出的《Web编程技术》课程能够帮您认识并构建Web体系框架，熟悉Web前端与后台，并结合云端实验，使您能快速搭建属于自己的Web站点。结合我国自主知识产权的HarmonyOS（鸿蒙操作系统），最新推出了基于HarmonyOS的移动应用开发和设备应用开发。",
+        "contentType": "resource",
+        "pedagogicalType": "courseware",
+        "format": "video",
+        "subject": "计算机科学",
+        "grade": "本科",
+        "difficulty": 3,
+        "url": "https://mooc-image.nosdn.127.net/51b4ad86-63e0-4de2-9d1e-8e06d506a241.png",
+        "cover": "https://mooc-image.nosdn.127.net/51b4ad86-63e0-4de2-9d1e-8e06d506a241.png",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "西安交通大学",
+        "publisher": "西安交通大学",
+        "organization": "西安交通大学",
+        "createdAt": "2024-03-01T00:00:00.000Z",
+        "updatedAt": "2024-06-22T17:15:26.357Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["Web编程", "前端开发", "后端开发", "鸿蒙系统"],
+        "highlightContent": "本课程帮助学习者认识并构建Web体系框架，熟悉Web前端与后台开发，结合云端实验快速搭建个人Web站点，并介绍基于鸿蒙系统的移动应用开发和设备应用开发技术。",
+        "averageRating": 4.5,
+        "metadata": {
+            "id": 1003679001,
+            "courseId": 1003679001
+        }
+    },
+    {
+        "id": 1130,
+        "title": "基于Java的面向对象编程范式",
+        "description": "本课程完成了编程思维、结构化编程范式、面向对象编程方式的介绍，并且着重强调了面向对象编程中封装、协作和可修改性三个重要概念。通过客观题和6道编程题的训练，进一步加深对面向对象编程范式的理解，初步领略面向对象编程范式的风采。",
+        "contentType": "resource",
+        "pedagogicalType": "courseware",
+        "format": "video",
+        "subject": "计算机科学",
+        "grade": "本科",
+        "difficulty": 3,
+        "url": "https://mooc-image.nosdn.127.net/8393e0cb-73a8-4bc0-8251-3c67f20e8c82.png",
+        "cover": "https://mooc-image.nosdn.127.net/8393e0cb-73a8-4bc0-8251-3c67f20e8c82.png",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "南京大学",
+        "publisher": "南京大学",
+        "organization": "南京大学",
+        "createdAt": "2024-01-25T00:00:00.000Z",
+        "updatedAt": "2024-06-22T17:45:56.357Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["Java", "面向对象编程", "编程范式", "软件设计"],
+        "highlightContent": "本课程介绍编程思维、结构化编程范式和面向对象编程方式，着重讲解封装、协作和可修改性概念，通过理论学习和编程实践帮助学生深入理解面向对象编程范式。",
+        "averageRating": 4.6,
+        "metadata": {
+            "id": 1002246017,
+            "courseId": 1002246017
+        }
+    },
+    {
+        "id": 1131,
+        "title": "Linux操作系统编程",
+        "description": "本课程对Linux下应用程序的设计思想、开发特点、开发手段进行介绍，并重点讲述文件I/O、目录操作、进程控制、线程控制、多任务同步与通信等POSIX API的使用方法和编程技巧。本课程是《C语言程序设计》与《操作系统基础》课程的后行课程，是对这两门课程的相关知识的应用、延续和深化。",
+        "contentType": "resource",
+        "pedagogicalType": "courseware",
+        "format": "video",
+        "subject": "操作系统",
+        "grade": "本科高年级",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/5e28b0ce-ae67-43bc-b3c9-40cbf496fac3.png",
+        "cover": "https://mooc-image.nosdn.127.net/5e28b0ce-ae67-43bc-b3c9-40cbf496fac3.png",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "电子科技大学",
+        "publisher": "电子科技大学",
+        "organization": "电子科技大学",
+        "createdAt": "2023-11-18T00:00:00.000Z",
+        "updatedAt": "2024-06-22T18:15:26.357Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["Linux", "系统编程", "POSIX", "操作系统"],
+        "highlightContent": "本课程介绍Linux应用程序开发，重点讲解文件I/O、目录操作、进程控制、线程控制、多任务同步与通信等POSIX API的使用方法和编程技巧，是C语言和操作系统基础知识的应用与深化。",
+        "averageRating": 4.7,
+        "metadata": {
+            "id": 1003040002,
+            "courseId": 1003040002
+        }
+    },
+    {
+        "id": 1132,
+        "title": "人工智能及深度学习",
+        "description": "本课程是智能制造工程专业的必修课程。通过课程学习，使学生系统了解人工智能的基本概念、原理、方法和遗传算法，蚁群算法等智能算法，同时培养学生面对实际工程问题时，应用人工智能的思维和方法解决问题的能力。本课程实践性强，在教学过程中，综合采用项目案例式、课堂实践以及专题讨论等多种教学方法。",
+        "contentType": "resource",
+        "pedagogicalType": "courseware",
+        "format": "video",
+        "subject": "人工智能",
+        "grade": "本科",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/8393e0cb-73a8-4bc0-8251-3c67f20e8c82.png",
+        "cover": "https://mooc-image.nosdn.127.net/8393e0cb-73a8-4bc0-8251-3c67f20e8c82.png",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "武汉理工大学",
+        "publisher": "武汉理工大学",
+        "organization": "武汉理工大学",
+        "createdAt": "2024-02-28T00:00:00.000Z",
+        "updatedAt": "2024-06-22T18:45:36.357Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["人工智能", "深度学习", "智能算法", "智能制造"],
+        "highlightContent": "本课程系统介绍人工智能基本概念、原理、方法和智能算法，注重实践性教学，通过项目案例式、课堂实践和专题讨论等多种教学方法，培养学生应用人工智能思维解决实际工程问题的能力。",
+        "averageRating": 4.6,
+        "metadata": {
+            "id": 1449987237,
+            "courseId": 1449987237
+        }
+    },
+    {
+        "id": 1133,
+        "title": "数据挖掘原理及应用",
+        "description": "数据挖掘原理与算法是一门应用性极强的科学，是在信息技术领域迅速兴起的计算机技术。本课程为选修课，通过本课程的学习，使学生掌握数据挖掘的基本概念,了解数据挖掘的定义和功能以及实现数据挖掘的主要步骤和具体实现方法,初步掌握数据挖掘的算法，使学生能实现简单的数据挖掘算法编程，了解实现数据挖掘的具体操作，具有初步设计能力。",
+        "contentType": "resource",
+        "pedagogicalType": "courseware",
+        "format": "video",
+        "subject": "数据科学",
+        "grade": "本科高年级",
+        "difficulty": 4,
+        "url": "https://mooc-image.nosdn.127.net/5e28b0ce-ae67-43bc-b3c9-40cbf496fac3.png",
+        "cover": "https://mooc-image.nosdn.127.net/5e28b0ce-ae67-43bc-b3c9-40cbf496fac3.png",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "武汉理工大学",
+        "publisher": "武汉理工大学",
+        "organization": "武汉理工大学",
+        "createdAt": "2024-03-05T00:00:00.000Z",
+        "updatedAt": "2024-06-22T19:15:36.357Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["数据挖掘", "数据科学", "算法", "机器学习"],
+        "highlightContent": "本课程系统介绍数据挖掘基本概念、定义、功能、实现步骤和方法，通过理论学习和实践训练，帮助学生掌握数据挖掘算法并能实现简单的数据挖掘编程，具备初步的数据挖掘设计能力。",
+        "averageRating": 4.5,
+        "metadata": {
+            "id": 1465114165,
+            "courseId": 1465114165
+        }
+    },
+    {
+        "id": 1134,
+        "title": "网络应用编程",
+        "description": "尽管基础的程序设计课程对于学生掌握计算机底层的工作原理非常重要，但要想解决更实际的问题，如设计网络聊天程序、网络游戏程序、网络会议程序、网络商城等，就需要编写高效代码提升工程应用开发能力。《C#网络应用编程》采用\"案例+课堂\"的模式，培养应用C#开发客户端/服务器、浏览器/服务器应用程序的实际编程能力。",
+        "contentType": "resource",
+        "pedagogicalType": "courseware",
+        "format": "video",
+        "subject": "计算机网络",
+        "grade": "本科",
+        "difficulty": 3,
+        "url": "https://mooc-image.nosdn.127.net/6da575dc-0957-412e-8df0-6f8171d0b675.png",
+        "cover": "https://mooc-image.nosdn.127.net/6da575dc-0957-412e-8df0-6f8171d0b675.png",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "武汉理工大学",
+        "publisher": "武汉理工大学",
+        "organization": "武汉理工大学",
+        "createdAt": "2024-02-10T00:00:00.000Z",
+        "updatedAt": "2024-06-22T19:45:56.357Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["C#", "网络编程", "客户端/服务器", "Web应用"],
+        "highlightContent": "本课程采用\"案例+课堂\"教学模式，培养使用C#开发网络聊天、网络游戏、网络会议、网络商城等应用的实际编程能力，重点讲解客户端/服务器和浏览器/服务器应用程序的开发技术。",
+        "averageRating": 4.4,
+        "metadata": {
+            "id": 1462096168,
+            "courseId": 1462096168
+        }
+    },
+    {
+        "id": 1135,
+        "title": "C编程方法学",
+        "description": "C语言在各类编程语言排行榜上一直位居前两位，历史悠久，但依然生命力旺盛，它是很多其他编程语言的基础，在系统程序、嵌入式系统、物联网应用等领域依然是无可替代的。本课程是零基础的编程入门课，是后续学习其它计算机课程的基础。学习它，掌握它，你将发现计算机编程原来也是一件很有趣的事情。",
+        "contentType": "resource",
+        "pedagogicalType": "courseware",
+        "format": "video",
+        "subject": "计算机科学",
+        "grade": "入门级",
+        "difficulty": 2,
+        "url": "https://mooc-image.nosdn.127.net/5fd76267-d761-4599-9ee5-5a436ca5d1e5.png",
+        "cover": "https://mooc-image.nosdn.127.net/5fd76267-d761-4599-9ee5-5a436ca5d1e5.png",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "河南大学",
+        "publisher": "河南大学",
+        "organization": "河南大学",
+        "createdAt": "2023-09-25T00:00:00.000Z",
+        "updatedAt": "2024-06-22T20:15:36.357Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["C语言", "编程基础", "嵌入式系统", "系统编程"],
+        "highlightContent": "本课程是零基础编程入门课，系统讲解C语言编程知识，作为计算机领域许多其他语言的基础，C语言在系统程序、嵌入式系统、物联网应用等领域仍不可替代，是后续学习其它计算机课程的重要基础。",
+        "averageRating": 4.6,
+        "metadata": {
+            "id": 1001862005,
+            "courseId": 1001862005
+        }
+    },
+    {
+        "id": 1136,
+        "title": "程序设计（Python）",
+        "description": "计算机是计算工具，更是创新平台，高效的利用计算机需要更简洁实用的编程语言。Python语言以简单的语法和最接近自然语言的风格诠释程序设计，成为当今世界最受欢迎的编程语言。请跟随我们用探索和创新的视角，从零开始，学习并掌握Python语言，一起轻松编程、享受创新，弹指间掌控计算。",
+        "contentType": "resource",
+        "pedagogicalType": "courseware",
+        "format": "video",
+        "subject": "计算机科学",
+        "grade": "入门级",
+        "difficulty": 2,
+        "url": "https://mooc-image.nosdn.127.net/51b4ad86-63e0-4de2-9d1e-8e06d506a241.png",
+        "cover": "https://mooc-image.nosdn.127.net/51b4ad86-63e0-4de2-9d1e-8e06d506a241.png",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "武汉理工大学",
+        "publisher": "武汉理工大学",
+        "organization": "武汉理工大学",
+        "createdAt": "2023-08-15T00:00:00.000Z",
+        "updatedAt": "2024-06-22T20:45:46.357Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["Python", "编程基础", "程序设计", "计算思维"],
+        "highlightContent": "本课程以探索和创新的视角，从零开始介绍Python语言，以其简单的语法和接近自然语言的风格，帮助学习者轻松掌握程序设计，培养计算思维能力，享受编程创新的乐趣。",
+        "averageRating": 4.8,
+        "metadata": {
+            "id": 1001963025,
+            "courseId": 1001963025
+        }
+    },
+    {
+        "id": 1137,
+        "title": "C程序设计基础",
+        "description": "C语言是计算机编程中最基础也是最重要的编程语言之一，本课程系统讲解C语言的基本语法、数据类型、控制结构、函数、数组、指针、结构体等核心概念，通过大量实例和编程练习，培养学生的编程思维和解决问题的能力。",
+        "contentType": "resource",
+        "pedagogicalType": "courseware",
+        "format": "video",
+        "subject": "计算机科学",
+        "grade": "入门级",
+        "difficulty": 2,
+        "url": "https://mooc-image.nosdn.127.net/8393e0cb-73a8-4bc0-8251-3c67f20e8c82.png",
+        "cover": "https://mooc-image.nosdn.127.net/8393e0cb-73a8-4bc0-8251-3c67f20e8c82.png",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "武汉理工大学",
+        "publisher": "武汉理工大学",
+        "organization": "武汉理工大学",
+        "createdAt": "2022-09-10T00:00:00.000Z",
+        "updatedAt": "2024-06-22T21:15:36.357Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["C语言", "程序设计", "编程基础", "数据结构"],
+        "highlightContent": "本课程系统讲解C语言编程基础，涵盖基本语法、数据类型、控制结构、函数、数组、指针、结构体等核心概念，通过丰富的实例和练习，帮助初学者打下坚实的编程基础。",
+        "averageRating": 4.5,
+        "metadata": {
+            "id": 1467953163,
+            "courseId": 1467953163
+        }
+    },
+    {
+        "id": 1138,
+        "title": "数据库原理与应用",
+        "description": "本课程系统介绍数据库系统的基本概念、原理和应用方法，内容包括数据库设计、SQL语言、关系数据库理论、数据库编程、事务处理和并发控制等。通过理论讲解和实践操作，培养学生设计和使用数据库系统的能力。",
+        "contentType": "resource",
+        "pedagogicalType": "courseware",
+        "format": "video",
+        "subject": "数据库",
+        "grade": "本科",
+        "difficulty": 3,
+        "url": "https://mooc-image.nosdn.127.net/6da575dc-0957-412e-8df0-6f8171d0b675.png",
+        "cover": "https://mooc-image.nosdn.127.net/6da575dc-0957-412e-8df0-6f8171d0b675.png",
+        "price": 0,
+        "originalPrice": 0,
+        "authors": "武汉理工大学",
+        "publisher": "武汉理工大学",
+        "organization": "武汉理工大学",
+        "createdAt": "2023-11-05T00:00:00.000Z",
+        "updatedAt": "2024-06-22T21:45:46.357Z",
+        "enrollCount": 0,
+        "studyAvatars": [],
+        "tags": ["数据库", "SQL", "数据库设计", "事务处理"],
+        "highlightContent": "本课程全面介绍数据库系统基本概念、原理和应用，包括数据库设计、SQL语言、关系数据库理论等内容，通过理论与实践相结合的方式，培养学生设计和使用数据库系统的专业能力。",
+        "averageRating": 4.4,
+        "metadata": {
+            "id": 1469122447,
+            "courseId": 1469122447
+        }
+    },
+    {
+        "id": 11345,
+        "title": "数控编程与加工技术",
+        "description": "本教材作为融媒体、交互式、智能化数字教材，全书内容以就业为导向，以国家职业标准和数控车铣（中级）职业技能等级标准为基本依据，通过数控车床编程与加工技术、数控铣床/加工中心编程与加工技术、数控车铣（中级）考证综合训练3个情境，讲授数控车削和铣削加工基础，简单回转轴类零件、阶梯轴类零件、螺纹轴类零件、复杂轴类零件、简单零件铣削、孔类零件钻削和复杂零件铣削的编程与加工，以及数控车铣（中级）职业技能综合训练。",
+        "pedagogicalType": "reference",
+        "format": "pdf",
+        "contentType": "resource",
+        "subject": "数控技术",
+        "grade": "高职",
+        "difficulty": 3,
+        "url": "",
+        "cover": "https://mooc-image.nosdn.127.net/b2562593-d694-4277-8d64-e4f909fa387b.png",
+        "price": 32.06,
+        "originalPrice": 45.8,
+        "authors": "蒲筠果",
+        "publisher": "高等教育出版社",
+        "organization": "高等教育出版社",
+        "createdBy": "64f7146e0a99c1456355",
+        "createdAt": "2023-11-20T10:23:50.462Z",
+        "updatedAt": "2023-11-21T12:36:29.033Z",
+        "enrollCount": 165,
+        "studyAvatars": [
+            "https://mooc-image.nosdn.127.net/8ab66123d9a04841924b8cebf2e47ce2.jpg",
+            "https://img-ph-mirror.nosdn.127.net/to6pOnFQHaAPSg_pRLxbyQ==",
+            "http://nos.netease.com/edu-image/71FBFBDB4CECDC13C0653DD64A55E386.jpg"
+        ],
+        "highlightContent": "微课、动画等资源丰富，培养综合编程能力，院校师生与行业人员的得力助手！",
+        "averageRating": 4.5,
+        "stats": {
+            "views": 325,
+            "downloads": 98,
+            "shares": 45,
+            "favorites": 72,
+            "lastViewed": "2023-11-30T08:45:12Z"
+        },
+        "access": {
+            "isPublic": true,
+            "allowedUsers": [],
+            "allowedRoles": ["user", "teacher"]
+        },
+        "version": {
+            "number": "1.0.0",
+            "history": [
+                {
+                    "version": "1.0.0",
+                    "changes": "初始版本",
+                    "updatedBy": "64f7146e0a99c1456355",
+                    "updatedAt": "2023-11-20T10:23:50.462Z"
+                }
+            ]
+        }
+    },
+    {
+        "id": 11346,
+        "title": "工业机器人现场编程",
+        "description": "本教材紧密结合全国职业院校技能大赛高职组\"工业机器人技术应用\"竞赛设备平台，贯彻落实\"岗课赛证\"综合育人理念，通过5个项目化教学模块，以\"知识+任务\"的形式深入浅出地介绍工业机器人基础知识、KEBAT70R工业机器人示教器的结构与功能、工业机器人基本操作方法、坐标系的建立与应用、编程指令功能与应用、工业机器人程序编写流程与规范、工业机器人程序调试及轨迹优化等内容。",
+        "pedagogicalType": "reference",
+        "format": "pdf",
+        "contentType": "resource",
+        "subject": "工业机器人",
+        "grade": "高职",
+        "difficulty": 3,
+        "url": "",
+        "cover": "https://mooc-image.nosdn.127.net/266ccef5-e28d-4788-aa8f-5872e11f7a35.png",
+        "price": 31.5,
+        "originalPrice": 45.0,
+        "authors": "武昌俊 杨浩",
+        "publisher": "高等教育出版社",
+        "organization": "高等教育出版社",
+        "createdBy": "64f7146e0a99c1456355",
+        "createdAt": "2023-11-20T10:28:18.626Z",
+        "updatedAt": "2023-11-21T14:47:21.236Z",
+        "enrollCount": 63,
+        "studyAvatars": [
+            "http://edu-image.nosdn.127.net/5151E863F79DE5EDB857AAFF988A6A17.JPG",
+            "https://img-ph-mirror.nosdn.127.net/NZ_uMJTB0OeFHfQKeN2cBg==",
+            "http://edu-image.nosdn.127.net/7F3192E85C0E886A90EE5831E473B63E.jpg"
+        ],
+        "highlightContent": "《工业机器人技术应用》教材紧密结合全国职业院校技能大赛高职组竞赛平台，融入\"岗课赛证\"综合育人理念，采用项目化教学方式，系统介绍工业机器人基础知识、操作方法、坐标系应用、编程与调试等内容。通过丰富的数字化资源，包括教学视频、示例程序、动画和微课等，全面支持学生的自主学习，提升学习效率。适用于高职院校工业机器人技术及相关专业的教材，也可作为技术人员培训和参考书籍。",
+        "averageRating": 4.3,
+        "stats": {
+            "views": 189,
+            "downloads": 45,
+            "shares": 23,
+            "favorites": 38,
+            "lastViewed": "2023-11-29T15:22:38Z"
+        },
+        "access": {
+            "isPublic": true,
+            "allowedUsers": [],
+            "allowedRoles": ["user", "teacher"]
+        },
+        "version": {
+            "number": "1.0.0",
+            "history": [
+                {
+                    "version": "1.0.0",
+                    "changes": "初始版本",
+                    "updatedBy": "64f7146e0a99c1456355",
+                    "updatedAt": "2023-11-20T10:28:18.626Z"
+                }
+            ]
+        }
+    },
+    {
+        "id": 1122045,
+        "title": "可编程控制器技术项目化教程",
+        "description": "本教材内容将理论知识与实践技能高度结合，共编写了六个项目，分别为：S7-1200 PLC和TIA博图软件认知、S7-1200 PLC 基本指令应用、S7-1200 PLC程序结构设计、S7-1200 PLC以太网通信技术应用、基于S7-1200 PLC、G120变频器的电动机控制、S7-1200 PLC与HMI的综合应用。每个项目包含：项目导入、学习目标、若干个任务、项目小结和项目作业。",
+        "pedagogicalType": "tutorial",
+        "format": "pdf",
+        "contentType": "resource",
+        "subject": "自动化技术",
+        "grade": "高职",
+        "difficulty": 3,
+        "url": "",
+        "cover": "https://mooc-image.nosdn.127.net/de1a11f1-ce3a-4832-8e4c-c9d4391ef879.png",
+        "price": 28.0,
+        "originalPrice": 40.0,
+        "authors": "商义叶，刘文光，李海祯",
+        "publisher": "高等教育出版社",
+        "organization": "高等教育出版社",
+        "createdBy": "64f7146e0a99c1456355",
+        "createdAt": "2024-01-11T12:40:18.450Z",
+        "updatedAt": "2024-01-15T03:34:44.619Z",
+        "enrollCount": 28,
+        "studyAvatars": [
+            "http://edu-image.nosdn.127.net/4F35557D9710600A6F0F0CBB9D614B04.jpg",
+            "http://nos.netease.com/edu-image/71FBFBDB4CECDC13C0653DD64A55E386.jpg",
+            "http://nos.netease.com/edu-image/47B1429D3D4F9E1C0CB96F7281279D21.jpg"
+        ],
+        "highlightContent": "本教材可以作为高职专科自动化类机电一体化技术专业、电气自动化技术专业等相关专业的教材，也可以作为职业培训学校的可编程控制器技术与应用培训教材，或作为相关工程技术人员的自学参考书。",
+        "averageRating": 4.1,
+        "stats": {
+            "views": 75,
+            "downloads": 22,
+            "shares": 12,
+            "favorites": 18,
+            "lastViewed": "2024-01-14T18:15:22Z"
+        },
+        "access": {
+            "isPublic": true,
+            "allowedUsers": [],
+            "allowedRoles": ["user", "teacher"]
+        },
+        "version": {
+            "number": "1.0.0",
+            "history": [
+                {
+                    "version": "1.0.0",
+                    "changes": "初始版本",
+                    "updatedBy": "64f7146e0a99c1456355",
+                    "updatedAt": "2024-01-11T12:40:18.450Z"
+                }
+            ]
+        }
+    },
+    {
+        "id": 1122046,
+        "title": "C语言程序设计",
+        "description": "本书全面系统地介绍了C语言程序设计的基础知识与应用技巧，涵盖了从数据类型、控制结构、函数到指针、数组和文件操作等各个方面的内容。采用循序渐进的教学方法，引导读者逐步深入理解C语言的核心概念。通过清晰的讲解和丰富的实例，帮助读者从零开始，逐步掌握C语言的编程技能。书中精选了大量实际案例提升读者的综合应用能力。",
+        "pedagogicalType": "reference",
+        "format": "pdf",
+        "contentType": "resource",
+        "subject": "计算机程序设计",
+        "grade": "本科",
+        "difficulty": 2,
+        "url": "",
+        "cover": "https://mooc-image.nosdn.127.net/242d8821-08d7-4f58-ae7d-a4796010511d.png",
+        "price": 19.6,
+        "originalPrice": 28.0,
+        "authors": "曹丽英",
+        "publisher": "高等教育出版社",
+        "organization": "高等教育出版社",
+        "createdBy": "64f7146e0a99c1456355",
+        "createdAt": "2024-01-11T12:40:40.986Z",
+        "updatedAt": "2024-01-15T04:15:56.902Z",
+        "enrollCount": 132,
+        "studyAvatars": [
+            "http://edu-image.nosdn.127.net/E83B804E914794BB0B667CB8B9E0D573.jpg",
+            "http://edu-image.nosdn.127.net/947121BF2959BA52CD25C0818885D90F.jpg",
+            "http://edu-image.nosdn.127.net/80B09AE05F68054EC818626EC1431549.jpg"
+        ],
+        "highlightContent": "通过清晰的讲解和丰富的实例，帮助读者从零开始，逐步掌握C语言的编程技能。书中精选了大量实际案例提升读者的综合应用能力。同时，本书特别注重知识点之间的连贯性和系统性，使读者能够系统地构建起完整的C语言知识体系。本书适用于广大初学者，包括高等院校计算机专业学生、计算机培训班学员以及对编程感兴趣的自学者。",
+        "averageRating": 4.7,
+        "stats": {
+            "views": 456,
+            "downloads": 187,
+            "shares": 69,
+            "favorites": 123,
+            "lastViewed": "2024-01-14T21:35:27Z"
+        },
+        "access": {
+            "isPublic": true,
+            "allowedUsers": [],
+            "allowedRoles": ["user", "teacher"]
+        },
+        "version": {
+            "number": "2.0.0",
+            "history": [
+                {
+                    "version": "1.0.0",
+                    "changes": "初始版本",
+                    "updatedBy": "64f7146e0a99c1456355",
+                    "updatedAt": "2024-01-11T12:40:40.986Z"
+                },
+                {
+                    "version": "2.0.0",
+                    "changes": "更新教材内容，增加实例",
+                    "updatedBy": "64f7146e0a99c1456355",
+                    "updatedAt": "2024-01-15T04:15:56.902Z"
+                }
+            ]
+        }
+    },
+    {
+        "id": 1122047,
+        "title": "Java程序设计案例教程",
+        "description": "本教材是具有交互性、智能化的数字教材，是省级精品课程配套教材的修订版，是按照计算机类专业标准的要求，总结高水平专业群专业教学改革经验编写而成的。本教材以培养Java开发能力为目标，注重Java项目开发技术的应用，通过精心选择工程中典型工作案例，对Java知识点进行精心编排，通过项目的学习，加深对所学知识的理解和提升。通过任务拓展，激发学生创新意识，提升发现问题和解决问题的能力。",
+        "pedagogicalType": "project",
+        "format": "pdf",
+        "contentType": "resource",
+        "subject": "Java程序设计",
+        "grade": "高职",
+        "difficulty": 3,
+        "url": "",
+        "cover": "https://mooc-image.nosdn.127.net/a80101db-e481-4410-98fe-e867543a8009.png",
+        "price": 49.8,
+        "originalPrice": 49.8,
+        "authors": "姜晓刚，张红梅",
+        "publisher": "高等教育出版社",
+        "organization": "高等教育出版社",
+        "createdBy": "64f7146e0a99c1456355",
+        "createdAt": "2024-05-05T10:16:32.215Z",
+        "updatedAt": "2024-05-06T07:25:23.431Z",
+        "enrollCount": 13,
+        "studyAvatars": [
+            "https://img-ph-mirror.nosdn.127.net/NZ_uMJTB0OeFHfQKeN2cBg==",
+            "http://nos.netease.com/edu-image/B131A61FCA342B18F06FA6AFEA8E856A-1444547967960",
+            "http://edu-image.nosdn.127.net/E83B804E914794BB0B667CB8B9E0D573.jpg"
+        ],
+        "highlightContent": "本教材共分9个项目，内容包括：搭建Java开发环境、面向过程编程、面向对象编程、常见API应用、集合容器使用、数据输入输出、数据库编程、技术热点实施、图形界面开发。每个项目首先是\"项目导学、技能导图\"，然后进入任务，每个任务都分为\"学习目标、任务描述、准备知识、任务实施、任务评价、任务拓展\"，最后是\"项目小结、项目练习\"。",
+        "averageRating": 4.6,
+        "stats": {
+            "views": 95,
+            "downloads": 38,
+            "shares": 12,
+            "favorites": 25,
+            "lastViewed": "2024-05-06T05:16:54Z"
+        },
+        "access": {
+            "isPublic": true,
+            "allowedUsers": [],
+            "allowedRoles": ["user", "teacher"]
+        },
+        "version": {
+            "number": "1.0.0",
+            "history": [
+                {
+                    "version": "1.0.0",
+                    "changes": "初始版本",
+                    "updatedBy": "64f7146e0a99c1456355",
+                    "updatedAt": "2024-05-05T10:16:32.215Z"
+                }
+            ]
+        }
+    },
+    {
+        "id": 1122048,
+        "title": "PLC应用技术项目化教程（西门子S7-1500）",
+        "description": "本书对接2023年职业教育国家在线精品课程\"SIMATIC S7-1500 PLC综合应用\"，以西门子S7-1500 PLC为学习机型，以全自动灌装生产线的工作流程为主线，碎片化PLC指令和设计方法，舍弃跳转编程等旧内容，增添SCL、图形化编程、结构化编程新方法，融合触摸屏技术，融入\"复兴号产线\"等思政案例，序化重构教材内容，按学生认知规律，由浅到深，通过\"基础模块\"\"应用模块\"两大模块递进展开。",
+        "pedagogicalType": "tutorial",
+        "format": "pdf",
+        "contentType": "resource",
+        "subject": "自动化技术",
+        "grade": "高职",
+        "difficulty": 4,
+        "url": "",
+        "cover": "https://mooc-image.nosdn.127.net/048f1bcd-cb26-4837-be01-92b445355250.png",
+        "price": 34.8,
+        "originalPrice": 49.8,
+        "authors": "吕茜，李丽，石宪红",
+        "publisher": "高等教育出版社",
+        "organization": "高等教育出版社",
+        "createdBy": "64f7146e0a99c1456355",
+        "createdAt": "2024-01-11T12:40:13.399Z",
+        "updatedAt": "2024-01-14T07:04:39.361Z",
+        "enrollCount": 59,
+        "studyAvatars": [
+            "http://nos.netease.com/edu-image/71FBFBDB4CECDC13C0653DD64A55E386.jpg",
+            "//nos.netease.com/edu-image/4A446310D8CF14CA93E6AFE75B32E155.JPG",
+            "http://img6.ph.126.net/SEiVzVEbBZevulWdZ1voqA=="
+        ],
+        "highlightContent": "本书对接2023年职业教育国家在线精品课程\"SIMATIC S7-1500 PLC综合应用\"，以西门子S7-1500 PLC为学习机型，以全自动灌装生产线的工作流程为主线，碎片化PLC指令和设计方法，舍弃跳转编程等旧内容，增添SCL、图形化编程、结构化编程新方法，融合触摸屏技术，融入\"复兴号产线\"等思政案例，序化重构教材内容，按学生认知规律，由浅到深，通过\"基础模块\"\"应用模块\"两大模块递进展开。",
+        "averageRating": 4.5,
+        "stats": {
+            "views": 195,
+            "downloads": 75,
+            "shares": 28,
+            "favorites": 45,
+            "lastViewed": "2024-01-13T16:28:45Z"
+        },
+        "access": {
+            "isPublic": true,
+            "allowedUsers": [],
+            "allowedRoles": ["user", "teacher"]
+        },
+        "version": {
+            "number": "1.0.0",
+            "history": [
+                {
+                    "version": "1.0.0",
+                    "changes": "初始版本",
+                    "updatedBy": "64f7146e0a99c1456355",
+                    "updatedAt": "2024-01-11T12:40:13.399Z"
+                }
+            ]
+        }
+    },
+    {
+        "id": 1122049,
+        "title": "数控铣削加工技术项目化教程",
+        "description": "本书以教育部数控技术应用型紧缺人才的培训方案为指导思想，参照最新的数控、模具专业教学计划，根据\"基本理论的教学以应用为目的，以必需和够用为尺度\"这一指导原则编写。全书介绍了主流数控系统 FANUC0i-MB及SINUMERIK802S/C的基本功能，以先进而具体的工装设备、工艺路线和加工方法为例，讲述各种编程指令的综合应用及数控机床的操作。",
+        "pedagogicalType": "tutorial",
+        "format": "pdf",
+        "contentType": "resource",
+        "subject": "数控技术",
+        "grade": "高职",
+        "difficulty": 3,
+        "url": "",
+        "cover": "https://mooc-image.nosdn.127.net/8d64510f-3656-47fb-9b3d-63a4d17a4315.png",
+        "price": 31.9,
+        "originalPrice": 45.6,
+        "authors": "孙贵斌，陈军",
+        "publisher": "高等教育出版社",
+        "organization": "高等教育出版社",
+        "createdBy": "64f7146e0a99c1456355",
+        "createdAt": "2024-01-11T12:39:59.360Z",
+        "updatedAt": "2024-01-14T05:58:33.463Z",
+        "enrollCount": 14,
+        "studyAvatars": [
+            "http://edu-image.nosdn.127.net/1544ACF531D3EE5FF1626A488CF9FF13.jpg",
+            "https://edu-image.nosdn.127.net/3A41AF829B26F24D6CA8737A8E1D5C81.jpg",
+            "http://img7.ph.126.net/TvmK1MEDO05HprXJKwg54Q=="
+        ],
+        "highlightContent": "介绍主流数控系统功能，结合先进工装设备等，详述编程指令应用与机床操作，尤其聚焦数控铣床。搭配数控仿真软件，内容循序渐进，极具针对性与实用性，助力数控人才培养。",
+        "averageRating": 4.0,
+        "stats": {
+            "views": 52,
+            "downloads": 18,
+            "shares": 9,
+            "favorites": 11,
+            "lastViewed": "2024-01-13T19:45:12Z"
+        },
+        "access": {
+            "isPublic": true,
+            "allowedUsers": [],
+            "allowedRoles": ["user", "teacher"]
+        },
+        "version": {
+            "number": "1.0.0",
+            "history": [
+                {
+                    "version": "1.0.0",
+                    "changes": "初始版本",
+                    "updatedBy": "64f7146e0a99c1456355",
+                    "updatedAt": "2024-01-11T12:39:59.360Z"
+                }
+            ]
+        }
+    },
+    {
+        "id": 1122050,
+        "title": "工业机器人技术基础",
+        "description": "本教材以7个学习项目系统地介绍工业机器人各组成部分及其应用。项目1介绍工业机器人的基本概念、分类及发展，工业机器人的基本结构及典型应用。项目2首先介绍工业机器人的结构基础知识，然后在此基础上介绍六关节机器人的机械结构及关键零部件。项目3主要介绍工业机器人的控制与驱动系统。项目4介绍华数工业机器人的示教器的使用方法及手动操作方法。项目5在工业机器人示教编程概念的基础上，介绍工业机器人程序和文件管理办法以及指令系统。",
+        "pedagogicalType": "reference",
+        "format": "pdf",
+        "contentType": "resource",
+        "subject": "工业机器人",
+        "grade": "高职",
+        "difficulty": 3,
+        "url": "",
+        "cover": "https://mooc-image.nosdn.127.net/d2479178-bee4-48e2-964c-db832cccd066.png",
+        "price": 28.0,
+        "originalPrice": 40.0,
+        "authors": "郑火胜 王保军 金磊",
+        "publisher": "高等教育出版社",
+        "organization": "高等教育出版社",
+        "createdBy": "64f7146e0a99c1456355",
+        "createdAt": "2023-11-20T16:15:10.649Z",
+        "updatedAt": "2023-11-26T12:27:28.319Z",
+        "enrollCount": 102,
+        "studyAvatars": [
+            "https://img-ph-mirror.nosdn.127.net/QvqCFGalN9SKkL6kUWUOkg==",
+            "https://img-ph-mirror.nosdn.127.net/inG2iKS3I3-GAn4AmOyS0g==",
+            "https://edu-image.nosdn.127.net/08C815E153C928C8E9486C0FFB6012A2.jpg"
+        ],
+        "highlightContent": "通过7个学习项目，涵盖了从工业机器人的基本概念、结构、驱动系统到编程、示教操作、典型应用及日常管理与维护等各方面内容。教材配有在线开放课程与教学课件，提供全面的学习资源，帮助学生掌握工业机器人技术的核心知识。适用于工业机器人技术、智能机器人技术及机电一体化等专业的学习和技术人员参考。",
+        "averageRating": 4.4,
+        "stats": {
+            "views": 278,
+            "downloads": 89,
+            "shares": 35,
+            "favorites": 58,
+            "lastViewed": "2023-11-25T09:43:15Z"
+        },
+        "access": {
+            "isPublic": true,
+            "allowedUsers": [],
+            "allowedRoles": ["user", "teacher"]
+        },
+        "version": {
+            "number": "1.0.0",
+            "history": [
+                {
+                    "version": "1.0.0",
+                    "changes": "初始版本",
+                    "updatedBy": "64f7146e0a99c1456355",
+                    "updatedAt": "2023-11-20T16:15:10.649Z"
+                }
+            ]
+        }
+    },
+    {
+        "id": 1122051,
+        "title": "机器学习及其在航空航天工程中的应用",
+        "description": "本书是航空航天战略性新兴领域\"十四五\"高等教育教材体系建设规划项目的研究成果，以航空航天相关应用场景为牵引，讲解数值计算和机器学习的基本算法和核心思想，并给出其在实际工程和科研中的应用例子。全书分为四个部分。第一部分为第一至三章，建立基本概念，提供Python基础知识，为后续编程实践打好基础。第二部分为第四至十章，介绍数值分析方法，包括方程求解，求微分、解微分方程、插值、拟合、寻优等，这些内容也是航空航天领域算法工程师必须掌握的。",
+        "pedagogicalType": "reference",
+        "format": "pdf",
+        "contentType": "resource",
+        "subject": "航空航天工程",
+        "grade": "本科",
+        "difficulty": 4,
+        "url": "",
+        "cover": "https://mooc-image.nosdn.127.net/15dc7c8b-2f52-4659-9e3d-3574b87a62c3.png",
+        "price": 28.0,
+        "originalPrice": 40.0,
+        "authors": "范雨，张浩鹏",
+        "publisher": "高等教育出版社",
+        "organization": "高等教育出版社",
+        "createdBy": "64f7146e0a99c1456355",
+        "createdAt": "2024-01-13T15:51:14.690Z",
+        "updatedAt": "2024-01-08T12:54:09.439Z",
+        "enrollCount": 21,
+        "studyAvatars": [
+            "https://img-ph-mirror.nosdn.127.net/vn1JpdBuwavQQ2WaeameoA==",
+            "https://img-ph-mirror.nosdn.127.net/Oy2FyvQxUzs_9dwfv0L0KA==",
+            "https://mooc-image.nosdn.127.net/a86c0ef2caf2475db8efafc86a72ea82.jpg"
+        ],
+        "highlightContent": "第一部分为第一至三章，建立基本概念，提供Python基础知识，为后续编程实践打好基础。第二部分为第四至十章，介绍数值分析方法，包括方程求解，求微分、解微分方程、插值、拟合、寻优等，这些内容也是航空航天领域算法工程师必须掌握的。第三部分为第十一至十六章，介绍基本机器学习方法，包括K近邻、K均值、支持向量机和神经网络等算法。第四部分为第十七章至二十三章，我们进入一个更\"实战\"的层次，通过数字孪生模型、寿命预测、空间目标分类等例子，将读者代入一个个航空航天工程场景中，体会所学算法的威力，培养同学将复杂工程问题抽象为机器学习算法模型的能力。",
+        "averageRating": 4.2,
+        "stats": {
+            "views": 67,
+            "downloads": 28,
+            "shares": 15,
+            "favorites": 19,
+            "lastViewed": "2024-01-12T11:23:45Z"
+        },
+        "access": {
+            "isPublic": true,
+            "allowedUsers": [],
+            "allowedRoles": ["user", "teacher"]
+        },
+        "version": {
+            "number": "1.0.0",
+            "history": [
+                {
+                    "version": "1.0.0",
+                    "changes": "初始版本",
+                    "updatedBy": "64f7146e0a99c1456355",
+                    "updatedAt": "2024-01-13T15:51:14.690Z"
+                }
+            ]
+        }
     }
 ]

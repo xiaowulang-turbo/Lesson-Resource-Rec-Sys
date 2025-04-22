@@ -4,39 +4,88 @@
         "email": "admin@example.com",
         "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
         "role": "admin",
-        "preferred_subjects": ["数学", "物理"],
-        "preferred_difficulty": 3,
-        "preferred_resource_types": ["视频", "文档"],
-        "interests": ["数学", "物理", "编程"]
+        "preferred_subjects": ["数据科学", "人工智能", "计算机科学"],
+        "preferred_difficulty": 4,
+        "preferred_resource_types": ["视频", "文档", "实验"],
+        "interests": ["机器学习", "深度学习", "大数据", "云计算"]
     },
     {
         "name": "jonas",
         "email": "jonas@example.com",
         "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
         "role": "admin",
-        "preferred_subjects": ["数学", "物理"],
-        "preferred_difficulty": 4,
-        "preferred_resource_types": ["视频", "文档"],
-        "interests": ["数学", "物理", "编程"]
+        "preferred_subjects": ["航空航天", "电子信息", "机械工程"],
+        "preferred_difficulty": 5,
+        "preferred_resource_types": ["文档", "图书", "工具软件"],
+        "interests": ["无人机", "智能控制", "电推进", "航空科技"],
+        "course_interactions": [
+            {
+                "course_id": "1473948443",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "date_completed": "2024-01-05"
+            },
+            {
+                "course_id": "1474376441",
+                "rating": 5,
+                "completion_percentage": 95,
+                "favorite": true,
+                "date_completed": "2024-01-20"
+            },
+            {
+                "course_id": "1474376444",
+                "rating": 4,
+                "completion_percentage": 80,
+                "favorite": true,
+                "date_completed": "2024-01-15"
+            }
+        ]
     },
     {
         "name": "教师",
         "email": "teacher@example.com",
         "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
         "role": "teacher",
-        "preferred_subjects": ["数学", "物理"],
+        "preferred_subjects": ["数学", "物理", "化学"],
         "preferred_difficulty": 3,
-        "preferred_resource_types": ["视频", "文档"],
-        "interests": ["数学", "物理", "编程"]
+        "preferred_resource_types": ["视频", "图书", "习题"],
+        "interests": ["教学方法", "教育技术", "学科教育", "STEM教育"]
     },
     {
         "name": "学生",
-        "email": "student@example.com",
+        "email": "xiaowu@example.com",
         "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
         "role": "user",
-        "preferred_subjects": ["数学", "物理"],
+        "preferred_subjects": ["信息技术", "编程语言", "软件工程"],
         "preferred_difficulty": 2,
-        "preferred_resource_types": ["视频", "文档"],
-        "interests": ["数学", "物理", "编程"]
+        "preferred_resource_types": ["视频", "在线课程", "互动实验"],
+        "interests": ["Web开发", "移动应用", "编程入门", "UI设计"],
+        "course_interactions": [
+            {
+                "course_id": "1474376450",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "date_completed": "2024-01-10"
+            },
+            {
+                "course_id": "1474376455",
+                "rating": 4,
+                "completion_percentage": 80,
+                "favorite": true,
+                "date_completed": "2024-01-18"
+            }
+        ]
+    },
+    {
+        "name": "新学生",
+        "email": "newstudent@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "user",
+        "preferred_subjects": ["经济学", "管理学", "市场营销"],
+        "preferred_difficulty": 3,
+        "preferred_resource_types": ["案例", "视频", "电子书"],
+        "interests": ["创业", "金融", "商业分析", "项目管理"]
     }
 ]
