@@ -28,7 +28,8 @@ const ResourceCard = styled.div`
     box-shadow: var(--shadow-sm);
     transition: all 0.3s;
     display: ${({ layout }) => (layout === 'list' ? 'flex' : 'block')};
-    align-items: ${({ layout }) => (layout === 'list' ? 'center' : 'stretch')};
+    align-items: ${({ layout }) =>
+        layout === 'list' ? 'flex-start' : 'stretch'};
 
     ${ResourceCardLink}:hover & {
         transform: translateY(-2px);
@@ -43,8 +44,9 @@ const ResourceImage = styled.div`
     ${({ layout }) => {
         if (layout === 'list') {
             return `
-                flex: 0 0 320px;
-                width: 320px;
+                flex: 0 0 240px;
+                width: 240px;
+                height: 360px;
             `
         }
         return ''
@@ -69,6 +71,7 @@ const ResourceContent = styled.div`
         `
         flex: 1;
         overflow: hidden;
+        padding-left: 2.4rem;
     `}
 `
 
@@ -214,17 +217,17 @@ const LayoutToggle = styled.button`
 `
 
 function ResourceList({ resources }) {
-    const [layout, setLayout] = useState('grid') // 'grid' or 'list'
+    const [layout, setLayout] = useState('list') // Changed default to 'list' from 'grid'
 
+    // EDUWEBDEVICE=87cd2566a4df449f80f9a4b14f41f499'                     'Content-Type':
+    // 'application/x-www-form-urlencoded;charset=UTF-8',
     // useEffect(() => {
     //     fetch(
     //         'https://www.icourse163.org/web/j/mocSearchBean.searchCourse.rpc?csrfKey=fba6bd9e19744ab0b9092da379ef375d',
     //         {
     //             method: 'POST',
     //             headers: {
-    //                 Cookie: 'NTESSTUDYSI=fba6bd9e19744ab0b9092da379ef375d; EDUWEBDEVICE=87cd2566a4df449f80f9a4b14f41f499',
-    //                 'Content-Type':
-    //                     'application/x-www-form-urlencoded;charset=UTF-8',
+    //                 Cookie: 'NTESSTUDYSI=fba6bd9e19744ab0b9092da379ef375d',
     //             },
     //             body: 'mocCourseQueryVo={"keyword":"人工智能","pageIndex":1,"highlight":true,"orderBy":0,"stats":30,"pageSize":20,"prodectType":5}',
     //         }
