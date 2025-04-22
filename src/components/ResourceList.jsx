@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import Empty from '../ui/Empty'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 // Revert to a reliable placeholder service as Unsplash Source seems unreliable
@@ -216,6 +216,24 @@ const LayoutToggle = styled.button`
 function ResourceList({ resources }) {
     const [layout, setLayout] = useState('grid') // 'grid' or 'list'
 
+    // useEffect(() => {
+    //     fetch(
+    //         'https://www.icourse163.org/web/j/mocSearchBean.searchCourse.rpc?csrfKey=fba6bd9e19744ab0b9092da379ef375d',
+    //         {
+    //             method: 'POST',
+    //             headers: {
+    //                 Cookie: 'NTESSTUDYSI=fba6bd9e19744ab0b9092da379ef375d; EDUWEBDEVICE=87cd2566a4df449f80f9a4b14f41f499',
+    //                 'Content-Type':
+    //                     'application/x-www-form-urlencoded;charset=UTF-8',
+    //             },
+    //             body: 'mocCourseQueryVo={"keyword":"人工智能","pageIndex":1,"highlight":true,"orderBy":0,"stats":30,"pageSize":20,"prodectType":5}',
+    //         }
+    //     )
+    //         .then((response) => response.json())
+    //         .then((data) => console.log(data, 'data'))
+    //         .catch((error) => console.error('Error:', error))
+    // }, [])
+
     const toggleLayout = () => {
         setLayout((prev) => (prev === 'grid' ? 'list' : 'grid'))
     }
@@ -273,7 +291,9 @@ function ResourceList({ resources }) {
                             <ResourceCard layout={layout}>
                                 <ResourceImage layout={layout}>
                                     <img
-                                        src={PLACEHOLDER_IMAGE}
+                                        src={
+                                            resource.cover || PLACEHOLDER_IMAGE
+                                        }
                                         alt={resource.title || '课程封面'}
                                         onError={(e) => {
                                             e.target.src = PLACEHOLDER_IMAGE
