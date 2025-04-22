@@ -2,22 +2,42 @@ import jwt from 'jsonwebtoken'
 import { promisify } from 'util'
 import catchAsync from '../utils/catchAsync.js'
 import { DataServiceFactory } from '../services/DataServiceFactory.js' // 导入 DataServiceFactory
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
-
-// ES Module equivalent for __dirname
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+// 导入推荐算法模块
+import {
+    contentBasedRecommendation,
+    collaborativeFilteringRecommendation,
+    hybridRecommendation,
+    getPopularRecommendations,
+} from '../recommendation/algorithms.js'
 
 // 获取 dataService 实例
 const dataService = new DataServiceFactory().getAdapter()
 
+// 添加日志记录函数
+const logRecommendation = (user, algorithm, result) => {
+    console.log(`[推荐系统] 用户: ${user?.email || '访客'}, 算法: ${algorithm}`)
+    console.log(
+        `[推荐系统] 结果状态: ${result?.success}, 推荐数量: ${
+            result?.recommendations?.length || 0
+        }`
+    )
+    if (result?.recommendations?.length > 0) {
+        console.log(
+            `[推荐系统] 前3个推荐: ${result.recommendations
+                .slice(0, 3)
+                .map((r) => r.title)
+                .join(', ')}`
+        )
+    }
+}
+
 // Controller function for homepage recommendations
 export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
-    // const limit = req.query.limit ? parseInt(req.query.limit, 10) : 8 // Comment out unused variable
     let recommendationsResult
     let currentUser = null
+    let usedAlgorithm = 'unknown'
+
+    console.log(req.headers, 'req.headers')
 
     // 1. 检查是否存在 token 并验证
     let token
@@ -26,7 +46,8 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
         req.headers.authorization.startsWith('Bearer')
     ) {
         token = req.headers.authorization.split(' ')[1]
-        console.log('Token found in headers.')
+        console.log('Token found in headers.', token)
+        console.log(process.env.JWT_SECRET, 'process.env.JWT_SECRET')
     }
 
     if (token) {
@@ -46,6 +67,21 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
                 // 确保我们获取的是普通对象或检查模型实例的属性
                 currentUser = freshUser // Mongoose 模型实例或普通对象
                 console.log('User found in DB:', currentUser.email)
+
+                // 打印用户偏好信息，用于调试
+                console.log(
+                    `[推荐系统] 用户偏好: 学科=${currentUser.preferred_subjects?.join(
+                        ','
+                    )}`
+                )
+                console.log(
+                    `[推荐系统] 用户兴趣: ${currentUser.interests?.join(',')}`
+                )
+                console.log(
+                    `[推荐系统] 用户交互记录: ${
+                        currentUser.course_interactions?.length || 0
+                    }条`
+                )
             } else {
                 console.log('User not found in DB for decoded ID:', decoded.id)
                 currentUser = null
@@ -63,162 +99,88 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
         currentUser = null
     }
 
-    // 2. 根据用户状态和角色选择推荐算法
+    // 2. 根据用户状态选择推荐算法
+    const limit = parseInt(req.query.limit) || 10 // 获取limit参数，默认为10
+
+    // 从请求参数中获取算法偏好（如果有的话）
+    const algorithmPreference = req.query.algorithm || 'hybrid'
+    const contentWeight = parseFloat(req.query.contentWeight) || 0.5
+    const collaborativeWeight = parseFloat(req.query.collaborativeWeight) || 0.5
+
     if (currentUser) {
         console.log(
             `Executing recommendations for logged-in user: ${currentUser.email}`
-        ) // Log: Executing logged-in logic
-        // Logged-in user - Implement content-based recommendation
-        // const userId = currentUser.id || currentUser._id; // Remove unused variable
-        // console.log(`Getting recommendations for logged-in user: ${userId}`); // Redundant log
+        )
 
-        // --- Load Resource Data --- (Similar to guest logic)
-        let coursesData = []
-        let loadError = null
-        try {
-            const dataPath = path.join(__dirname, '../data/resources.json')
-            const jsonData = fs.readFileSync(dataPath, 'utf8')
-            coursesData = JSON.parse(jsonData)
-        } catch (error) {
-            loadError = error
-        }
-
-        if (loadError || !coursesData || coursesData.length === 0) {
-            console.error(
-                'Courses data is not loaded or empty for logged-in user:',
-                loadError
+        // 根据请求参数选择算法
+        if (algorithmPreference === 'content') {
+            // 使用基于内容的推荐
+            console.log('[推荐系统] 使用基于内容的推荐算法')
+            usedAlgorithm = 'content'
+            recommendationsResult = contentBasedRecommendation(
+                currentUser,
+                limit
             )
-            // Return empty recommendations instead of 500 error for a smoother user experience
-            recommendationsResult = {
-                success: true,
-                message: '无法加载课程数据，暂无推荐',
-                recommendations: [],
-            }
+        } else if (algorithmPreference === 'collaborative') {
+            // 使用协同过滤推荐
+            console.log('[推荐系统] 使用协同过滤推荐算法')
+            usedAlgorithm = 'collaborative'
+            recommendationsResult = collaborativeFilteringRecommendation(
+                currentUser,
+                limit
+            )
         } else {
-            // --- Get User Preferences ---
-            const preferredSubjects = currentUser.preferred_subjects || []
-            const interests = currentUser.interests || []
-            const preferredDifficulty = currentUser.preferred_difficulty
-            const limit = parseInt(req.query.limit) || 10
-
-            // --- Calculate Scores and Recommend ---
-            const scoredResources = coursesData.map((resource) => {
-                let score = 0
-                const resourceTags = Array.isArray(resource.tags)
-                    ? resource.tags
-                    : []
-
-                // Score based on subject match
-                if (preferredSubjects.includes(resource.subject)) {
-                    score += 5 // High score for direct subject match
-                }
-
-                // Score based on interest/tag overlap
-                const commonInterests = resourceTags.filter((tag) =>
-                    interests.includes(tag)
-                )
-                score += commonInterests.length * 2 // Score per matching tag
-
-                // Score based on difficulty proximity
-                if (
-                    preferredDifficulty !== undefined &&
-                    resource.difficulty !== undefined
-                ) {
-                    const diffDelta = Math.abs(
-                        resource.difficulty - preferredDifficulty
-                    )
-                    if (diffDelta === 0) {
-                        score += 3 // Perfect difficulty match
-                    } else if (diffDelta === 1) {
-                        score += 1 // Close difficulty match
-                    }
-                    // Larger differences get no points for difficulty
-                }
-
-                // Add a small amount based on enroll count to break ties
-                const enrollment = parseInt(
-                    resource.enrollCount?.toString().replace(/[^0-9]/g, '') ||
-                        '0',
-                    10
-                )
-                score += enrollment * 0.001
-
-                return { ...resource, score }
+            // 默认使用混合推荐
+            console.log('[推荐系统] 使用混合推荐算法，权重为:', {
+                content: contentWeight,
+                collaborative: collaborativeWeight,
             })
+            usedAlgorithm = 'hybrid'
+            const weights = {
+                content: contentWeight,
+                collaborative: collaborativeWeight,
+            }
+            recommendationsResult = hybridRecommendation(
+                currentUser,
+                limit,
+                weights
+            )
 
-            // Sort by score (descending) and take top N
-            const recommendedResources = scoredResources
-                .filter((r) => r.score > 0) // Only recommend resources with a positive score
-                .sort((a, b) => b.score - a.score)
-                .slice(0, limit)
-                .map((resource) => ({
-                    ...resource,
-                    id: resource.metadata?.id, // Ensure ID is present
-                    recommendation_reason: `根据你的偏好推荐 (学科: ${
-                        resource.subject
-                    }, 难度: ${
-                        resource.difficulty
-                    }, 匹配得分: ${resource.score.toFixed(2)})`,
-                }))
+            // 如果混合推荐失败（例如，用户没有交互记录），则回退到基于内容的推荐
+            if (
+                !recommendationsResult.success ||
+                recommendationsResult.recommendations.length === 0
+            ) {
+                console.log('[推荐系统] 混合推荐失败，回退到基于内容的推荐')
+                usedAlgorithm = 'content (fallback)'
+                recommendationsResult = contentBasedRecommendation(
+                    currentUser,
+                    limit
+                )
 
-            recommendationsResult = {
-                success: true,
-                message: '为你推荐的资源',
-                recommendations: recommendedResources,
+                // 如果基于内容的推荐也失败，则回退到热门推荐
+                if (
+                    !recommendationsResult.success ||
+                    recommendationsResult.recommendations.length === 0
+                ) {
+                    console.log(
+                        '[推荐系统] 基于内容的推荐也失败，回退到热门推荐'
+                    )
+                    usedAlgorithm = 'popular (fallback)'
+                    recommendationsResult = getPopularRecommendations(limit)
+                }
             }
         }
     } else {
         console.log('Executing guest recommendations.')
-        // 对于访客用户，执行不同的推荐逻辑，例如推荐热门课程
-        // 确保 coursesData 已加载
-        let coursesData = []
-        let loadError = null
-        try {
-            const dataPath = path.join(__dirname, '../data/resources.json') // Now __dirname is defined correctly
-            const jsonData = fs.readFileSync(dataPath, 'utf8')
-            coursesData = JSON.parse(jsonData)
-        } catch (error) {
-            loadError = error
-        }
-
-        if (loadError || !coursesData || coursesData.length === 0) {
-            // Check loadError as well
-            console.error('Courses data is not loaded or empty:', loadError)
-            return res.status(500).json({
-                status: 'error',
-                message: '课程数据加载失败',
-                results: 0,
-                data: { recommendations: [] },
-            })
-        }
-
-        const limit = parseInt(req.query.limit) || 10 // 获取limit参数，默认为10
-
-        const popularCourses = coursesData // Restore popular course logic
-            .sort((a, b) => {
-                const enrollmentA = parseInt(
-                    a.course_students_enrolled?.replace(/[^0-9]/g, '') || '0',
-                    10
-                )
-                const enrollmentB = parseInt(
-                    b.course_students_enrolled?.replace(/[^0-9]/g, '') || '0',
-                    10
-                )
-                return enrollmentB - enrollmentA
-            })
-            .slice(0, limit)
-            .map((course) => ({
-                ...course,
-                id: course.metadata?.id,
-                recommendation_reason: '热门课程，很多学习者都在学习',
-            }))
-
-        recommendationsResult = {
-            success: true,
-            message: '热门课程推荐', // Changed message
-            recommendations: popularCourses, // Use popular courses
-        }
+        // 对于访客用户，使用热门推荐
+        console.log('[推荐系统] 用户未登录，使用热门推荐')
+        usedAlgorithm = 'popular'
+        recommendationsResult = getPopularRecommendations(limit)
     }
+
+    // 记录推荐结果
+    logRecommendation(currentUser, usedAlgorithm, recommendationsResult)
 
     // 3. 处理推荐结果并响应
     if (!recommendationsResult || !recommendationsResult.success) {
@@ -241,6 +203,125 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
         results: recommendationsResult.recommendations.length,
         data: {
             recommendations: recommendationsResult.recommendations,
+            algorithm: usedAlgorithm,
+        },
+    })
+})
+
+// 根据用户ID获取推荐（API端点）
+export const getRecommendationsByUserId = catchAsync(async (req, res, next) => {
+    const { userId } = req.params
+    const limit = parseInt(req.query.limit) || 10
+    let usedAlgorithm = 'unknown'
+
+    if (!userId) {
+        return res.status(400).json({
+            status: 'error',
+            message: '未提供用户ID',
+            results: 0,
+            data: { recommendations: [] },
+        })
+    }
+
+    // 从请求参数中获取算法偏好
+    const algorithmPreference = req.query.algorithm || 'hybrid'
+    const contentWeight = parseFloat(req.query.contentWeight) || 0.5
+    const collaborativeWeight = parseFloat(req.query.collaborativeWeight) || 0.5
+
+    // 加载用户数据
+    let user = null
+    try {
+        user = await dataService.getUserById(userId)
+    } catch (error) {
+        console.error(`Error fetching user ${userId}:`, error.message)
+    }
+
+    if (!user) {
+        return res.status(404).json({
+            status: 'error',
+            message: `未找到ID为 ${userId} 的用户`,
+            results: 0,
+            data: { recommendations: [] },
+        })
+    }
+
+    // 打印用户信息用于调试
+    console.log(`[推荐系统] 获取用户${userId}的推荐`)
+    console.log(
+        `[推荐系统] 用户偏好: 学科=${user.preferred_subjects?.join(',')}`
+    )
+    console.log(`[推荐系统] 用户兴趣: ${user.interests?.join(',')}`)
+    console.log(
+        `[推荐系统] 用户交互记录: ${user.course_interactions?.length || 0}条`
+    )
+
+    // 根据指定算法生成推荐
+    let recommendationsResult
+
+    if (algorithmPreference === 'content') {
+        console.log('[推荐系统] 使用基于内容的推荐算法')
+        usedAlgorithm = 'content'
+        recommendationsResult = contentBasedRecommendation(user, limit)
+    } else if (algorithmPreference === 'collaborative') {
+        console.log('[推荐系统] 使用协同过滤推荐算法')
+        usedAlgorithm = 'collaborative'
+        recommendationsResult = collaborativeFilteringRecommendation(
+            user,
+            limit
+        )
+    } else {
+        // 默认混合推荐
+        console.log('[推荐系统] 使用混合推荐算法，权重为:', {
+            content: contentWeight,
+            collaborative: collaborativeWeight,
+        })
+        usedAlgorithm = 'hybrid'
+        const weights = {
+            content: contentWeight,
+            collaborative: collaborativeWeight,
+        }
+        recommendationsResult = hybridRecommendation(user, limit, weights)
+
+        // 如果混合推荐失败，回退到基于内容的推荐
+        if (
+            !recommendationsResult.success ||
+            recommendationsResult.recommendations.length === 0
+        ) {
+            console.log('[推荐系统] 混合推荐失败，回退到基于内容的推荐')
+            usedAlgorithm = 'content (fallback)'
+            recommendationsResult = contentBasedRecommendation(user, limit)
+
+            // 如果基于内容的推荐也失败，则回退到热门推荐
+            if (
+                !recommendationsResult.success ||
+                recommendationsResult.recommendations.length === 0
+            ) {
+                console.log('[推荐系统] 基于内容的推荐也失败，回退到热门推荐')
+                usedAlgorithm = 'popular (fallback)'
+                recommendationsResult = getPopularRecommendations(limit)
+            }
+        }
+    }
+
+    // 记录推荐结果
+    logRecommendation(user, usedAlgorithm, recommendationsResult)
+
+    if (!recommendationsResult.success) {
+        return res.status(200).json({
+            status: 'success',
+            message: recommendationsResult.message || '无法生成推荐',
+            results: 0,
+            data: { recommendations: [] },
+        })
+    }
+
+    res.status(200).json({
+        status: 'success',
+        message: recommendationsResult.message,
+        results: recommendationsResult.recommendations.length,
+        data: {
+            recommendations: recommendationsResult.recommendations,
+            algorithm: usedAlgorithm,
         },
     })
 })
