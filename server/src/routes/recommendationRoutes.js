@@ -10,6 +10,9 @@ const router = express.Router()
 // router.get('/homepage', protectOptional, recommendationController.getHomepageRecommendations);
 router.get('/homepage', recommendationController.getHomepageRecommendations)
 
+// 根据用户ID获取推荐路由
+router.get('/user/:userId', recommendationController.getRecommendationsByUserId)
+
 // Add other recommendation-related routes here
 
 export default router

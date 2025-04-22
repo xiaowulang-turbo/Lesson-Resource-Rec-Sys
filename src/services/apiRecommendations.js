@@ -9,8 +9,17 @@ export const fetchHomepageRecommendations = async (limit = 8) => {
     try {
         const url = `${API_URL}/recommendations/homepage?limit=${limit}`
 
-        // Retrieve the token from local storage (or wherever it's stored)
-        const token = localStorage.getItem('jwt') // Adjust if token is stored differently
+        // 修正获取token的方式，从auth对象中获取，而不是直接获取jwt
+        let token = null
+        const storedAuth = localStorage.getItem('auth')
+        if (storedAuth) {
+            try {
+                const authData = JSON.parse(storedAuth)
+                token = authData.token
+            } catch (e) {
+                console.error('Error parsing auth data:', e)
+            }
+        }
 
         const headers = {
             'Content-Type': 'application/json',
