@@ -26,6 +26,20 @@ const userSchema = new mongoose.Schema(
             enum: ['user', 'admin', 'teacher'],
             default: 'user',
         },
+        // 添加扁平结构的字段以支持从JSON导入的数据
+        preferred_subjects: [String],
+        preferred_difficulty: Number,
+        preferred_resource_types: [String],
+        interests: [String],
+        course_interactions: [
+            {
+                course_id: String,
+                rating: Number,
+                completion_percentage: Number,
+                favorite: Boolean,
+                date_completed: Date,
+            },
+        ],
         // 新增教师特定字段
         teacherProfile: {
             subjects: [
