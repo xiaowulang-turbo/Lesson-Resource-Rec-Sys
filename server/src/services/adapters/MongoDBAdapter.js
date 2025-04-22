@@ -14,7 +14,18 @@ export class MongoDBAdapter extends DataServiceInterface {
         // 移除手动加密逻辑，直接将 userData 传递给 User.create
         // Mongoose 的 pre('save') 中间件会负责加密
         try {
-            const user = await User.create(userData)
+            // 为新用户添加默认偏好
+            const userDataWithDefaults = {
+                ...userData,
+                preferences: {
+                    preferredSubjects: ['数学', '语文', '英语'], // 默认学科
+                    preferredGrades: ['初中', '高中'], // 默认年级
+                    preferredDifficulty: '中级',
+                    learningStyle: '视觉型',
+                },
+            }
+
+            const user = await User.create(userDataWithDefaults)
             return {
                 id: user._id,
                 name: user.name,
@@ -31,11 +42,28 @@ export class MongoDBAdapter extends DataServiceInterface {
     async getUserById(id) {
         const user = await User.findById(id)
         if (!user) return null
+
+        // 同时检查扁平结构和嵌套结构，优先使用扁平结构（来自JSON导入的数据）
+        const preferredSubjects =
+            user.preferred_subjects || user.preferences?.preferredSubjects || []
+        const preferredResourceTypes = user.preferred_resource_types || []
+        const interests = user.interests || []
+        const courseInteractions = user.course_interactions || []
+        const preferredDifficulty =
+            user.preferred_difficulty || user.preferences?.preferredDifficulty
+
         return {
             id: user._id,
             name: user.name,
             email: user.email,
             role: user.role,
+            preferred_subjects: preferredSubjects,
+            preferred_difficulty: preferredDifficulty,
+            preferred_resource_types: preferredResourceTypes,
+            interests: interests,
+            course_interactions: courseInteractions,
+            // 仍然保留原始字段，以便其他地方使用
+            preferences: user.preferences,
         }
     }
 
@@ -62,6 +90,12 @@ export class MongoDBAdapter extends DataServiceInterface {
             name: user.name,
             email: user.email,
             role: user.role,
+            preferred_subjects: user.preferences?.preferredSubjects || [],
+            preferred_difficulty: user.preferences?.preferredDifficulty,
+            interests: user.preferences?.learningStyle
+                ? [user.preferences.learningStyle]
+                : [],
+            preferences: user.preferences,
         }
     }
 
