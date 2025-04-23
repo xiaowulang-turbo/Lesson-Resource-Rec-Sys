@@ -28,7 +28,7 @@ const ResourceCard = styled.div`
     box-shadow: var(--shadow-sm);
     transition: all 0.3s;
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
 
     ${ResourceCardLink}:hover & {
         transform: translateY(-2px);
@@ -41,7 +41,7 @@ const ResourceImage = styled.div`
     background-color: var(--color-grey-100); // Background for placeholder
     flex: 0 0 240px;
     width: 240px;
-    height: 180px;
+    height: auto;
 
     img {
         width: 100%;
