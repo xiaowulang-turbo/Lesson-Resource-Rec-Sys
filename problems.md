@@ -1,0 +1,4 @@
+-   仅对 icourse 进行 whistle 代理，而忘记对图片服务器代理，导致图片无法加载
+-   whistle https 服务配置异常，导致无法正确代理 http 请求
+-   图片服务器 referer 配置缺少 https，导致无法正确获取数据
+-   图片服务器仅需一个 referer 即可代理
