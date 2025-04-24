@@ -3,9 +3,8 @@ import Empty from '../ui/Empty'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-// Revert to a reliable placeholder service as Unsplash Source seems unreliable
-// Use Lorem Picsum as a potentially better placeholder for China access
-const PLACEHOLDER_IMAGE = 'https://picsum.photos/400/180?random=1'
+// 使用本地默认资源图片替代在线服务
+const PLACEHOLDER_IMAGE = '../public/default-resource.jpg'
 
 const ResourceGrid = styled.div`
     display: grid;
@@ -207,21 +206,21 @@ function ResourceList({ resources }) {
 
     // EDUWEBDEVICE=87cd2566a4df449f80f9a4b14f41f499'                     'Content-Type':
     // 'application/x-www-form-urlencoded;charset=UTF-8',
-    // useEffect(() => {
-    //     fetch(
-    //         'https://www.icourse163.org/web/j/mocSearchBean.searchCourse.rpc?csrfKey=fba6bd9e19744ab0b9092da379ef375d',
-    //         {
-    //             method: 'POST',
-    //             headers: {
-    //                 Cookie: 'NTESSTUDYSI=fba6bd9e19744ab0b9092da379ef375d',
-    //             },
-    //             body: 'mocCourseQueryVo={"keyword":"人工智能","pageIndex":1,"highlight":true,"orderBy":0,"stats":30,"pageSize":20,"prodectType":5}',
-    //         }
-    //     )
-    //         .then((response) => response.json())
-    //         .then((data) => console.log(data, 'data'))
-    //         .catch((error) => console.error('Error:', error))
-    // }, [])
+    useEffect(() => {
+        fetch(
+            'https://www.icourse163.org/web/j/mocSearchBean.searchCourse.rpc?csrfKey=fba6bd9e19744ab0b9092da379ef375d',
+            {
+                method: 'POST',
+                headers: {
+                    Cookie: 'NTESSTUDYSI=fba6bd9e19744ab0b9092da379ef375d',
+                },
+                body: 'mocCourseQueryVo={"keyword":"人工智能","pageIndex":1,"highlight":true,"orderBy":0,"stats":30,"pageSize":20,"prodectType":5}',
+            }
+        )
+            .then((response) => response.json())
+            .then((data) => console.log(data, 'data'))
+            .catch((error) => console.error('Error:', error))
+    }, [])
 
     const toggleLayout = () => {
         setLayout((prev) => (prev === 'grid' ? 'list' : 'grid'))
