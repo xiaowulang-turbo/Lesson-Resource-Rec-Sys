@@ -54,34 +54,16 @@ export function convertMocCourseToResource(mocCourse) {
         专家: 5,
     }
 
-    // 提取课程ID的辅助函数
-    const extractCourseId = (course) => {
-        // 优先使用完整的courseId（包含学校代码）
-        if (course.courseId) {
-            const courseIdStr = String(course.courseId)
-            if (courseIdStr.includes('-')) {
-                return courseIdStr
-            }
-        }
-
-        // 如果有学校代码和ID，则组合
-        const schoolShortName =
-            course.schoolPanel?.shortName ||
-            course.school?.shortName ||
-            course.originalData?.schoolPanel?.shortName ||
-            course.originalData?.school?.shortName
-
-        if (schoolShortName && (course.id || course.termId)) {
-            const id = String(course.id || course.termId)
-            return `${schoolShortName}-${id}`
-        }
-
-        // 如果都没有，则返回null
-        return null
-    }
-
     // 获取学校信息的辅助函数
     const getSchoolInfo = (course) => {
+        // 安全地获取shortName的辅助函数
+        const safeGetShortName = (value) => {
+            if (!value) return ''
+            // 确保value是字符串类型
+            const strValue = String(value)
+            return strValue.includes('-') ? strValue.split('-')[0] : ''
+        }
+
         // 优先使用schoolPanel信息
         const schoolPanel =
             course.schoolPanel || course.originalData?.schoolPanel
@@ -111,6 +93,28 @@ export function convertMocCourseToResource(mocCourse) {
             }
         }
 
+        // 如果有highlightUniversity，使用它
+        const schoolName =
+            course.highlightUniversity ||
+            course.originalData?.highlightUniversity
+        if (schoolName) {
+            // 尝试从tid或courseId中提取shortName，使用安全的方法
+            const shortName =
+                safeGetShortName(course.tid) ||
+                safeGetShortName(course.courseId) ||
+                ''
+
+            return {
+                id: null,
+                name: cleanHtmlAndWhitespace(schoolName),
+                shortName: shortName,
+                imgUrl: '',
+                supportMooc: true,
+                supportSpoc: false,
+                bgPhoto: '',
+            }
+        }
+
         // 如果都没有，返回默认值
         return {
             id: null,
@@ -121,6 +125,45 @@ export function convertMocCourseToResource(mocCourse) {
             supportSpoc: false,
             bgPhoto: '',
         }
+    }
+
+    // 提取课程ID的辅助函数
+    const extractCourseId = (course) => {
+        // 安全地获取ID的辅助函数
+        const safeGetId = (value) => {
+            if (!value) return null
+            // 确保value是字符串类型
+            const strValue = String(value)
+            return strValue.includes('-') ? strValue : null
+        }
+
+        // 优先使用完整的courseId（包含学校代码）
+        const fullCourseId = safeGetId(course.courseId)
+        if (fullCourseId) return fullCourseId
+
+        // 尝试从tid中获取完整ID
+        const tidId = safeGetId(course.tid)
+        if (tidId) return tidId
+
+        // 如果有学校代码和ID，则组合
+        const schoolShortName =
+            course.schoolPanel?.shortName ||
+            course.school?.shortName ||
+            course.originalData?.schoolPanel?.shortName ||
+            course.originalData?.school?.shortName ||
+            (course.tid ? String(course.tid).split('-')[0] : null)
+
+        const courseId =
+            course.id ||
+            course.termId ||
+            (course.tid ? String(course.tid).split('-')[1] : null)
+
+        if (schoolShortName && courseId) {
+            return `${schoolShortName}-${String(courseId)}`
+        }
+
+        // 如果都没有，则返回null
+        return null
     }
 
     // 标签处理
