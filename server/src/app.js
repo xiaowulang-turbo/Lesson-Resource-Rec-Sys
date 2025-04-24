@@ -8,6 +8,7 @@ import userRoutes from './routes/userRoutes.js'
 import settingsRoutes from './routes/settingsRoutes.js'
 import statsRoutes from './routes/statsRoutes.js'
 import recommendationRoutes from './routes/recommendationRoutes.js'
+import moocRoutes from './routes/moocRoutes.js'
 import rateLimit from 'express-rate-limit'
 import cookieParser from 'cookie-parser'
 import globalErrorHandler from './middlewares/errorMiddleware.js'
@@ -68,29 +69,14 @@ app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/settings', settingsRoutes)
 app.use('/api/v1/stats', statsRoutes)
 app.use('/api/v1/recommendations', recommendationRoutes)
+app.use('/api/v1/mooc', moocRoutes)
 
 // 添加中国大学慕课的API代理路由
 app.post('/api/course/search', async (req, res) => {
     try {
-        // 从请求URL中获取csrfKey参数
-        const csrfKey = req.query.csrfKey || 'fba6bd9e19744ab0b9092da379ef375d'
-
-        const response = await fetch(
-            `https://www.icourse163.org/web/j/mocSearchBean.searchCourse.rpc?csrfKey=${csrfKey}`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type':
-                        'application/x-www-form-urlencoded;charset=UTF-8',
-                    Cookie: 'NTESSTUDYSI=fba6bd9e19744ab0b9092da379ef375d',
-                    Origin: 'https://www.icourse163.org',
-                    Referer: 'https://www.icourse163.org',
-                },
-                body: req.body.toString(),
-            }
-        )
-        const data = await response.json()
-        res.json(data)
+        // 重定向到mooc代理处理程序
+        req.url = '/api/v1/mooc/proxy'
+        app._router.handle(req, res)
     } catch (error) {
         console.error('代理请求失败:', error)
         res.status(500).json({ error: '代理请求失败' })
