@@ -21,3 +21,4 @@ config.env
 
 # 临时文件
 temp.json
+newResources.json
