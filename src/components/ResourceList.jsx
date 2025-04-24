@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import Empty from '../ui/Empty'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { extractAndConvertMocSearchResults } from '../utils/mocDataAdapter'
 
 // 使用本地默认资源图片替代在线服务
 const PLACEHOLDER_IMAGE = '../public/default-resource.jpg'
@@ -154,6 +155,14 @@ const Label = styled.span`
         background-color: var(--color-grey-100);
         color: var(--color-grey-700);
       `}
+    
+    // 为format类型添加样式
+    ${(props) =>
+        props.type === 'format' &&
+        `
+        background-color: var(--color-indigo-100);
+        color: var(--color-indigo-700);
+      `}
 `
 
 const Description = styled.p`
@@ -201,29 +210,85 @@ const LayoutToggle = styled.button`
     }
 `
 
-function ResourceList({ resources }) {
+function ResourceList({ resources: initialResources }) {
     const [layout, setLayout] = useState('grid') // Changed back to 'grid' as default
+    const [resources, setResources] = useState(initialResources || [])
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState(null)
 
     // EDUWEBDEVICE=87cd2566a4df449f80f9a4b14f41f499'                     'Content-Type':
     // 'application/x-www-form-urlencoded;charset=UTF-8',
     useEffect(() => {
-        fetch(
-            'https://www.icourse163.org/web/j/mocSearchBean.searchCourse.rpc?csrfKey=fba6bd9e19744ab0b9092da379ef375d',
-            {
-                method: 'POST',
-                headers: {
-                    Cookie: 'NTESSTUDYSI=fba6bd9e19744ab0b9092da379ef375d',
-                },
-                body: 'mocCourseQueryVo={"keyword":"人工智能","pageIndex":1,"highlight":true,"orderBy":0,"stats":30,"pageSize":20,"prodectType":5}',
+        // 如果已有初始资源，则不需要获取额外数据
+        if (initialResources && initialResources.length > 0) return
+
+        const fetchMoocResources = async () => {
+            setIsLoading(true)
+            setError(null)
+
+            try {
+                const response = await fetch(
+                    '/api/course/search?csrfKey=fba6bd9e19744ab0b9092da379ef375d', // 确保带上csrfKey参数
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type':
+                                'application/x-www-form-urlencoded;charset=UTF-8',
+                            Origin: 'https://www.icourse163.org', // 设置来源
+                            Referer: 'https://www.icourse163.org', // 设置引用页
+                        },
+                        body: 'mocCourseQueryVo={"keyword":"人工智能","pageIndex":1,"highlight":true,"orderBy":0,"stats":30,"pageSize":20,"prodectType":5}',
+                    }
+                )
+
+                const data = await response.json()
+                console.log('原始MOOC数据:', data)
+
+                // 使用适配器转换数据
+                const convertedResources =
+                    extractAndConvertMocSearchResults(data)
+                console.log('转换后的资源数据:', convertedResources)
+
+                // 更新资源列表
+                if (convertedResources && convertedResources.length > 0) {
+                    setResources((prevResources) => {
+                        // 合并现有资源和新资源，避免重复
+                        const existingIds = new Set(
+                            prevResources.map(
+                                (r) => r.metadata?.mocSourceId || r.id
+                            )
+                        )
+
+                        const newResources = convertedResources.filter(
+                            (r) =>
+                                r.metadata?.mocSourceId &&
+                                !existingIds.has(r.metadata.mocSourceId)
+                        )
+
+                        return [...prevResources, ...newResources]
+                    })
+                }
+            } catch (error) {
+                console.error('获取MOOC资源失败:', error)
+                setError('获取MOOC资源时发生错误')
+            } finally {
+                setIsLoading(false)
             }
-        )
-            .then((response) => response.json())
-            .then((data) => console.log(data, 'data'))
-            .catch((error) => console.error('Error:', error))
-    }, [])
+        }
+
+        fetchMoocResources()
+    }, [initialResources])
 
     const toggleLayout = () => {
         setLayout((prev) => (prev === 'grid' ? 'list' : 'grid'))
+    }
+
+    if (isLoading) {
+        return <div>正在加载资源...</div>
+    }
+
+    if (error) {
+        return <div>错误: {error}</div>
     }
 
     if (!resources || !resources.length) {
@@ -239,14 +304,23 @@ function ResourceList({ resources }) {
 
     // Difficulty mapping remains useful for display text, but label uses string directly
     const getDifficultyText = (levelString) => {
-        // Check if levelString is truthy AND a string before capitalizing
+        // 处理数值型难度等级
+        if (typeof levelString === 'number') {
+            const difficultyMap = {
+                1: '入门',
+                2: '初级',
+                3: '中级',
+                4: '高级',
+                5: '专家',
+            }
+            return difficultyMap[levelString] || '未知'
+        }
+
+        // 处理字符串型难度等级
         if (levelString && typeof levelString === 'string') {
             return levelString.charAt(0).toUpperCase() + levelString.slice(1)
         }
-        // If it's a truthy non-string (like a number), or a falsy value, handle it.
-        if (typeof levelString === 'number') {
-            return String(levelString) // Display number as string
-        }
+
         // Fallback for null, undefined, '', false, etc.
         return '未知'
     }
@@ -268,32 +342,65 @@ function ResourceList({ resources }) {
                         )
                     }
 
+                    // 检查是否是MOOC资源
+                    const isMoocResource =
+                        resource.metadata?.mocSourceType === 'icourse163'
+
+                    // 确保必要的字段都有值
+                    const resourceTitle = resource.title || '未知课程'
+                    const resourceOrg =
+                        resource.organization ||
+                        (isMoocResource ? '中国大学MOOC' : '未知机构')
+                    const resourceDesc = resource.description || '无描述'
+                    const resourceCover = resource.cover || PLACEHOLDER_IMAGE
+
+                    if (isMoocResource) {
+                        console.log(
+                            `渲染MOOC资源: ${resourceTitle} (ID: ${resourceId}), cover: ${resourceCover.slice(
+                                0,
+                                50
+                            )}, org: ${resourceOrg}`
+                        )
+                    }
+
                     const displayRating = parseRating(resource.averageRating)
                     const tagsToDisplay = resource.tags || []
 
                     return (
                         <ResourceCardLink
                             key={resourceId}
-                            to={`/resources/${resourceId}`}
+                            to={
+                                isMoocResource
+                                    ? resource.url
+                                    : `/resources/${resourceId}`
+                            }
+                            target={isMoocResource ? '_blank' : undefined}
+                            rel={
+                                isMoocResource
+                                    ? 'noopener noreferrer'
+                                    : undefined
+                            }
                         >
                             <ResourceCard>
                                 <ResourceImage>
                                     <img
-                                        src={
-                                            resource.cover || PLACEHOLDER_IMAGE
-                                        }
-                                        alt={resource.title || '课程封面'}
+                                        src={resourceCover}
+                                        alt={resourceTitle || '课程封面'}
                                         onError={(e) => {
+                                            console.warn(
+                                                `图片加载失败: ${e.target.src}, 使用占位图`
+                                            )
                                             e.target.src = PLACEHOLDER_IMAGE
                                         }}
                                     />
                                 </ResourceImage>
                                 <ResourceContent>
                                     <ResourceTitle>
-                                        {resource.title || '无标题'}
+                                        {resourceTitle}
+                                        {isMoocResource && ' 🌐'}
                                     </ResourceTitle>
                                     <ResourcePublisher>
-                                        {resource.organization || '未知机构'}
+                                        {resourceOrg}
                                     </ResourcePublisher>
 
                                     <ResourceInfo>
@@ -313,16 +420,20 @@ function ResourceList({ resources }) {
                                                 )}
                                             </Label>
                                         )}
-                                        {resource.enrollCount && (
+                                        {resource.enrollCount > 0 && (
                                             <Label type="students">
                                                 {resource.enrollCount}
                                             </Label>
                                         )}
+                                        {isMoocResource &&
+                                            resource.format === 'pdf' && (
+                                                <Label type="format">
+                                                    教材
+                                                </Label>
+                                            )}
                                     </ResourceInfo>
 
-                                    <Description>
-                                        {resource.description || '无描述'}
-                                    </Description>
+                                    <Description>{resourceDesc}</Description>
 
                                     {tagsToDisplay.length > 0 && (
                                         <TagContainer>
