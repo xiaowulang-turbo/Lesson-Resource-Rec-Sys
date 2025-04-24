@@ -22,7 +22,20 @@ const app = express()
 
 // 中间件
 app.use(helmet())
-app.use(cors())
+app.use(
+    cors({
+        origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: [
+            'Content-Type',
+            'Authorization',
+            'X-Requested-With',
+            'Origin',
+            'Accept',
+        ],
+    })
+)
 app.use(express.json({ limit: '10kb' }))
 app.use(morgan('dev'))
 
@@ -55,6 +68,34 @@ app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/settings', settingsRoutes)
 app.use('/api/v1/stats', statsRoutes)
 app.use('/api/v1/recommendations', recommendationRoutes)
+
+// 添加中国大学慕课的API代理路由
+app.post('/api/course/search', async (req, res) => {
+    try {
+        // 从请求URL中获取csrfKey参数
+        const csrfKey = req.query.csrfKey || 'fba6bd9e19744ab0b9092da379ef375d'
+
+        const response = await fetch(
+            `https://www.icourse163.org/web/j/mocSearchBean.searchCourse.rpc?csrfKey=${csrfKey}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type':
+                        'application/x-www-form-urlencoded;charset=UTF-8',
+                    Cookie: 'NTESSTUDYSI=fba6bd9e19744ab0b9092da379ef375d',
+                    Origin: 'https://www.icourse163.org',
+                    Referer: 'https://www.icourse163.org',
+                },
+                body: req.body.toString(),
+            }
+        )
+        const data = await response.json()
+        res.json(data)
+    } catch (error) {
+        console.error('代理请求失败:', error)
+        res.status(500).json({ error: '代理请求失败' })
+    }
+})
 
 // 全局错误处理
 app.use(globalErrorHandler)
