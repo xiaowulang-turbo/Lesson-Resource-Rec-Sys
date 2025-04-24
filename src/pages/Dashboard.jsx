@@ -21,13 +21,43 @@ const StyledDashboard = styled.div`
 
 const SearchContainer = styled.div`
     display: flex;
+    flex-direction: column;
     gap: 1.2rem;
     padding: 1.6rem;
     background-color: var(--color-grey-50);
     border-radius: var(--border-radius-md);
+`
+
+const SearchInputRow = styled.div`
+    display: flex;
+    gap: 1.2rem;
+    width: 100%;
 
     input {
         flex-grow: 1;
+    }
+`
+
+const SearchOptionsRow = styled.div`
+    display: flex;
+    gap: 1.2rem;
+    margin-top: 0.8rem;
+`
+
+const SearchOptionButton = styled.button`
+    background: ${(props) =>
+        props.active ? 'var(--color-brand-600)' : 'var(--color-grey-200)'};
+    color: ${(props) => (props.active ? 'white' : 'var(--color-grey-700)')};
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: ${(props) =>
+            props.active ? 'var(--color-brand-700)' : 'var(--color-grey-300)'};
     }
 `
 
@@ -40,6 +70,7 @@ const RecommendationsContainer = styled.section`
 
 function Dashboard() {
     const [searchQuery, setSearchQuery] = useState('')
+    const [searchType, setSearchType] = useState('local') // 'local' 或 'mooc'
     const navigate = useNavigate()
     const { user, isAuthenticated } = useAuth()
 
@@ -70,7 +101,15 @@ function Dashboard() {
     const handleSearchSubmit = (e) => {
         e.preventDefault()
         if (!searchQuery.trim()) return
-        navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+
+        // 根据搜索类型导航到不同的搜索页面
+        if (searchType === 'local') {
+            navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+        } else {
+            navigate(
+                `/search?q=${encodeURIComponent(searchQuery.trim())}&type=mooc`
+            )
+        }
     }
 
     const recommendationTitle = isAuthenticated
@@ -91,14 +130,32 @@ function Dashboard() {
             </Row>
 
             <SearchContainer as="form" onSubmit={handleSearchSubmit}>
-                <Input
-                    type="search"
-                    placeholder="快速搜索资源..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    id="dashboard-search"
-                />
-                <Button type="submit">搜索</Button>
+                <SearchInputRow>
+                    <Input
+                        type="search"
+                        placeholder="快速搜索资源..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        id="dashboard-search"
+                    />
+                    <Button type="submit">搜索</Button>
+                </SearchInputRow>
+                <SearchOptionsRow>
+                    <SearchOptionButton
+                        type="button"
+                        active={searchType === 'local'}
+                        onClick={() => setSearchType('local')}
+                    >
+                        搜本地
+                    </SearchOptionButton>
+                    <SearchOptionButton
+                        type="button"
+                        active={searchType === 'mooc'}
+                        onClick={() => setSearchType('mooc')}
+                    >
+                        搜全网
+                    </SearchOptionButton>
+                </SearchOptionsRow>
             </SearchContainer>
 
             <RecommendationsContainer>
