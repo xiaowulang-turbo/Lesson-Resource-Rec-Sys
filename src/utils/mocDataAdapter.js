@@ -3,6 +3,40 @@
  * 将中国大学MOOC API返回的数据结构转换为系统资源模型格式
  */
 
+// 清理HTML标签和特殊空格符的工具函数
+const cleanHtmlAndWhitespace = (text) => {
+    if (!text || typeof text !== 'string') return ''
+
+    // 去除HTML标签
+    let cleanText = text.replace(/<[^>]*>/g, '')
+
+    // 替换常见HTML实体
+    cleanText = cleanText
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&ldquo;/g, '"')
+        .replace(/&rdquo;/g, '"')
+        .replace(/&lsquo;/g, "'")
+        .replace(/&rsquo;/g, "'")
+        .replace(/&hellip;/g, '...')
+        .replace(/&mdash;/g, '—')
+        .replace(/&ndash;/g, '–')
+
+    // 通用HTML实体替换（如&#xxxx;形式）
+    cleanText = cleanText.replace(/&#(\d+);/g, (match, dec) => {
+        return String.fromCharCode(dec)
+    })
+
+    // 去除多余空格、换行和制表符
+    cleanText = cleanText.replace(/\s+/g, ' ').trim()
+
+    return cleanText
+}
+
 /**
  * 将MOOC课程数据转换为系统资源模型
  * @param {Object} mocCourse - MOOC API返回的课程数据对象
@@ -22,10 +56,40 @@ export function convertMocCourseToResource(mocCourse) {
 
     // 提取课程ID的辅助函数
     const extractCourseId = (course) => {
-        if (course.courseId) return course.courseId
-        if (course.id) return course.id
-        // 如果没有明确的ID，尝试从其他字段构造
-        if (course.termId) return `term-${course.termId}`
+        // 优先使用完整的courseId（包含学校代码）
+        if (course.courseId) {
+            const courseIdStr = String(course.courseId)
+            if (courseIdStr.includes('-')) {
+                return courseIdStr
+            }
+        }
+
+        // 如果有学校代码和ID，则组合
+        if (course.schoolCode && (course.id || course.termId)) {
+            const id = String(course.id || course.termId)
+            return `${course.schoolCode}-${id}`
+        }
+
+        // 从originalData中尝试获取
+        if (course.originalData) {
+            if (course.originalData.courseId) {
+                const originalCourseIdStr = String(course.originalData.courseId)
+                if (originalCourseIdStr.includes('-')) {
+                    return originalCourseIdStr
+                }
+            }
+            if (
+                course.originalData.schoolCode &&
+                (course.originalData.id || course.originalData.termId)
+            ) {
+                const originalId = String(
+                    course.originalData.id || course.originalData.termId
+                )
+                return `${course.originalData.schoolCode}-${originalId}`
+            }
+        }
+
+        // 如果都没有，则返回null
         return null
     }
 
@@ -116,7 +180,7 @@ export function convertMocCourseToResource(mocCourse) {
         ]
         for (const field of possibleFields) {
             if (course[field] && typeof course[field] === 'string') {
-                return course[field]
+                return cleanHtmlAndWhitespace(course[field])
             }
         }
         return '无描述' // 默认描述
@@ -132,7 +196,7 @@ export function convertMocCourseToResource(mocCourse) {
         ]
         for (const field of possibleFields) {
             if (course[field] && typeof course[field] === 'string') {
-                return course[field]
+                return cleanHtmlAndWhitespace(course[field])
             }
         }
         return '未知教师' // 默认教师名
@@ -149,14 +213,16 @@ export function convertMocCourseToResource(mocCourse) {
         ]
         for (const field of possibleFields) {
             if (course[field] && typeof course[field] === 'string') {
-                return course[field]
+                return cleanHtmlAndWhitespace(course[field])
             }
         }
 
         // 检查嵌套在mocTextbookVo中的字段
         if (course.mocTextbookVo) {
             if (course.mocTextbookVo.editorInChief) {
-                return course.mocTextbookVo.editorInChief // 使用主编作为机构
+                return cleanHtmlAndWhitespace(
+                    course.mocTextbookVo.editorInChief
+                ) // 使用主编作为机构
             }
 
             // 尝试其他可能的字段
@@ -165,7 +231,7 @@ export function convertMocCourseToResource(mocCourse) {
                     course.mocTextbookVo[field] &&
                     typeof course.mocTextbookVo[field] === 'string'
                 ) {
-                    return course.mocTextbookVo[field]
+                    return cleanHtmlAndWhitespace(course.mocTextbookVo[field])
                 }
             }
         }
@@ -174,13 +240,17 @@ export function convertMocCourseToResource(mocCourse) {
         if (course.originalData) {
             // 检查highlightUniversity字段
             if (course.originalData.highlightUniversity) {
-                return course.originalData.highlightUniversity
+                return cleanHtmlAndWhitespace(
+                    course.originalData.highlightUniversity
+                )
             }
 
             // 检查mocTextbookVo
             if (course.originalData.mocTextbookVo) {
                 if (course.originalData.mocTextbookVo.editorInChief) {
-                    return course.originalData.mocTextbookVo.editorInChief
+                    return cleanHtmlAndWhitespace(
+                        course.originalData.mocTextbookVo.editorInChief
+                    )
                 }
 
                 for (const field of possibleFields) {
@@ -189,14 +259,18 @@ export function convertMocCourseToResource(mocCourse) {
                         typeof course.originalData.mocTextbookVo[field] ===
                             'string'
                     ) {
-                        return course.originalData.mocTextbookVo[field]
+                        return cleanHtmlAndWhitespace(
+                            course.originalData.mocTextbookVo[field]
+                        )
                     }
                 }
             }
 
             // 检查教师名字段
             if (course.originalData.highlightTeacherNames) {
-                return course.originalData.highlightTeacherNames
+                return cleanHtmlAndWhitespace(
+                    course.originalData.highlightTeacherNames
+                )
             }
         }
 
@@ -269,6 +343,9 @@ export function convertMocCourseToResource(mocCourse) {
                 .replace(/##}/g, '')
         }
     }
+
+    // 清理标题中的HTML标签
+    title = cleanHtmlAndWhitespace(title)
 
     const resource = {
         // 添加唯一ID
@@ -435,24 +512,30 @@ export function extractAndConvertMocSearchResults(mocResponse) {
 
             // 处理高亮字段
             if (course.highlightName && !course.name) {
-                course.name = course.highlightName
-                    .replace(/{##/g, '')
-                    .replace(/##}/g, '')
+                course.name = cleanHtmlAndWhitespace(
+                    course.highlightName.replace(/{##/g, '').replace(/##}/g, '')
+                )
             }
 
             if (course.highlightContent && !course.description) {
-                course.description = course.highlightContent
-                    .replace(/spContent=/g, '')
-                    .replace(/{##/g, '')
-                    .replace(/##}/g, '')
+                course.description = cleanHtmlAndWhitespace(
+                    course.highlightContent
+                        .replace(/spContent=/g, '')
+                        .replace(/{##/g, '')
+                        .replace(/##}/g, '')
+                )
             }
 
             if (course.highlightUniversity && !course.organization) {
-                course.organization = course.highlightUniversity
+                course.organization = cleanHtmlAndWhitespace(
+                    course.highlightUniversity
+                )
             }
 
             if (course.highlightTeacherNames && !course.authors) {
-                course.authors = course.highlightTeacherNames
+                course.authors = cleanHtmlAndWhitespace(
+                    course.highlightTeacherNames
+                )
             }
 
             return course
