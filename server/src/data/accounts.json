@@ -50,7 +50,23 @@
         "preferred_subjects": ["数学", "物理", "化学"],
         "preferred_difficulty": 3,
         "preferred_resource_types": ["视频", "图书", "习题"],
-        "interests": ["教学方法", "教育技术", "学科教育", "STEM教育"]
+        "interests": ["教学方法", "教育技术", "学科教育", "STEM教育"],
+        "course_interactions": [
+            {
+                "course_id": "1474376445",
+                "rating": 4,
+                "completion_percentage": 90,
+                "favorite": true,
+                "date_completed": "2024-02-15"
+            },
+            {
+                "course_id": "1474376450",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "date_completed": "2024-01-25"
+            }
+        ]
     },
     {
         "name": "学生",
@@ -75,6 +91,13 @@
                 "completion_percentage": 80,
                 "favorite": true,
                 "date_completed": "2024-01-18"
+            },
+            {
+                "course_id": "1474376456",
+                "rating": 3,
+                "completion_percentage": 60,
+                "favorite": false,
+                "date_completed": "2024-02-10"
             }
         ]
     },
@@ -86,6 +109,343 @@
         "preferred_subjects": ["经济学", "管理学", "市场营销"],
         "preferred_difficulty": 3,
         "preferred_resource_types": ["案例", "视频", "电子书"],
-        "interests": ["创业", "金融", "商业分析", "项目管理"]
+        "interests": ["创业", "金融", "商业分析", "项目管理"],
+        "course_interactions": [
+            {
+                "course_id": "1474376445",
+                "rating": 3,
+                "completion_percentage": 70,
+                "favorite": false,
+                "date_completed": "2024-02-05"
+            }
+        ]
+    },
+    {
+        "name": "李明",
+        "email": "liming@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "user",
+        "preferred_subjects": ["计算机科学", "数据科学", "人工智能"],
+        "preferred_difficulty": 4,
+        "preferred_resource_types": ["视频", "实验", "在线课程"],
+        "interests": ["深度学习", "数据挖掘", "机器视觉", "自然语言处理"],
+        "course_interactions": [
+            {
+                "course_id": "1474376445",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "date_completed": "2024-01-15"
+            },
+            {
+                "course_id": "1473948443",
+                "rating": 4,
+                "completion_percentage": 85,
+                "favorite": true,
+                "date_completed": "2024-02-01"
+            }
+        ]
+    },
+    {
+        "name": "王芳",
+        "email": "wangfang@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "user",
+        "preferred_subjects": ["航空航天", "物理", "机械工程"],
+        "preferred_difficulty": 5,
+        "preferred_resource_types": ["文档", "实验", "图书"],
+        "interests": ["无人机", "卫星技术", "航天器设计", "空气动力学"],
+        "course_interactions": [
+            {
+                "course_id": "1474376444",
+                "rating": 5,
+                "completion_percentage": 95,
+                "favorite": true,
+                "date_completed": "2024-01-28"
+            },
+            {
+                "course_id": "1474376441",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "date_completed": "2024-02-10"
+            },
+            {
+                "course_id": "1473948443",
+                "rating": 4,
+                "completion_percentage": 80,
+                "favorite": true,
+                "date_completed": "2024-01-20"
+            }
+        ]
+    },
+    {
+        "name": "张伟",
+        "email": "zhangwei@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "user",
+        "preferred_subjects": ["电子信息", "通信工程", "信息技术"],
+        "preferred_difficulty": 3,
+        "preferred_resource_types": ["视频", "工具软件", "在线课程"],
+        "interests": ["通信技术", "电子电路", "信号处理", "嵌入式系统"],
+        "course_interactions": [
+            {
+                "course_id": "1474376456",
+                "rating": 5,
+                "completion_percentage": 90,
+                "favorite": true,
+                "date_completed": "2024-02-05"
+            },
+            {
+                "course_id": "1474376450",
+                "rating": 4,
+                "completion_percentage": 85,
+                "favorite": true,
+                "date_completed": "2024-01-15"
+            }
+        ]
+    },
+    {
+        "name": "刘洋",
+        "email": "liuyang@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "user",
+        "preferred_subjects": ["软件工程", "计算机科学", "数据科学"],
+        "preferred_difficulty": 4,
+        "preferred_resource_types": ["视频", "在线课程", "互动实验"],
+        "interests": ["软件开发", "应用架构", "DevOps", "云计算"],
+        "course_interactions": [
+            {
+                "course_id": "1474376450",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "date_completed": "2024-01-10"
+            },
+            {
+                "course_id": "1474376445",
+                "rating": 4,
+                "completion_percentage": 75,
+                "favorite": false,
+                "date_completed": "2024-02-15"
+            }
+        ]
+    },
+    {
+        "name": "陈慧",
+        "email": "chenhui@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "user",
+        "preferred_subjects": ["人工智能", "数学", "统计学"],
+        "preferred_difficulty": 5,
+        "preferred_resource_types": ["文档", "习题", "图书"],
+        "interests": ["机器学习", "数据分析", "算法设计", "优化理论"],
+        "course_interactions": [
+            {
+                "course_id": "1473948443",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "date_completed": "2024-01-25"
+            },
+            {
+                "course_id": "1474376445",
+                "rating": 5,
+                "completion_percentage": 95,
+                "favorite": true,
+                "date_completed": "2024-02-10"
+            }
+        ]
+    },
+    {
+        "name": "赵小红",
+        "email": "zhaoxiaohong@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "user",
+        "preferred_subjects": ["教育学", "心理学", "信息技术"],
+        "preferred_difficulty": 2,
+        "preferred_resource_types": ["视频", "电子书", "案例"],
+        "interests": ["教育科技", "学习心理", "教学方法", "教育评估"],
+        "course_interactions": [
+            {
+                "course_id": "1474376450",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "date_completed": "2024-01-20"
+            },
+            {
+                "course_id": "1474376455",
+                "rating": 3,
+                "completion_percentage": 65,
+                "favorite": false,
+                "date_completed": "2024-02-05"
+            }
+        ]
+    },
+    {
+        "name": "孙宇",
+        "email": "sunyu@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "user",
+        "preferred_subjects": ["机械工程", "航空航天", "电子信息"],
+        "preferred_difficulty": 4,
+        "preferred_resource_types": ["实验", "工具软件", "文档"],
+        "interests": ["自动控制", "机器人", "精密机械", "制造工艺"],
+        "course_interactions": [
+            {
+                "course_id": "1474376441",
+                "rating": 4,
+                "completion_percentage": 80,
+                "favorite": true,
+                "date_completed": "2024-01-15"
+            },
+            {
+                "course_id": "1474376444",
+                "rating": 5,
+                "completion_percentage": 90,
+                "favorite": true,
+                "date_completed": "2024-02-01"
+            },
+            {
+                "course_id": "1474376456",
+                "rating": 3,
+                "completion_percentage": 50,
+                "favorite": false,
+                "date_completed": "2024-02-20"
+            }
+        ]
+    },
+    {
+        "name": "杨莉",
+        "email": "yangli@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "teacher",
+        "preferred_subjects": ["数据科学", "计算机科学", "统计学"],
+        "preferred_difficulty": 4,
+        "preferred_resource_types": ["视频", "实验", "习题"],
+        "interests": ["数据挖掘", "大数据分析", "可视化", "预测模型"],
+        "course_interactions": [
+            {
+                "course_id": "1474376445",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "date_completed": "2024-01-10"
+            },
+            {
+                "course_id": "1473948443",
+                "rating": 4,
+                "completion_percentage": 85,
+                "favorite": true,
+                "date_completed": "2024-01-28"
+            },
+            {
+                "course_id": "1474376450",
+                "rating": 4,
+                "completion_percentage": 90,
+                "favorite": false,
+                "date_completed": "2024-02-15"
+            }
+        ]
+    },
+    {
+        "name": "林强",
+        "email": "linqiang@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "user",
+        "preferred_subjects": ["电子信息", "通信工程", "信息安全"],
+        "preferred_difficulty": 3,
+        "preferred_resource_types": ["视频", "在线课程", "工具软件"],
+        "interests": ["网络安全", "加密技术", "物联网", "5G技术"],
+        "course_interactions": [
+            {
+                "course_id": "1474376450",
+                "rating": 4,
+                "completion_percentage": 85,
+                "favorite": true,
+                "date_completed": "2024-01-25"
+            },
+            {
+                "course_id": "1474376456",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "date_completed": "2024-02-10"
+            },
+            {
+                "course_id": "1474376445",
+                "rating": 4,
+                "completion_percentage": 75,
+                "favorite": false,
+                "date_completed": "2024-02-20"
+            }
+        ]
+    },
+    {
+        "name": "周海",
+        "email": "zhouhai@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "user",
+        "preferred_subjects": ["航空航天", "物理", "数学"],
+        "preferred_difficulty": 5,
+        "preferred_resource_types": ["文档", "习题", "实验"],
+        "interests": ["卫星技术", "轨道力学", "航空电子", "航天器设计"],
+        "course_interactions": [
+            {
+                "course_id": "1473948443",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "date_completed": "2024-01-15"
+            },
+            {
+                "course_id": "1474376441",
+                "rating": 5,
+                "completion_percentage": 95,
+                "favorite": true,
+                "date_completed": "2024-01-30"
+            },
+            {
+                "course_id": "1474376444",
+                "rating": 4,
+                "completion_percentage": 85,
+                "favorite": true,
+                "date_completed": "2024-02-10"
+            }
+        ]
+    },
+    {
+        "name": "吴燕",
+        "email": "wuyan@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "teacher",
+        "preferred_subjects": ["信息技术", "教育学", "心理学"],
+        "preferred_difficulty": 3,
+        "preferred_resource_types": ["视频", "电子书", "案例"],
+        "interests": ["教育信息化", "在线教育", "教学设计", "学习评估"],
+        "course_interactions": [
+            {
+                "course_id": "1474376450",
+                "rating": 5,
+                "completion_percentage": 100,
+                "favorite": true,
+                "date_completed": "2024-01-10"
+            },
+            {
+                "course_id": "1474376455",
+                "rating": 4,
+                "completion_percentage": 90,
+                "favorite": true,
+                "date_completed": "2024-01-25"
+            },
+            {
+                "course_id": "1474376456",
+                "rating": 4,
+                "completion_percentage": 80,
+                "favorite": false,
+                "date_completed": "2024-02-15"
+            }
+        ]
     }
 ]
