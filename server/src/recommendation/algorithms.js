@@ -275,16 +275,16 @@ export const collaborativeFilteringRecommendation = (user, limit = 10) => {
                 resourceRelationship.similar_resources.length > 0
             ) {
                 resourceRelationship.similar_resources.forEach((similar) => {
-                    // 确保similar.id存在且不是undefined
-                    if (!similar || !similar.id) return
+                    // 确保similar.resource_id存在且不是undefined
+                    if (!similar || !similar.resource_id) return
 
                     try {
-                        const similarId = similar.id.toString()
+                        const similarId = similar.resource_id.toString()
                         // 跳过用户已交互的资源
                         if (userResourceIds.includes(similarId)) return
 
-                        // 计算相似度得分
-                        const similarityScore = similar.similarity || 0.5
+                        // 计算相似度得分 (使用similarity_score替代similarity)
+                        const similarityScore = similar.similarity_score || 0.5
 
                         if (candidateResources.has(similarId)) {
                             // 更新已有候选资源的得分
@@ -304,37 +304,38 @@ export const collaborativeFilteringRecommendation = (user, limit = 10) => {
                 })
             }
 
-            // 添加相关资源（如果有的话）
+            // 添加共同访问资源
             if (
-                resourceRelationship.related_resources &&
-                resourceRelationship.related_resources.length > 0
+                resourceRelationship.co_accessed_with &&
+                resourceRelationship.co_accessed_with.length > 0
             ) {
-                resourceRelationship.related_resources.forEach((related) => {
-                    // 确保related.id存在且不是undefined
-                    if (!related || !related.id) return
+                resourceRelationship.co_accessed_with.forEach((coAccessed) => {
+                    // 确保coAccessed.resource_id存在且不是undefined
+                    if (!coAccessed || !coAccessed.resource_id) return
 
                     try {
-                        const relatedId = related.id.toString()
+                        const coAccessedId = coAccessed.resource_id.toString()
                         // 跳过用户已交互的资源
-                        if (userResourceIds.includes(relatedId)) return
+                        if (userResourceIds.includes(coAccessedId)) return
 
-                        // 相关资源得分稍低于相似资源
-                        const relatedScore = (related.relevance || 0.3) * 0.8
+                        // 计算共同访问得分
+                        const coAccessScore =
+                            ((coAccessed.co_access_percentage || 0) / 100) * 0.8
 
-                        if (candidateResources.has(relatedId)) {
+                        if (candidateResources.has(coAccessedId)) {
                             // 更新已有候选资源的得分
                             const existingScore =
-                                candidateResources.get(relatedId)
+                                candidateResources.get(coAccessedId)
                             candidateResources.set(
-                                relatedId,
-                                existingScore + relatedScore
+                                coAccessedId,
+                                existingScore + coAccessScore
                             )
                         } else {
                             // 添加新的候选资源
-                            candidateResources.set(relatedId, relatedScore)
+                            candidateResources.set(coAccessedId, coAccessScore)
                         }
                     } catch (err) {
-                        console.error('处理相关资源时出错:', err)
+                        console.error('处理共同访问资源时出错:', err)
                     }
                 })
             }
