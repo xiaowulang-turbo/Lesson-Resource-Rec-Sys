@@ -1,0 +1,29 @@
+# 将本地 /api/course/search 请求代理到实际的课程搜索API，保留csrfKey参数
+/api/course/search https://www.icourse163.org/web/j/mocSearchBean.searchCourse.rpc
+
+# 确保POST方法而不是GET方法
+www.icourse163.org method://POST
+
+# 设置CORS响应头
+www.icourse163.org resCors://{
+  "Access-Control-Allow-Origin": "http://localhost:5173",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Origin, Referer, Cookie",
+  "Access-Control-Allow-Credentials": "true"
+}
+
+# 设置请求头
+www.icourse163.org reqHeaders://{
+  "Origin": "https://www.icourse163.org",
+  "Referer": "https://www.icourse163.org",
+  "Cookie": "NTESSTUDYSI=fba6bd9e19744ab0b9092da379ef375d",
+  "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+}
+
+# 禁用浏览器的同源策略检查(危险操作，仅用于开发环境)
+# localhost:5173 disable://cors
+
+# 转发所有icourse163相关请求
+www.icourse163.org/web/j anyhost://
+*.icourse163.org anyhost://
+*.nosdn127.net anyhost:// 
