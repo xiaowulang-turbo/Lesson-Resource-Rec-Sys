@@ -65,32 +65,62 @@ export function convertMocCourseToResource(mocCourse) {
         }
 
         // 如果有学校代码和ID，则组合
-        if (course.schoolCode && (course.id || course.termId)) {
-            const id = String(course.id || course.termId)
-            return `${course.schoolCode}-${id}`
-        }
+        const schoolShortName =
+            course.schoolPanel?.shortName ||
+            course.school?.shortName ||
+            course.originalData?.schoolPanel?.shortName ||
+            course.originalData?.school?.shortName
 
-        // 从originalData中尝试获取
-        if (course.originalData) {
-            if (course.originalData.courseId) {
-                const originalCourseIdStr = String(course.originalData.courseId)
-                if (originalCourseIdStr.includes('-')) {
-                    return originalCourseIdStr
-                }
-            }
-            if (
-                course.originalData.schoolCode &&
-                (course.originalData.id || course.originalData.termId)
-            ) {
-                const originalId = String(
-                    course.originalData.id || course.originalData.termId
-                )
-                return `${course.originalData.schoolCode}-${originalId}`
-            }
+        if (schoolShortName && (course.id || course.termId)) {
+            const id = String(course.id || course.termId)
+            return `${schoolShortName}-${id}`
         }
 
         // 如果都没有，则返回null
         return null
+    }
+
+    // 获取学校信息的辅助函数
+    const getSchoolInfo = (course) => {
+        // 优先使用schoolPanel信息
+        const schoolPanel =
+            course.schoolPanel || course.originalData?.schoolPanel
+        if (schoolPanel) {
+            return {
+                id: schoolPanel.id || null,
+                name: schoolPanel.name || '',
+                shortName: schoolPanel.shortName || '',
+                imgUrl: schoolPanel.imgUrl || '',
+                supportMooc: Boolean(schoolPanel.supportMooc),
+                supportSpoc: Boolean(schoolPanel.supportSpoc),
+                bgPhoto: schoolPanel.bgPhoto || '',
+            }
+        }
+
+        // 如果没有schoolPanel，尝试使用school信息
+        const school = course.school || course.originalData?.school
+        if (school) {
+            return {
+                id: school.id || null,
+                name: school.name || '',
+                shortName: school.shortName || '',
+                imgUrl: school.imgUrl || '',
+                supportMooc: Boolean(school.supportMooc),
+                supportSpoc: Boolean(school.supportSpoc),
+                bgPhoto: school.bgPhoto || '',
+            }
+        }
+
+        // 如果都没有，返回默认值
+        return {
+            id: null,
+            name: course.schoolName || '',
+            shortName: '',
+            imgUrl: '',
+            supportMooc: false,
+            supportSpoc: false,
+            bgPhoto: '',
+        }
     }
 
     // 标签处理
@@ -371,6 +401,9 @@ export function convertMocCourseToResource(mocCourse) {
         authors: getTeacherName(mocCourse),
         publisher: '中国大学MOOC',
         organization: getSchoolName(mocCourse),
+        school: getSchoolInfo(mocCourse),
+        shortName:
+            mocCourse.shortName || mocCourse.originalData?.shortName || '', // 保存学校代码
 
         // 学习和评价数据
         enrollCount: getEnrollCount(mocCourse),

@@ -109,6 +109,39 @@ const resourceSchema = new mongoose.Schema(
             trim: true,
             default: '',
         },
+        // 学校信息
+        school: {
+            id: {
+                type: Number,
+                default: null,
+            },
+            name: {
+                type: String,
+                trim: true,
+                default: '',
+            },
+            shortName: {
+                type: String,
+                trim: true,
+                default: '',
+            },
+            imgUrl: {
+                type: String,
+                default: '',
+            },
+            supportMooc: {
+                type: Boolean,
+                default: false,
+            },
+            supportSpoc: {
+                type: Boolean,
+                default: false,
+            },
+            bgPhoto: {
+                type: String,
+                default: '',
+            },
+        },
         // 创建和更新信息
         createdBy: {
             type: mongoose.Schema.ObjectId,
