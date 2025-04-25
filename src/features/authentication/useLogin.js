@@ -23,7 +23,7 @@ export default function useLogin() {
             // queryClient.setQueryData(['user'], data.data.user) // Keep or remove based on how useUser works
 
             // 3. Navigate
-            navigate('/dashboard', { replace: true })
+            navigate('/home', { replace: true })
         },
 
         onError: (error) => {
