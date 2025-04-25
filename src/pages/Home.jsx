@@ -13,7 +13,7 @@ import ResourceList from '../components/ResourceList'
 import { fetchHomepageRecommendations } from '../services/apiRecommendations'
 import { useAuth } from '../context/AuthContext'
 
-const StyledDashboard = styled.div`
+const StyledHome = styled.div`
     display: flex;
     flex-direction: column;
     gap: 2.4rem;
@@ -28,6 +28,12 @@ const SearchContainer = styled.div`
     border-radius: var(--border-radius-md);
 `
 
+const SearchOptionsRow = styled.div`
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 0.8rem;
+`
+
 const SearchInputRow = styled.div`
     display: flex;
     gap: 1.2rem;
@@ -36,12 +42,6 @@ const SearchInputRow = styled.div`
     input {
         flex-grow: 1;
     }
-`
-
-const SearchOptionsRow = styled.div`
-    display: flex;
-    gap: 1.2rem;
-    margin-top: 0.8rem;
 `
 
 const SearchOptionButton = styled.button`
@@ -68,7 +68,7 @@ const RecommendationsContainer = styled.section`
     padding: 2.4rem;
 `
 
-function Dashboard() {
+function Home() {
     const [searchQuery, setSearchQuery] = useState('')
     const [searchType, setSearchType] = useState('local') // 'local' 或 'mooc'
     const navigate = useNavigate()
@@ -116,30 +116,20 @@ function Dashboard() {
         ? `${user?.name || '用户'}，为你推荐`
         : '为你推荐'
 
-    console.log('[Dashboard] Rendering - isLoading:', isLoading)
-    console.log('[Dashboard] Rendering - error:', error)
+    console.log('[Home] Rendering - isLoading:', isLoading)
+    console.log('[Home] Rendering - error:', error)
     console.log(
-        '[Dashboard] Rendering - recommendedResources:',
+        '[Home] Rendering - recommendedResources:',
         recommendedResources
     )
 
     return (
-        <StyledDashboard>
+        <StyledHome>
             <Row type="horizontal" style={{ justifyContent: 'space-between' }}>
-                {/* <Heading as="h1">首页仪表盘</Heading> */}
+                {/* <Heading as="h1">首页</Heading> */}
             </Row>
 
             <SearchContainer as="form" onSubmit={handleSearchSubmit}>
-                <SearchInputRow>
-                    <Input
-                        type="search"
-                        placeholder="快速搜索资源..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        id="dashboard-search"
-                    />
-                    <Button type="submit">搜索</Button>
-                </SearchInputRow>
                 <SearchOptionsRow>
                     <SearchOptionButton
                         type="button"
@@ -156,6 +146,16 @@ function Dashboard() {
                         搜全网
                     </SearchOptionButton>
                 </SearchOptionsRow>
+                <SearchInputRow>
+                    <Input
+                        type="search"
+                        placeholder="快速搜索资源..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        id="home-search"
+                    />
+                    <Button type="submit">搜索</Button>
+                </SearchInputRow>
             </SearchContainer>
 
             <RecommendationsContainer>
@@ -177,8 +177,8 @@ function Dashboard() {
                     <Empty resourceName="推荐资源">暂无推荐内容。</Empty>
                 )}
             </RecommendationsContainer>
-        </StyledDashboard>
+        </StyledHome>
     )
 }
 
-export default Dashboard
+export default Home
