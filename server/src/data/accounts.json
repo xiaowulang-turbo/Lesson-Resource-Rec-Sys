@@ -284,6 +284,32 @@
         ]
     },
     {
+        "name": "张宇",
+        "email": "zhangyu@example.com",
+        "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
+        "role": "user",
+        "preferred_subjects": ["生物学", "医学", "药学"],
+        "preferred_difficulty": 3,
+        "preferred_resource_types": ["案例", "模拟", "课件"],
+        "interests": ["基因编辑", "临床研究", "药物研发"],
+        "course_interactions": [
+            {
+                "course_id": "1474376460",
+                "rating": 4,
+                "completion_percentage": 80,
+                "favorite": true,
+                "date_completed": "2024-03-01"
+            },
+            {
+                "course_id": "1474376461",
+                "rating": 3,
+                "completion_percentage": 60,
+                "favorite": false,
+                "date_completed": "2024-03-10"
+            }
+        ]
+    },
+    {
         "name": "孙宇",
         "email": "sunyu@example.com",
         "password": "$2a$12$Wda5p.qyTiV7kkv6c4EhVuJ3FyJW/v4UAceteWzs92doRamaNmh3i",
