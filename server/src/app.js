@@ -37,7 +37,28 @@ mongoose.connection.on('disconnected', () => {
 })
 
 // 中间件
-app.use(helmet())
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                connectSrc: [
+                    "'self'",
+                    'http://localhost:5173',
+                    'http://127.0.0.1:5173',
+                ],
+                frameSrc: ["'self'"],
+                childSrc: ["'self'"],
+                scriptSrc: ["'self'", "'unsafe-inline'"],
+                styleSrc: ["'self'", "'unsafe-inline'"],
+                imgSrc: ["'self'", 'data:', 'blob:'],
+                mediaSrc: ["'self'", 'data:', 'blob:'],
+            },
+        },
+        crossOriginResourcePolicy: { policy: 'cross-origin' },
+    })
+)
+
 app.use(
     cors({
         origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
@@ -57,6 +78,20 @@ app.use(morgan('dev'))
 
 // 添加静态文件服务中间件，用于访问上传的文件
 app.use('/public', express.static(path.join(__dirname, '..', 'public')))
+
+// 设置文件下载头的中间件
+app.use('/public/uploads', (req, res, next) => {
+    // 检查是否请求下载文件
+    if (req.query.download === 'true') {
+        // 设置Content-Disposition头，让浏览器下载而不是打开文件
+        const filename = path.basename(req.url.split('?')[0]) // 获取文件名
+        res.setHeader(
+            'Content-Disposition',
+            `attachment; filename="${filename}"`
+        )
+    }
+    next()
+})
 
 // 添加额外的调试日志
 app.use((req, res, next) => {
