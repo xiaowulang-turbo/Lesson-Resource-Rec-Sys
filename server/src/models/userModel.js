@@ -1,30 +1,14 @@
 import mongoose from 'mongoose'
-import bcrypt from 'bcryptjs'
-import validator from 'validator'
 
+/**
+ * 用户模型 - 存储用户偏好、统计和个人资料等信息
+ * 账户信息（认证相关）已移至accountModel
+ */
 const userSchema = new mongoose.Schema(
     {
-        email: {
-            type: String,
-            required: [true, '请提供邮箱'],
-            unique: true,
-            lowercase: true,
-            validate: [validator.isEmail, '请提供有效的邮箱地址'],
-        },
-        password: {
-            type: String,
-            required: [true, '请提供密码'],
-            minlength: 8,
-            select: false,
-        },
         name: {
             type: String,
             required: [true, '请提供姓名'],
-        },
-        role: {
-            type: String,
-            enum: ['user', 'admin', 'teacher'],
-            default: 'user',
         },
         // 添加扁平结构的字段以支持从JSON导入的数据
         preferred_subjects: [String],
@@ -125,10 +109,10 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: 'default.jpg',
         },
-        active: {
-            type: Boolean,
-            default: true,
-            select: false,
+        accountId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Account',
+            required: true,
         },
         createdAt: {
             type: Date,
@@ -155,31 +139,11 @@ userSchema.virtual('activityScore').get(function () {
     return Math.max(0, 100 - daysSinceLastActive * 5) // 每天减5分，最低0分
 })
 
-// 密码加密中间件
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next()
-    this.password = await bcrypt.hash(this.password, 12)
-    next()
-})
-
 // 更新时间中间件
 userSchema.pre('save', function (next) {
     this.updatedAt = Date.now()
     next()
 })
-
-// 验证密码方法
-userSchema.methods.correctPassword = async function (
-    candidatePassword,
-    userPassword
-) {
-    return await bcrypt.compare(candidatePassword, userPassword)
-}
-
-// 检查用户是否为教师
-userSchema.methods.isTeacher = function () {
-    return this.role === 'teacher'
-}
 
 // 更新用户统计信息的方法
 userSchema.methods.updateStats = async function () {
@@ -189,39 +153,56 @@ userSchema.methods.updateStats = async function () {
 }
 
 // 添加索引
-userSchema.index({ email: 1 })
-userSchema.index({ role: 1 })
+userSchema.index({ accountId: 1 }, { unique: true })
 userSchema.index({ 'teacherProfile.subjects': 1 })
 userSchema.index({ 'teacherProfile.grades': 1 })
 userSchema.index({ 'stats.lastActive': -1 })
 
+// 虚拟填充账户信息
+userSchema.virtual('account', {
+    ref: 'Account',
+    localField: 'accountId',
+    foreignField: '_id',
+    justOne: true,
+})
+
 // 添加新的静态方法
 userSchema.statics.findTeachers = async function (query = {}) {
-    return this.find({
-        role: 'teacher',
-        ...query,
+    const users = await this.find(query).populate({
+        path: 'account',
+        match: { role: 'teacher' },
+        select: 'name email role',
     })
-        .select('-password')
-        .sort({ 'stats.averageRating': -1 })
+
+    // 过滤掉没有匹配account的用户
+    return users.filter((user) => user.account)
 }
 
 userSchema.statics.findBySubjects = async function (subjects) {
     return this.find({
-        role: 'teacher',
         'teacherProfile.subjects': { $in: subjects },
-    }).select('-password')
+    }).populate({
+        path: 'account',
+        select: 'name email role',
+    })
 }
 
 userSchema.statics.findActiveTeachers = async function (days = 30) {
     const date = new Date()
     date.setDate(date.getDate() - days)
 
-    return this.find({
-        role: 'teacher',
+    const users = await this.find({
         'stats.lastActive': { $gte: date },
     })
-        .select('-password')
         .sort({ 'stats.lastActive': -1 })
+        .populate({
+            path: 'account',
+            match: { role: 'teacher' },
+            select: 'name email role',
+        })
+
+    // 过滤掉没有匹配account的用户
+    return users.filter((user) => user.account)
 }
 
 userSchema.statics.findByPreferences = async function (preferences) {
@@ -243,34 +224,30 @@ userSchema.statics.findByPreferences = async function (preferences) {
         query['preferences.preferredDifficulty'] = preferences.difficulty
     }
 
-    return this.find(query).select('-password')
+    return this.find(query).populate({
+        path: 'account',
+        select: 'name email role',
+    })
 }
 
 // 添加新的实例方法
 userSchema.methods.updateProfile = async function (profileData) {
-    const allowedFields = ['name', 'avatar', 'teacherProfile', 'preferences']
-
-    allowedFields.forEach((field) => {
-        if (profileData[field]) {
-            this[field] = profileData[field]
+    // 更新用户个人资料的核心字段
+    if (profileData.teacherProfile) {
+        this.teacherProfile = {
+            ...this.teacherProfile,
+            ...profileData.teacherProfile,
         }
-    })
-
-    await this.save()
-}
-
-userSchema.methods.updateTeacherProfile = async function (profileData) {
-    if (this.role !== 'teacher') {
-        throw new Error('只有教师可以更新教师资料')
     }
 
-    Object.assign(this.teacherProfile, profileData)
-    await this.save()
-}
+    if (profileData.preferences) {
+        this.preferences = {
+            ...this.preferences,
+            ...profileData.preferences,
+        }
+    }
 
-userSchema.methods.updatePreferences = async function (preferences) {
-    Object.assign(this.preferences, preferences)
-    await this.save()
+    return this.save()
 }
 
 const User = mongoose.model('User', userSchema)
