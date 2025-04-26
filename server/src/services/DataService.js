@@ -1,16 +1,11 @@
-import { DataServiceInterface } from '../interfaces/DataServiceInterface.js'
-import User from '../../models/userModel.js'
-import Account from '../../models/accountModel.js'
-import Resource from '../../models/resourceModel.js'
+import User from '../models/userModel.js'
+import Account from '../models/accountModel.js'
+import Resource from '../models/resourceModel.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import mongoose from 'mongoose'
 
-export class MongoDBAdapter extends DataServiceInterface {
-    constructor() {
-        super()
-    }
-
+export class DataService {
     // 用户相关方法
     async createUser(userData) {
         const user = await User.create(userData)
