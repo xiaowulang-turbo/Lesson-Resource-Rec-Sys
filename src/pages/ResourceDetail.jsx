@@ -1,8 +1,9 @@
 import React from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import styled from 'styled-components'
 import { getResourceById } from '../services/apiResources' // 确保 API 函数路径正确
+import { getPublicUserProfile } from '../services/apiUsers' // 使用公开API
 import Heading from '../ui/Heading'
 import Spinner from '../ui/Spinner'
 import Row from '../ui/Row'
@@ -55,9 +56,24 @@ const ResourceInfo = styled.section`
 
 const TagsContainer = styled.div`
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 0.6rem;
-    margin-top: 1.2rem;
+    overflow-x: auto;
+
+    /* 美化滚动条 */
+    &::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--color-grey-100);
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--color-grey-300);
+        border-radius: 4px;
+    }
 `
 
 const ActionsContainer = styled.section`
@@ -81,6 +97,18 @@ const SimilarResources = styled.section`
     /* 添加相似资源样式 */
 `
 
+// 添加链接样式
+const AuthorLink = styled(Link)`
+    color: var(--color-brand-600);
+    text-decoration: none;
+    transition: all 0.3s;
+
+    &:hover {
+        color: var(--color-brand-700);
+        text-decoration: underline;
+    }
+`
+
 // 模拟相似资源数据
 const mockSimilarResources = [
     // { id: 'mock1', title: '相似资源 A', description: '这是A的描述', type: 1, subject: '模拟学科' },
@@ -99,6 +127,16 @@ function ResourceDetail() {
         queryKey: ['resource', id],
         queryFn: () => getResourceById(id),
         retry: false, // 如果 ID 无效，则不重试
+    })
+
+    console.log(resource, 'resource')
+
+    // 获取上传者信息 - 使用公开接口
+    const { data: creatorUser, isLoading: isLoadingCreator } = useQuery({
+        queryKey: ['publicUser', resource?.createdBy],
+        queryFn: () => getPublicUserProfile(resource.createdBy),
+        // 只有当resource存在且有createdBy字段时才发起请求
+        enabled: !!resource?.createdBy,
     })
 
     if (isLoading) return <Spinner />
@@ -159,12 +197,23 @@ function ResourceDetail() {
                             ? `¥${resource.price.toFixed(2)}`
                             : '免费'}
                     </p>
-                    {/* <p><strong>上传者：</strong> {resource.createdBy?.username || '未知用户'}</p> */}
+                    <p>
+                        <strong>上传者：</strong>{' '}
+                        {isLoadingCreator ? (
+                            '加载中...'
+                        ) : resource.createdBy ? (
+                            <AuthorLink to={`/users/${resource.createdBy}`}>
+                                {creatorUser?.name || '未知用户'}
+                            </AuthorLink>
+                        ) : (
+                            '未知用户'
+                        )}
+                    </p>
                     <p>
                         <strong>上传时间：</strong> {formattedDate}
                     </p>
                     {resource.tags && resource.tags.length > 0 && (
-                        <div>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
                             <strong>标签：</strong>
                             <TagsContainer>
                                 {resource.tags.map((tag, index) => (
