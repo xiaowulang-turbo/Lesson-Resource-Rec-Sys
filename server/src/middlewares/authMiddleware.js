@@ -1,6 +1,6 @@
-import { DataServiceFactory } from '../services/DataServiceFactory.js'
+import { DataService } from '../services/DataService.js'
 
-const dataService = new DataServiceFactory().getAdapter()
+const dataService = new DataService()
 
 export const protect = async (req, res, next) => {
     try {
