@@ -1,6 +1,6 @@
-import { DataServiceFactory } from '../services/DataServiceFactory.js'
+import { DataService } from '../services/DataService.js'
 
-const dataService = new DataServiceFactory().getAdapter()
+const dataService = new DataService()
 
 export const getAllUsers = async (req, res) => {
     try {
@@ -23,6 +23,7 @@ export const getAllUsers = async (req, res) => {
 
 export const getUser = async (req, res) => {
     try {
+        console.log(req.params.id, 'req.params.id')
         const user = await dataService.getUserById(req.params.id)
 
         if (!user) {
