@@ -50,23 +50,71 @@ const handleValidationErrorDB = (err) => {
 const handleJWTError = () => new AppError('无效的令牌，请重新登录', 401)
 const handleJWTExpiredError = () => new AppError('令牌已过期，请重新登录', 401)
 
-// 错误处理中间件
-export default (err, req, res, next) => {
-    err.statusCode = err.statusCode || 500
-    err.status = err.status || 'error'
+/**
+ * 全局错误处理中间件
+ */
+const errorHandler = (err, req, res, next) => {
+    // 默认错误状态和消息
+    const statusCode = err.statusCode || 500
+    const status = err.status || 'error'
 
-    if (process.env.NODE_ENV === 'development') {
-        sendErrorDev(err, res)
-    } else {
-        let error = { ...err }
-        error.message = err.message
+    // 在开发环境中提供更详细的错误信息
+    const isDev = process.env.NODE_ENV === 'development'
 
-        if (error.code === 11000) error = handleDuplicateFieldsDB(error)
-        if (error.name === 'ValidationError')
-            error = handleValidationErrorDB(error)
-        if (error.name === 'JsonWebTokenError') error = handleJWTError()
-        if (error.name === 'TokenExpiredError') error = handleJWTExpiredError()
-
-        sendErrorProd(error, res)
+    // 处理MongoDB重复键错误
+    if (err.code === 11000) {
+        const field = Object.keys(err.keyValue)[0]
+        const value = err.keyValue[field]
+        return res.status(400).json({
+            status: 'error',
+            message: `${field} '${value}' 已存在`,
+            error: isDev ? err : {},
+        })
     }
+
+    // 处理MongoDB验证错误
+    if (err.name === 'ValidationError') {
+        const errors = Object.values(err.errors).map((val) => val.message)
+        return res.status(400).json({
+            status: 'error',
+            message: `验证失败: ${errors.join(', ')}`,
+            error: isDev ? err : {},
+        })
+    }
+
+    // 处理JWT错误
+    if (err.name === 'JsonWebTokenError') {
+        return res.status(401).json({
+            status: 'error',
+            message: '无效的令牌，请重新登录',
+            error: isDev ? err : {},
+        })
+    }
+
+    // 处理JWT过期错误
+    if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({
+            status: 'error',
+            message: '您的登录已过期，请重新登录',
+            error: isDev ? err : {},
+        })
+    }
+
+    // 处理Mongoose CastError (通常是无效ID)
+    if (err.name === 'CastError') {
+        return res.status(400).json({
+            status: 'error',
+            message: `无效的 ${err.path}: ${err.value}`,
+            error: isDev ? err : {},
+        })
+    }
+
+    // 默认错误响应
+    res.status(statusCode).json({
+        status: status,
+        message: err.message || '服务器内部错误',
+        error: isDev ? err : {},
+    })
 }
+
+export default errorHandler

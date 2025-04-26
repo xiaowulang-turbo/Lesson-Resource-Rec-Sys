@@ -35,8 +35,18 @@ export const protect = async (req, res, next) => {
             })
         }
 
-        // 4) 将用户信息附加到请求对象
+        // 4) 获取账户信息
+        const account = await dataService.getAccountById(decoded.accountId)
+        if (!account) {
+            return res.status(401).json({
+                status: 'error',
+                message: '此令牌的账户已不存在',
+            })
+        }
+
+        // 5) 将用户信息附加到请求对象
         req.user = user
+        req.account = account
         next()
     } catch (err) {
         res.status(401).json({
@@ -48,7 +58,8 @@ export const protect = async (req, res, next) => {
 
 export const restrictTo = (...roles) => {
     return (req, res, next) => {
-        if (!roles.includes(req.user.role)) {
+        // 保护中间件已将用户附加到请求对象
+        if (!req.account || !roles.includes(req.account.role)) {
             return res.status(403).json({
                 status: 'error',
                 message: '您没有执行此操作的权限',
