@@ -94,3 +94,65 @@ export async function createResource(formData) {
         throw new Error(error.message || '网络请求错误，无法创建资源')
     }
 }
+
+// 获取资源文件
+export async function getResourceFile(id) {
+    try {
+        const res = await fetch(
+            `${BASE_URL}${ENDPOINTS.RESOURCES.BASE}/${id}/file`
+        )
+
+        if (!res.ok) {
+            const errData = await res.json()
+            throw new Error(errData.message || '获取资源文件失败')
+        }
+
+        // 处理不同响应类型
+        const contentType = res.headers.get('content-type')
+        if (contentType && contentType.includes('application/json')) {
+            // API返回JSON (包含文件URL)
+            const data = await res.json()
+            return data.data
+        } else {
+            // API直接返回文件或重定向 (用于在新窗口打开)
+            return {
+                directUrl: res.url,
+                status: res.status,
+            }
+        }
+    } catch (error) {
+        console.error('获取资源文件失败:', error)
+        throw new Error(error.message)
+    }
+}
+
+// 下载资源文件
+export async function downloadResourceFile(id) {
+    try {
+        const res = await fetch(
+            `${BASE_URL}${ENDPOINTS.RESOURCES.BASE}/${id}/download`
+        )
+
+        if (!res.ok) {
+            const errData = await res.json()
+            throw new Error(errData.message || '下载资源文件失败')
+        }
+
+        // 处理不同响应类型
+        const contentType = res.headers.get('content-type')
+        if (contentType && contentType.includes('application/json')) {
+            // API返回JSON (包含下载URL)
+            const data = await res.json()
+            return data.data
+        } else {
+            // API直接返回文件或重定向 (用于触发浏览器下载)
+            return {
+                directUrl: res.url,
+                status: res.status,
+            }
+        }
+    } catch (error) {
+        console.error('下载资源文件失败:', error)
+        throw new Error(error.message)
+    }
+}
