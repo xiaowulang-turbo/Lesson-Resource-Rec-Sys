@@ -329,6 +329,18 @@ export class DataService {
 
     // 资源相关
     async createResource(resourceData) {
+        // 确保标签是字符串数组
+        if (
+            resourceData.tags &&
+            !Array.isArray(resourceData.tags) &&
+            typeof resourceData.tags === 'string'
+        ) {
+            resourceData.tags = resourceData.tags
+                .split(',')
+                .map((tag) => tag.trim())
+                .filter(Boolean)
+        }
+
         const resource = await Resource.create(resourceData)
         return {
             id: resource._id,
@@ -429,6 +441,18 @@ export class DataService {
     }
 
     async updateResource(id, resourceData) {
+        // 确保标签是字符串数组
+        if (
+            resourceData.tags &&
+            !Array.isArray(resourceData.tags) &&
+            typeof resourceData.tags === 'string'
+        ) {
+            resourceData.tags = resourceData.tags
+                .split(',')
+                .map((tag) => tag.trim())
+                .filter(Boolean)
+        }
+
         const resource = await Resource.findByIdAndUpdate(id, resourceData, {
             new: true,
             runValidators: true,
