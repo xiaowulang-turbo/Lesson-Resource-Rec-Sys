@@ -30,6 +30,25 @@
 node server/src/demo.js
 ```
 
+## 数据管理
+
+系统提供了数据上传工具，可以将 JSON 格式的数据文件上传到数据库中：
+
+```bash
+# 上传所有数据文件
+npm run upload:data --prefix server
+
+# 上传特定类型的数据
+npm run upload:resources --prefix server
+npm run upload:users --prefix server
+npm run upload:accounts --prefix server
+
+# 上传指定文件并指定模型
+node server/src/scripts/uploadData.js --file=resources.json --model=Resource
+```
+
+更多详细信息请参考 [数据管理脚本说明](server/src/scripts/README.md)。
+
 ## 推荐算法说明
 
 ### 基于内容推荐
