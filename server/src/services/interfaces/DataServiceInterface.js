@@ -20,6 +20,26 @@ export class DataServiceInterface {
         throw new Error('Not implemented')
     }
 
+    // 账户相关
+    async createAccount(accountData) {
+        throw new Error('Not implemented')
+    }
+    async getAccountById(id) {
+        throw new Error('Not implemented')
+    }
+    async getAccountByEmail(email) {
+        throw new Error('Not implemented')
+    }
+    async updateAccount(id, accountData) {
+        throw new Error('Not implemented')
+    }
+    async deleteAccount(id) {
+        throw new Error('Not implemented')
+    }
+    async createUserWithAccount(userData, accountData) {
+        throw new Error('Not implemented')
+    }
+
     // 资源相关
     async createResource(resourceData) {
         throw new Error('Not implemented')
