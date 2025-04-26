@@ -13,6 +13,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createResource } from '../services/apiResources'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
+import useUser from '../features/authentication/useUser' // 添加用户钩子
 
 const UploadPageLayout = styled.div`
     padding: 3.2rem 4.8rem;
@@ -40,6 +41,7 @@ const RadioGroup = styled.div`
 function Upload() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+    const { user, isLoading: isLoadingUser } = useUser() // 获取当前用户信息
 
     const [uploadType, setUploadType] = useState('file') // 'file' or 'link'
     // Add state for all form fields
@@ -94,6 +96,13 @@ function Upload() {
             return
         }
 
+        // 如果用户未登录，提示用户登录
+        if (!user) {
+            toast.error('请先登录后再上传资源')
+            navigate('/login')
+            return
+        }
+
         const formData = new FormData()
         formData.append('title', title)
         formData.append('description', description)
@@ -109,6 +118,7 @@ function Upload() {
         // FormData 不能直接 append 数组，需要为每个元素 append
         tagArray.forEach((tag) => formData.append('tags[]', tag))
         formData.append('price', price)
+        // 服务器端会从JWT令牌中自动提取用户ID，无需手动添加createdBy字段
 
         if (uploadType === 'file' && file) {
             formData.append('resourceFile', file)
