@@ -162,12 +162,7 @@ const resourceSchema = new mongoose.Schema(
             default: 0,
         },
         studyAvatars: [String],
-        tags: [
-            {
-                type: mongoose.Schema.ObjectId,
-                ref: 'Tag',
-            },
-        ],
+        tags: [String],
         // 高亮和搜索信息
         highlightContent: {
             type: String,

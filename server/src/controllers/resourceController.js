@@ -82,9 +82,15 @@ export const createResource = async (req, res) => {
                 .split(',')
                 .map((tag) => tag.trim())
                 .filter(Boolean)
-            // Note: Ideally, tags should be ObjectIds referencing a Tag collection.
-            // This requires frontend changes to send ObjectIds or backend logic to find/create tags.
-            // For now, we store them as an array of strings.
+            // 直接存储字符串数组，符合模型定义和推荐算法的使用方式
+        } else if (req.body['tags[]']) {
+            // 处理以tags[]形式提交的数组数据
+            const tagsArray = Array.isArray(req.body['tags[]'])
+                ? req.body['tags[]']
+                : [req.body['tags[]']]
+            resourceData.tags = tagsArray
+                .map((tag) => tag.trim())
+                .filter(Boolean)
         }
 
         // Handle file upload vs link
