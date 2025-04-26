@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { promisify } from 'util'
 import catchAsync from '../utils/catchAsync.js'
-import { DataServiceFactory } from '../services/DataServiceFactory.js' // 导入 DataServiceFactory
+import { DataService } from '../services/DataService.js' // 导入 DataService
 // 导入推荐算法模块
 import {
     contentBasedRecommendation,
@@ -11,7 +11,7 @@ import {
 } from '../recommendation/algorithms.js'
 
 // 获取 dataService 实例
-const dataService = new DataServiceFactory().getAdapter()
+const dataService = new DataService()
 
 // 添加日志记录函数
 const logRecommendation = (user, algorithm, result) => {
