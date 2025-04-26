@@ -19,20 +19,47 @@ export const signup = async (req, res) => {
             })
         }
 
-        const newUser = await dataService.createUser({
+        // 分离账户数据和用户偏好/个人资料数据
+        const accountData = {
             name,
             email,
             password,
             // role 将由 Mongoose schema 的默认值 'user' 自动设置
-        })
+        }
 
-        const token = await dataService.generateAuthToken(newUser.id)
+        const userData = {
+            name,
+            // 添加默认的用户偏好
+            preferences: {
+                preferredSubjects: [],
+                preferredGrades: [],
+                preferredDifficulty: '中级',
+                learningStyle: '视觉型',
+            },
+            stats: {
+                lastActive: Date.now(),
+            },
+        }
+
+        // 使用新的方法一次性创建用户和账户
+        const result = await dataService.createUserWithAccount(
+            userData,
+            accountData
+        )
+
+        // 生成认证令牌，使用用户ID
+        const token = await dataService.generateAuthToken(result.user.id)
 
         res.status(201).json({
             status: 'success',
             token,
             data: {
-                user: newUser,
+                user: {
+                    id: result.user.id,
+                    name: result.user.name,
+                    email: result.account.email,
+                    role: result.account.role,
+                },
             },
         })
     } catch (err) {
@@ -64,26 +91,43 @@ export const login = async (req, res) => {
             })
         }
 
-        // 获取用户信息
-        const user = await dataService.getUserByEmail(email)
-        const token = await dataService.generateAuthToken(user.id)
+        try {
+            // 获取用户信息
+            const user = await dataService.getUserByEmail(email)
+            // 生成认证令牌
+            const token = await dataService.generateAuthToken(user.id)
 
-        res.status(200).json({
-            status: 'success',
-            token,
-            data: {
-                user: {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    role: user.role,
+            // 更新最后登录时间
+            if (user.accountId) {
+                await dataService.updateAccount(user.accountId, {
+                    lastLogin: Date.now(),
+                })
+            }
+
+            return res.status(200).json({
+                status: 'success',
+                token,
+                data: {
+                    user: {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        role: user.role,
+                    },
                 },
-            },
-        })
+            })
+        } catch (userError) {
+            console.error('获取用户信息或生成令牌失败:', userError)
+            return res.status(500).json({
+                status: 'error',
+                message: '登录过程中发生错误，请联系管理员',
+            })
+        }
     } catch (err) {
-        res.status(400).json({
+        console.error('登录失败:', err)
+        return res.status(400).json({
             status: 'error',
-            message: err.message,
+            message: err.message || '登录失败',
         })
     }
 }

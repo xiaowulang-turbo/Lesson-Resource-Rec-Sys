@@ -14,12 +14,27 @@ import cookieParser from 'cookie-parser'
 import globalErrorHandler from './middlewares/errorMiddleware.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import mongoose from 'mongoose'
+import 'dotenv/config'
 
 // 获取 __dirname 在 ES Modules 中的等效值
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const app = express()
+
+// 检查数据库连接状态
+mongoose.connection.on('connected', () => {
+    console.log('数据库连接成功')
+})
+
+mongoose.connection.on('error', (err) => {
+    console.error('数据库连接错误:', err)
+})
+
+mongoose.connection.on('disconnected', () => {
+    console.log('数据库连接断开')
+})
 
 // 中间件
 app.use(helmet())
@@ -85,5 +100,10 @@ app.post('/api/course/search', async (req, res) => {
 
 // 全局错误处理
 app.use(globalErrorHandler)
+
+// 服务端渲染支持，将所有未匹配的路由交给前端路由处理
+app.get('*', (req, res) => {
+    res.sendFile(path.join(path.join(__dirname, '..', 'public'), 'index.html'))
+})
 
 export default app
