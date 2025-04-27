@@ -75,14 +75,14 @@ export async function getCurrentUser() {
         })
 
         if (!res.ok) {
-            clearAuth()
+            // clearAuth()
             return null
         }
 
         const data = await res.json()
         return data.data.user
     } catch (error) {
-        clearAuth()
+        // clearAuth()
         return null
     }
 }
