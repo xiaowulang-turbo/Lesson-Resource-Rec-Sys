@@ -1,5 +1,10 @@
 // Base URL for your API
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1'
+import {
+    calculateItemSimilarityMatrix,
+    findSimilarResources,
+    prepareRatingMatrix,
+} from '../utils/recommendationAlgorithms'
 
 /**
  * Fetches homepage recommendations from the backend.
@@ -69,138 +74,786 @@ export const fetchHomepageRecommendations = async (limit = 8) => {
  */
 export const fetchSimilarResources = async (resourceId, limit = 4) => {
     try {
-        // 在实际项目中，这里会调用后端API
-        // const url = `${API_URL}/recommendations/similar/${resourceId}?limit=${limit}`;
+        // 实际项目中，应该调用后端API
+        const url = `${API_URL}/recommendations/similar/${resourceId}?limit=${limit}`
 
-        // 由于此刻可能还没有实现后端API，我们先使用模拟数据
-        // 模拟API调用延迟
-        await new Promise((resolve) => setTimeout(resolve, 300))
+        // 获取存储的用户认证信息（如果有的话）
+        let token = null
+        const storedAuth = localStorage.getItem('auth')
+        if (storedAuth) {
+            try {
+                const authData = JSON.parse(storedAuth)
+                token = authData.token
+            } catch (e) {
+                console.error('Error parsing auth data:', e)
+            }
+        }
 
-        // 生成模拟的相似资源数据
-        const mockSimilarResources = generateMockSimilarResources(
-            resourceId,
-            limit
+        // 方法1: 显式定义的资源关系 - 尝试从资源关系数据中查找相似资源
+        const resourceRelationships = await fetchResourceRelationships()
+        const currentResourceRelationship = resourceRelationships.find(
+            (r) => r.resource_id === resourceId.toString()
         )
 
-        return mockSimilarResources
+        // 获取所有资源数据
+        const allResources = await fetchAllResources()
+
+        // 初始化推荐结果数组
+        let recommendedResources = []
+
+        // 方法2: 使用协同过滤算法进行推荐
+        const userInteractions = await fetchUserInteractions()
+
+        if (userInteractions && userInteractions.length > 0) {
+            try {
+                // 准备用户-资源评分矩阵
+                const ratingMatrix = prepareRatingMatrix(userInteractions)
+
+                // 计算物品相似度矩阵
+                const itemSimilarityMatrix =
+                    calculateItemSimilarityMatrix(ratingMatrix)
+
+                // 基于物品相似度寻找相似资源
+                const cfRecommendations = findSimilarResources(
+                    resourceId.toString(),
+                    itemSimilarityMatrix,
+                    allResources,
+                    limit
+                )
+
+                if (cfRecommendations && cfRecommendations.length > 0) {
+                    // 将协同过滤的推荐添加到结果中
+                    recommendedResources = [...cfRecommendations]
+
+                    // 如果协同过滤推荐的资源数量已经足够，直接返回
+                    if (recommendedResources.length >= limit) {
+                        return recommendedResources.slice(0, limit)
+                    }
+                }
+            } catch (error) {
+                console.error('协同过滤推荐出错:', error)
+                // 错误时继续使用其他方法
+            }
+        }
+
+        // 方法1: 如果找到显式定义的相似资源关系
+        if (
+            currentResourceRelationship &&
+            currentResourceRelationship.similar_resources &&
+            currentResourceRelationship.similar_resources.length > 0
+        ) {
+            // 处理相似资源数据
+            const similarResources =
+                currentResourceRelationship.similar_resources
+                    .map((similar) => {
+                        const resource = allResources.find(
+                            (r) =>
+                                r.id.toString() ===
+                                similar.resource_id.toString()
+                        )
+
+                        if (resource) {
+                            return {
+                                ...resource,
+                                similarityScore: similar.similarity_score,
+                                commonTopics: similar.common_topics,
+                                commonSkills: similar.common_skills,
+                                recommendationReason: `基于${similar.common_topics.join(
+                                    '、'
+                                )}的内容匹配`,
+                            }
+                        }
+                        return null
+                    })
+                    .filter((item) => item !== null)
+
+            // 将显式定义的相似资源添加到推荐结果中，避免重复
+            const existingIds = recommendedResources.map((r) => r.id.toString())
+
+            for (const resource of similarResources) {
+                if (!existingIds.includes(resource.id.toString())) {
+                    recommendedResources.push(resource)
+                    existingIds.push(resource.id.toString())
+
+                    // 如果已经达到限制数量，直接返回
+                    if (recommendedResources.length >= limit) {
+                        return recommendedResources
+                    }
+                }
+            }
+
+            // 如果相似资源不足，添加共同访问的资源
+            if (
+                recommendedResources.length < limit &&
+                currentResourceRelationship.co_accessed_with &&
+                currentResourceRelationship.co_accessed_with.length > 0
+            ) {
+                const remainingSlots = limit - recommendedResources.length
+
+                // 获取已经添加的资源ID列表，避免重复
+                const addedResourceIds = recommendedResources.map((r) =>
+                    r.id.toString()
+                )
+
+                const coAccessedResources =
+                    currentResourceRelationship.co_accessed_with
+                        .filter(
+                            (item) =>
+                                !addedResourceIds.includes(
+                                    item.resource_id.toString()
+                                )
+                        )
+                        .map((coAccessed) => {
+                            const resource = allResources.find(
+                                (r) =>
+                                    r.id.toString() ===
+                                    coAccessed.resource_id.toString()
+                            )
+
+                            if (resource) {
+                                return {
+                                    ...resource,
+                                    coAccessCount: coAccessed.co_access_count,
+                                    coAccessPercentage:
+                                        coAccessed.co_access_percentage,
+                                    recommendationReason: `${coAccessed.co_access_percentage}%的用户同时访问了此资源`,
+                                }
+                            }
+                            return null
+                        })
+                        .filter((item) => item !== null)
+                        .slice(0, remainingSlots)
+
+                // 合并相似资源和共同访问资源
+                recommendedResources.push(...coAccessedResources)
+            }
+        }
+
+        // 方法3: 如果当前推荐结果不足，使用基于内容的过滤
+        if (recommendedResources.length < limit) {
+            const remainingSlots = limit - recommendedResources.length
+            const addedResourceIds = recommendedResources.map((r) =>
+                r.id.toString()
+            )
+
+            // 查找当前资源的信息
+            const currentResource = allResources.find(
+                (r) => r.id.toString() === resourceId.toString()
+            )
+
+            if (currentResource) {
+                // 使用内容过滤方法找到额外的推荐
+                const contentBasedRecs = contentBasedFiltering(
+                    currentResource,
+                    allResources,
+                    remainingSlots,
+                    addedResourceIds
+                )
+
+                // 合并内容过滤推荐结果
+                recommendedResources.push(...contentBasedRecs)
+            }
+        }
+
+        // 确保不超过limit个推荐
+        return recommendedResources.slice(0, limit)
     } catch (error) {
         console.error('获取相似资源推荐失败:', error)
-        // 在生产环境中，如果API失败，返回空数组而不是抛出错误，以避免UI错误
+        // 如果API失败，返回空数组而不是抛出错误，以避免UI错误
         return []
     }
 }
 
 /**
- * 生成模拟的相似资源数据
- * @private
+ * 基于内容过滤的推荐算法
+ * @param {Object} currentResource - 当前资源
+ * @param {Array} allResources - 所有资源列表
+ * @param {Number} limit - 推荐数量
+ * @param {Array} excludeIds - 要排除的资源ID列表
+ * @returns {Array} - 推荐结果
  */
-function generateMockSimilarResources(resourceId, limit) {
-    // 资源类型列表
-    const types = [1, 2, 3, 4, 5] // 对应文档、视频、音频、图片、其他
-    const subjects = [
-        '数学',
-        '语文',
-        '英语',
-        '物理',
-        '化学',
-        '历史',
-        '地理',
-        '生物',
-        '政治',
-        '信息技术',
-    ]
-    const grades = [
-        '小学一年级',
-        '小学二年级',
-        '小学三年级',
-        '小学四年级',
-        '小学五年级',
-        '小学六年级',
-        '初中一年级',
-        '初中二年级',
-        '初中三年级',
-        '高中一年级',
-        '高中二年级',
-        '高中三年级',
-    ]
-    const difficulties = [1, 2, 3, 4, 5] // 对应入门、初级、中级、高级、专家
-
-    // 随机生成几个相似资源
-    const count = Math.min(limit, 4 + Math.floor(Math.random() * 3)) // 生成4-6个资源，但不超过传入的limit
-    const resources = []
-
-    for (let i = 0; i < count; i++) {
-        // 确保ID与当前资源不同
-        const id = `sim-${resourceId.substring(0, 3)}-${i + 1}`
-
-        // 随机生成资源数据
-        resources.push({
-            id,
-            title: `相似教学资源 ${i + 1} - ${
-                subjects[Math.floor(Math.random() * subjects.length)]
-            }`,
-            description:
-                '这是一个与当前资源相似的推荐资源，基于内容或协同过滤算法推荐。',
-            type: types[Math.floor(Math.random() * types.length)],
-            subject: subjects[Math.floor(Math.random() * subjects.length)],
-            grade: grades[Math.floor(Math.random() * grades.length)],
-            difficulty:
-                difficulties[Math.floor(Math.random() * difficulties.length)],
-            price: Math.random() > 0.7 ? Math.floor(Math.random() * 100) : 0, // 70%概率免费
-            createdAt: new Date(
-                Date.now() -
-                    Math.floor(Math.random() * 90 * 24 * 60 * 60 * 1000)
-            ).toISOString(), // 过去90天内随机时间
-            coverImage: `https://picsum.photos/seed/${id}/300/200`, // 使用随机图片服务生成封面
-            tags: generateRandomTags(),
-            stats: {
-                views: Math.floor(Math.random() * 1000),
-                likes: Math.floor(Math.random() * 200),
-                downloads: Math.floor(Math.random() * 100),
-            },
-        })
+const contentBasedFiltering = (
+    currentResource,
+    allResources,
+    limit,
+    excludeIds = []
+) => {
+    if (!currentResource || !allResources || allResources.length === 0) {
+        return []
     }
 
-    return resources
+    // 为每个资源计算与当前资源的相似度分数
+    const scoredResources = allResources
+        .filter((r) => {
+            // 排除当前资源和已经在推荐列表中的资源
+            return (
+                r.id.toString() !== currentResource.id.toString() &&
+                !excludeIds.includes(r.id.toString())
+            )
+        })
+        .map((resource) => {
+            let score = 0
+
+            // 相同主题加分
+            if (resource.subject === currentResource.subject) {
+                score += 5
+            }
+
+            // 难度接近加分
+            if (resource.difficulty && currentResource.difficulty) {
+                const diffDelta = Math.abs(
+                    resource.difficulty - currentResource.difficulty
+                )
+                if (diffDelta === 0) {
+                    score += 3 // 完全匹配难度
+                } else if (diffDelta === 1) {
+                    score += 1 // 难度接近
+                }
+            }
+
+            // 标签重叠加分
+            if (resource.tags && currentResource.tags) {
+                const resourceTags = Array.isArray(resource.tags)
+                    ? resource.tags
+                    : []
+                const currentTags = Array.isArray(currentResource.tags)
+                    ? currentResource.tags
+                    : []
+
+                const commonTags = resourceTags.filter((tag) =>
+                    currentTags.includes(tag)
+                )
+                score += commonTags.length * 2 // 每个匹配的标签得分
+
+                // 记录共同标签用于推荐原因
+                resource.commonTags = commonTags
+            }
+
+            // 相同年级加分
+            if (resource.grade === currentResource.grade) {
+                score += 2
+            }
+
+            // 添加少量基于热门程度的分数
+            let enrollment = 0
+            try {
+                const enrollCountStr = resource.enrollCount?.toString() || '0'
+                enrollment = parseInt(
+                    enrollCountStr.replace(/[^0-9]/g, '') || '0',
+                    10
+                )
+            } catch (err) {
+                enrollment = 0
+            }
+            score += enrollment * 0.001
+
+            // 生成推荐原因
+            let recommendationReason = `与您正在查看的资源相似`
+            if (resource.subject === currentResource.subject) {
+                recommendationReason = `同样是${resource.subject}领域的资源`
+            } else if (resource.commonTags && resource.commonTags.length > 0) {
+                recommendationReason = `包含相似标签: ${resource.commonTags
+                    .slice(0, 2)
+                    .join('、')}`
+            }
+
+            return {
+                ...resource,
+                similarityScore: score,
+                recommendationReason,
+            }
+        })
+        .filter((r) => r.similarityScore > 3) // 只保留相似度较高的
+        .sort((a, b) => b.similarityScore - a.similarityScore)
+        .slice(0, limit)
+
+    return scoredResources
 }
 
 /**
- * 生成随机标签
+ * 获取资源关系数据
  * @private
  */
-function generateRandomTags() {
-    const allTags = [
-        '小学教育',
-        '中学教育',
-        '高中教育',
-        '教学课件',
-        '教案',
-        '习题',
-        '考试',
-        '练习',
-        '知识点',
-        '重点难点',
-        '实验',
-        '课外阅读',
-        '教学视频',
-        '教学资料',
-        '教学指导',
-        '教学计划',
+const fetchResourceRelationships = async () => {
+    // 实际项目中，这里应该从API获取
+    // 由于目前可能没有API可用，我们使用示例数据
+    // 资源关系数据示例
+    return [
+        {
+            resource_id: '1473948443',
+            resource_title: '人工智能及其航空航天应用',
+            similar_resources: [
+                {
+                    resource_id: '1474376445',
+                    similarity_score: 0.78,
+                    common_topics: ['人工智能', '数据科学'],
+                    common_skills: ['机器学习', '深度学习'],
+                },
+                {
+                    resource_id: '1474376441',
+                    similarity_score: 0.85,
+                    common_topics: ['航空航天', '智能控制'],
+                    common_skills: ['人工智能', '控制系统'],
+                },
+                {
+                    resource_id: '1474376444',
+                    similarity_score: 0.72,
+                    common_topics: ['航空航天', '无人机'],
+                    common_skills: ['智能控制', '网络通信'],
+                },
+            ],
+            co_accessed_with: [
+                {
+                    resource_id: '1474376441',
+                    co_access_count: 180,
+                    co_access_percentage: 65,
+                },
+                {
+                    resource_id: '1474376444',
+                    co_access_count: 150,
+                    co_access_percentage: 55,
+                },
+            ],
+            recommended_sequence: ['1474376441', '1474376444', '1474376445'],
+        },
+        {
+            resource_id: '1474376441',
+            resource_title: '电推进智能控制',
+            similar_resources: [
+                {
+                    resource_id: '1473948443',
+                    similarity_score: 0.85,
+                    common_topics: ['航空航天', '智能控制'],
+                    common_skills: ['人工智能', '控制系统'],
+                },
+                {
+                    resource_id: '1474376444',
+                    similarity_score: 0.79,
+                    common_topics: ['航空航天', '智能控制'],
+                    common_skills: ['无人机技术', '控制系统'],
+                },
+            ],
+            co_accessed_with: [
+                {
+                    resource_id: '1473948443',
+                    co_access_count: 180,
+                    co_access_percentage: 75,
+                },
+                {
+                    resource_id: '1474376444',
+                    co_access_count: 120,
+                    co_access_percentage: 50,
+                },
+            ],
+            recommended_sequence: ['1473948443', '1474376444'],
+        },
+        {
+            resource_id: '1474376444',
+            resource_title: '无人机集群技术——智能组网与协同',
+            similar_resources: [
+                {
+                    resource_id: '1473948443',
+                    similarity_score: 0.72,
+                    common_topics: ['航空航天', '无人机'],
+                    common_skills: ['智能控制', '网络通信'],
+                },
+                {
+                    resource_id: '1474376441',
+                    similarity_score: 0.79,
+                    common_topics: ['航空航天', '智能控制'],
+                    common_skills: ['无人机技术', '控制系统'],
+                },
+            ],
+            co_accessed_with: [
+                {
+                    resource_id: '1473948443',
+                    co_access_count: 150,
+                    co_access_percentage: 60,
+                },
+                {
+                    resource_id: '1474376441',
+                    co_access_count: 120,
+                    co_access_percentage: 48,
+                },
+            ],
+            recommended_sequence: ['1473948443', '1474376441'],
+        },
+        {
+            resource_id: '1474376450',
+            resource_title: '信息技术',
+            similar_resources: [
+                {
+                    resource_id: '1474376455',
+                    similarity_score: 0.83,
+                    common_topics: ['信息技术', '电子信息'],
+                    common_skills: ['技术服务', '产品检测'],
+                },
+                {
+                    resource_id: '1474376456',
+                    similarity_score: 0.79,
+                    common_topics: ['信息技术', '智能终端'],
+                    common_skills: ['技术服务', '产品开发'],
+                },
+            ],
+            co_accessed_with: [
+                {
+                    resource_id: '1474376455',
+                    co_access_count: 200,
+                    co_access_percentage: 70,
+                },
+                {
+                    resource_id: '1474376456',
+                    co_access_count: 180,
+                    co_access_percentage: 65,
+                },
+            ],
+            recommended_sequence: ['1474376455', '1474376456'],
+        },
+        {
+            resource_id: '1474376455',
+            resource_title: '智能通信终端产品检测与维修',
+            similar_resources: [
+                {
+                    resource_id: '1474376450',
+                    similarity_score: 0.83,
+                    common_topics: ['信息技术', '电子信息'],
+                    common_skills: ['技术服务', '产品检测'],
+                },
+                {
+                    resource_id: '1474376456',
+                    similarity_score: 0.9,
+                    common_topics: ['电子信息', '智能终端'],
+                    common_skills: ['产品检测', '技术服务'],
+                },
+            ],
+            co_accessed_with: [
+                {
+                    resource_id: '1474376450',
+                    co_access_count: 200,
+                    co_access_percentage: 75,
+                },
+                {
+                    resource_id: '1474376456',
+                    co_access_count: 230,
+                    co_access_percentage: 85,
+                },
+            ],
+            recommended_sequence: ['1474376456', '1474376450'],
+        },
     ]
+}
 
-    // 随机选择2-4个标签
-    const count = 2 + Math.floor(Math.random() * 3)
-    const tags = []
+/**
+ * 获取所有资源数据
+ * @private
+ */
+const fetchAllResources = async () => {
+    // 实际项目中，这里应该从API获取
+    // 由于目前可能没有API可用，我们使用示例数据
+    return [
+        {
+            id: 1473948443,
+            title: '人工智能及其航空航天应用',
+            description:
+                '本书是航空航天新兴领域"十四五"高等教育教材。人工智能时代已然来临，航空航天作为全世界最早的信息科技产业应用技术领域之一，迫切需要开设人工智能技术及其于航空航天的应用课程，为人工智能在航空航天的普及、人才的培养、学科的发展提供条件。',
+            subject: '航空航天',
+            grade: '本科及研究生',
+            difficulty: 4,
+            coverImage:
+                'https://mooc-image.nosdn.127.net/8393e0cb-73a8-4bc0-8251-3c67f20e8c82.png',
+            price: 24.5,
+            tags: ['人工智能', '航空航天', '教材'],
+            enrollCount: 76,
+        },
+        {
+            id: 1474376445,
+            title: '隐私计算导论',
+            description:
+                '本书是大数据新兴领域"十四五"高等教育教材。在当今社会，数据已经晋升为与传统土地、劳动力、资本和技术并列的"第五生产要素"。',
+            subject: '数据科学',
+            grade: '本科及研究生',
+            difficulty: 4,
+            coverImage:
+                'https://mooc-image.nosdn.127.net/5e28b0ce-ae67-43bc-b3c9-40cbf496fac3.png',
+            price: 27.3,
+            tags: ['隐私计算', '数据科学', '人工智能'],
+            enrollCount: 24,
+        },
+        {
+            id: 1474376441,
+            title: '电推进智能控制',
+            description:
+                '《电推进智能控制》是航空航天新兴领域"十四五"高等教育教材，专为空天智能电推进技术专业的高年级学生编写。',
+            subject: '航空航天',
+            grade: '本科高年级',
+            difficulty: 4,
+            coverImage:
+                'https://mooc-image.nosdn.127.net/6da575dc-0957-412e-8df0-6f8171d0b675.png',
+            price: 24.5,
+            tags: ['电推进', '智能控制', '航空航天'],
+            enrollCount: 7,
+        },
+        {
+            id: 1474376450,
+            title: '信息技术',
+            description:
+                '本教材依据教育部最新发布的《高等职业教育专科信息技术课程标准》及《全国高等学校计算机水平考试大纲》编写。',
+            subject: '信息技术',
+            grade: '专科',
+            difficulty: 3,
+            coverImage:
+                'https://mooc-image.nosdn.127.net/51b4ad86-63e0-4de2-9d1e-8e06d506a241.png',
+            price: 32.55,
+            tags: ['信息技术', '计算机基础', '职业教育'],
+            enrollCount: 11,
+        },
+        {
+            id: 1474376444,
+            title: '无人机集群技术——智能组网与协同',
+            description:
+                '本书是航空航天战略性新兴领域"十四五"高等教育教材体系建设规划项目的研究成果，书中紧密结合无人机集群技术最新发展趋势。',
+            subject: '航空航天',
+            grade: '本科',
+            difficulty: 4,
+            coverImage:
+                'https://mooc-image.nosdn.127.net/b83d242e-2f0a-46ed-a69e-d366f48d66e6.png',
+            price: 24.5,
+            tags: ['无人机', '智能组网', '航空航天'],
+            enrollCount: 2,
+        },
+        {
+            id: 1474376456,
+            title: '智能终端产品技术服务',
+            description:
+                '本书以项目引领、教学一体化为特色，根据高职高专教学的基本要求，结合岗位技能职业标准。',
+            subject: '电子信息',
+            grade: '高职高专',
+            difficulty: 3,
+            coverImage:
+                'https://mooc-image.nosdn.127.net/5fd76267-d761-4599-9ee5-5a436ca5d1e5.png',
+            price: 34.8,
+            tags: ['智能终端', '技术服务', '职业教育'],
+            enrollCount: 0,
+        },
+    ]
+}
 
-    // 从标签池中随机选择不重复的标签
-    const tagPool = [...allTags]
-    for (let i = 0; i < count && tagPool.length > 0; i++) {
-        const index = Math.floor(Math.random() * tagPool.length)
-        tags.push(tagPool[index])
-        tagPool.splice(index, 1) // 从池中移除已选标签
-    }
+/**
+ * 获取用户交互数据
+ * 用于协同过滤算法
+ */
+const fetchUserInteractions = async () => {
+    // 在实际项目中应该从API获取
+    // 这里使用示例数据
+    return [
+        // 用户1的交互记录
+        {
+            userId: 'user1',
+            resourceId: '1473948443',
+            interactionType: 'view',
+            timestamp: '2023-01-01',
+        },
+        {
+            userId: 'user1',
+            resourceId: '1474376441',
+            interactionType: 'like',
+            timestamp: '2023-01-01',
+        },
+        {
+            userId: 'user1',
+            resourceId: '1474376444',
+            interactionType: 'download',
+            timestamp: '2023-01-02',
+        },
+        {
+            userId: 'user1',
+            resourceId: '1474376445',
+            interactionType: 'collection',
+            timestamp: '2023-01-03',
+        },
 
-    return tags
+        // 用户2的交互记录
+        {
+            userId: 'user2',
+            resourceId: '1473948443',
+            interactionType: 'like',
+            timestamp: '2023-01-01',
+        },
+        {
+            userId: 'user2',
+            resourceId: '1474376441',
+            interactionType: 'download',
+            timestamp: '2023-01-02',
+        },
+        {
+            userId: 'user2',
+            resourceId: '1474376448',
+            interactionType: 'collection',
+            timestamp: '2023-01-03',
+        },
+
+        // 用户3的交互记录
+        {
+            userId: 'user3',
+            resourceId: '1474376441',
+            interactionType: 'view',
+            timestamp: '2023-01-01',
+        },
+        {
+            userId: 'user3',
+            resourceId: '1474376444',
+            interactionType: 'like',
+            timestamp: '2023-01-02',
+        },
+        {
+            userId: 'user3',
+            resourceId: '1474376445',
+            interactionType: 'download',
+            timestamp: '2023-01-03',
+        },
+        {
+            userId: 'user3',
+            resourceId: '1474376448',
+            interactionType: 'collection',
+            timestamp: '2023-01-04',
+        },
+
+        // 用户4的交互记录
+        {
+            userId: 'user4',
+            resourceId: '1474376444',
+            interactionType: 'like',
+            timestamp: '2023-01-01',
+        },
+        {
+            userId: 'user4',
+            resourceId: '1474376445',
+            interactionType: 'collection',
+            timestamp: '2023-01-02',
+        },
+        {
+            userId: 'user4',
+            resourceId: '1474376448',
+            interactionType: 'download',
+            timestamp: '2023-01-03',
+        },
+
+        // 用户5的交互记录
+        {
+            userId: 'user5',
+            resourceId: '1473948443',
+            interactionType: 'collection',
+            timestamp: '2023-01-01',
+        },
+        {
+            userId: 'user5',
+            resourceId: '1474376445',
+            interactionType: 'like',
+            timestamp: '2023-01-02',
+        },
+        {
+            userId: 'user5',
+            resourceId: '1474376448',
+            interactionType: 'download',
+            timestamp: '2023-01-03',
+        },
+
+        // 更多用户的交互记录
+        {
+            userId: 'user6',
+            resourceId: '1473948443',
+            interactionType: 'like',
+            timestamp: '2023-01-01',
+        },
+        {
+            userId: 'user6',
+            resourceId: '1474376444',
+            interactionType: 'collection',
+            timestamp: '2023-01-02',
+        },
+        {
+            userId: 'user6',
+            resourceId: '1474376448',
+            interactionType: 'download',
+            timestamp: '2023-01-03',
+        },
+
+        {
+            userId: 'user7',
+            resourceId: '1474376441',
+            interactionType: 'view',
+            timestamp: '2023-01-01',
+        },
+        {
+            userId: 'user7',
+            resourceId: '1474376444',
+            interactionType: 'collection',
+            timestamp: '2023-01-02',
+        },
+        {
+            userId: 'user7',
+            resourceId: '1474376445',
+            interactionType: 'like',
+            timestamp: '2023-01-03',
+        },
+
+        {
+            userId: 'user8',
+            resourceId: '1474376441',
+            interactionType: 'collection',
+            timestamp: '2023-01-01',
+        },
+        {
+            userId: 'user8',
+            resourceId: '1474376444',
+            interactionType: 'like',
+            timestamp: '2023-01-02',
+        },
+        {
+            userId: 'user8',
+            resourceId: '1474376448',
+            interactionType: 'download',
+            timestamp: '2023-01-03',
+        },
+
+        {
+            userId: 'user9',
+            resourceId: '1473948443',
+            interactionType: 'download',
+            timestamp: '2023-01-01',
+        },
+        {
+            userId: 'user9',
+            resourceId: '1474376445',
+            interactionType: 'collection',
+            timestamp: '2023-01-02',
+        },
+        {
+            userId: 'user9',
+            resourceId: '1474376448',
+            interactionType: 'like',
+            timestamp: '2023-01-03',
+        },
+
+        {
+            userId: 'user10',
+            resourceId: '1474376441',
+            interactionType: 'like',
+            timestamp: '2023-01-01',
+        },
+        {
+            userId: 'user10',
+            resourceId: '1474376444',
+            interactionType: 'download',
+            timestamp: '2023-01-02',
+        },
+        {
+            userId: 'user10',
+            resourceId: '1474376445',
+            interactionType: 'collection',
+            timestamp: '2023-01-03',
+        },
+    ]
 }
 
 // Add other recommendation-related API functions here if needed
