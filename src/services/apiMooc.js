@@ -92,31 +92,3 @@ export async function searchMoocCoursesDirectly(query, options = {}) {
         throw error
     }
 }
-
-/**
- * 获取课程评价数据
- * @param {string} courseId - 课程ID
- * @param {object} options - 其他选项，如页码、每页数量、排序方式等
- * @returns {Promise<object>} - 评价数据
- */
-export async function getCourseEvaluations(courseId, options = {}) {
-    const { pageIndex = 1, pageSize = 20, orderBy = 3 } = options
-    const csrfKey = 'fa2c35db81bb400a97f5ed9465e22b9d' // 固定的csrfKey，实际应用中可能需要动态获取
-
-    try {
-        // 构建API请求URL
-        const url = `${BASE_URL}/mooc/evaluations?courseId=${courseId}&pageIndex=${pageIndex}&pageSize=${pageSize}&orderBy=${orderBy}&csrfKey=${csrfKey}`
-
-        const response = await fetch(url)
-
-        if (!response.ok) {
-            throw new Error('获取课程评价数据失败')
-        }
-
-        const data = await response.json()
-        return data
-    } catch (error) {
-        console.error('获取课程评价数据出错:', error)
-        throw error
-    }
-}
