@@ -10,6 +10,7 @@ import Row from '../ui/Row'
 import Tag from '../ui/Tag'
 import Button from '../ui/Button'
 import Empty from '../ui/Empty'
+import SimilarResourceList from '../ui/SimilarResourceList'
 
 // --- 样式化组件 ---
 const DetailLayout = styled.div`
@@ -84,12 +85,6 @@ const ActionsContainer = styled.section`
     border-top: 1px solid var(--color-grey-100);
 `
 
-const SimilarResources = styled.section`
-    h3 {
-        margin-bottom: 1.6rem;
-    }
-`
-
 // 添加链接样式
 const AuthorLink = styled(Link)`
     color: var(--color-brand-600);
@@ -101,9 +96,6 @@ const AuthorLink = styled(Link)`
         text-decoration: underline;
     }
 `
-
-// 模拟相似资源数据
-const mockSimilarResources = []
 
 function ResourceDetail() {
     const { id } = useParams()
@@ -250,16 +242,7 @@ function ResourceDetail() {
             </MainContent>
 
             <Sidebar>
-                <SimilarResources>
-                    <Heading as="h3">相似资源</Heading>
-                    {mockSimilarResources.length > 0 ? (
-                        mockSimilarResources.map((res) => (
-                            <p key={res.id}>{res.title}</p>
-                        ))
-                    ) : (
-                        <p>暂无相似资源推荐。</p>
-                    )}
-                </SimilarResources>
+                <SimilarResourceList resourceId={id} />
             </Sidebar>
         </DetailLayout>
     )
