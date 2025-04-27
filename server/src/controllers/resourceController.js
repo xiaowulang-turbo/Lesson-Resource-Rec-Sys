@@ -259,6 +259,7 @@ export const getResourceFile = async (req, res) => {
         }
 
         // 检查权限（如果资源不是公开的）
+        /*
         if (!resource.access.isPublic) {
             // 检查用户是否有权限访问
             const userId = req.user?.id
@@ -275,6 +276,7 @@ export const getResourceFile = async (req, res) => {
                 })
             }
         }
+        */
 
         // 更新资源访问统计
         resource.stats.views += 1
