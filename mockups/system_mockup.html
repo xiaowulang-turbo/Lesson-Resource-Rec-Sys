@@ -463,6 +463,14 @@
                 color: #ced4da;
              }
 
+            .resource-detail .resource-info { margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #eee;}
+            .resource-detail .resource-info h2 { margin-bottom: 20px; }
+            .resource-detail .resource-info p { margin-bottom: 10px; }
+            .resource-detail .resource-info .tags { margin-top: 15px; }
+            .resource-detail .resource-info .tag { display: inline-block; padding: 4px 8px; margin-right: 8px; background: #f0f0f0; border-radius: 4px; }
+            .resource-detail .resource-actions { margin-bottom: 30px; }
+            .resource-detail .resource-actions button { margin-right: 10px; }
+
         </style>
     </head>
     <body>
@@ -776,6 +784,30 @@
                          暂无相关资源推荐。
                      </div>
                  </div>
+                 <div class="resource-detail">
+                    <div class="resource-info">
+                        <h2><i class="fas fa-book" style="margin-right: 8px; color: #6f42c1;"></i>资源信息</h2>
+                        <p><strong>标题：</strong> <span id="resource-title">物理实验教学视频集</span></p>
+                        <p><strong>描述：</strong> <span id="resource-description">包含多个经典物理实验的详细操作视频和讲解。</span></p>
+                        <p><strong>类型：</strong> <span id="resource-type">视频</span></p>
+                        <p><strong>学科：</strong> <span id="resource-subject">物理</span></p>
+                        <p><strong>年级：</strong> <span id="resource-grade">高中</span></p>
+                        <p><strong>上传者：</strong> <a href="#" id="resource-uploader">张老师</a></p>
+                        <p><strong>上传时间：</strong> <span id="resource-upload-time">2024-03-15</span></p>
+                        <div class="tags">
+                            <strong>标签：</strong>
+                            <span class="tag">物理实验</span>
+                            <span class="tag">教学视频</span>
+                            <span class="tag">实验教学</span>
+                        </div>
+                    </div>
+                    <div class="resource-actions">
+                        <button type="button" class="download" id="download-button"><i class="fas fa-download"></i> 下载资源</button>
+                        <button type="button" class="share" id="share-button"><i class="fas fa-share-alt"></i> 分享</button>
+                        <button type="button" class="favorite" id="favorite-button"><i class="far fa-heart"></i> 收藏</button>
+                        <button type="button" class="report" id="report-button"><i class="fas fa-flag"></i> 举报</button>
+                    </div>
+                </div>
             </section>
 
         </main>
