@@ -198,474 +198,108 @@ export function convertMocCourseToResource(mocCourse) {
         return `mooc-${Math.random().toString(36).substring(2, 15)}`
     }
 
-    // 安全获取图片URL
-    const getImageUrl = (course) => {
-        // 首先检查标准字段
-        const possibleFields = [
-            'imgUrl',
-            'bigPhotoUrl',
-            'thumbnail',
-            'picture',
-            'smallPhotoUrl',
-        ]
-        for (const field of possibleFields) {
-            if (course[field] && typeof course[field] === 'string') {
-                return course[field]
-            }
-        }
-
-        // 检查嵌套在mocTextbookVo中的cover字段
-        if (course.mocTextbookVo && course.mocTextbookVo.cover) {
-            return course.mocTextbookVo.cover
-        }
-
-        // 检查原始数据中的cover字段
-        if (course.originalData) {
-            // 检查mocTextbookVo
-            if (
-                course.originalData.mocTextbookVo &&
-                course.originalData.mocTextbookVo.cover
-            ) {
-                return course.originalData.mocTextbookVo.cover
-            }
-
-            // 检查其他可能的图片字段
-            for (const field of possibleFields) {
-                if (
-                    course.originalData[field] &&
-                    typeof course.originalData[field] === 'string'
-                ) {
-                    return course.originalData[field]
-                }
-            }
-        }
-
-        return '' // 默认空字符串
-    }
-
-    // 安全获取描述
-    const getDescription = (course) => {
-        const possibleFields = [
-            'description',
-            'shortDescription',
-            'intro',
-            'summary',
-        ]
-        for (const field of possibleFields) {
-            if (course[field] && typeof course[field] === 'string') {
-                return cleanHtmlAndWhitespace(course[field])
-            }
-        }
-        return '无描述' // 默认描述
-    }
-
-    // 安全获取教师名
-    const getTeacherName = (course) => {
-        const possibleFields = [
-            'teacherName',
-            'lectorName',
-            'teacher',
-            'author',
-        ]
-        for (const field of possibleFields) {
-            if (course[field] && typeof course[field] === 'string') {
-                return cleanHtmlAndWhitespace(course[field])
-            }
-        }
-        return '未知教师' // 默认教师名
-    }
-
-    // 安全获取学校/机构名
-    const getSchoolName = (course) => {
-        // 首先检查标准字段
-        const possibleFields = [
-            'schoolName',
-            'school',
-            'organization',
-            'provider',
-        ]
-        for (const field of possibleFields) {
-            if (course[field] && typeof course[field] === 'string') {
-                return cleanHtmlAndWhitespace(course[field])
-            }
-        }
-
-        // 检查嵌套在mocTextbookVo中的字段
-        if (course.mocTextbookVo) {
-            if (course.mocTextbookVo.editorInChief) {
-                return cleanHtmlAndWhitespace(
-                    course.mocTextbookVo.editorInChief
-                ) // 使用主编作为机构
-            }
-
-            // 尝试其他可能的字段
-            for (const field of possibleFields) {
-                if (
-                    course.mocTextbookVo[field] &&
-                    typeof course.mocTextbookVo[field] === 'string'
-                ) {
-                    return cleanHtmlAndWhitespace(course.mocTextbookVo[field])
-                }
-            }
-        }
-
-        // 检查原始数据
-        if (course.originalData) {
-            // 检查highlightUniversity字段
-            if (course.originalData.highlightUniversity) {
-                return cleanHtmlAndWhitespace(
-                    course.originalData.highlightUniversity
-                )
-            }
-
-            // 检查mocTextbookVo
-            if (course.originalData.mocTextbookVo) {
-                if (course.originalData.mocTextbookVo.editorInChief) {
-                    return cleanHtmlAndWhitespace(
-                        course.originalData.mocTextbookVo.editorInChief
-                    )
-                }
-
-                for (const field of possibleFields) {
-                    if (
-                        course.originalData.mocTextbookVo[field] &&
-                        typeof course.originalData.mocTextbookVo[field] ===
-                            'string'
-                    ) {
-                        return cleanHtmlAndWhitespace(
-                            course.originalData.mocTextbookVo[field]
-                        )
-                    }
-                }
-            }
-
-            // 检查教师名字段
-            if (course.originalData.highlightTeacherNames) {
-                return cleanHtmlAndWhitespace(
-                    course.originalData.highlightTeacherNames
-                )
-            }
-        }
-
-        return '未知机构' // 默认机构名
-    }
-
-    // 安全获取难度级别
-    const getDifficulty = (course) => {
-        let difficulty = 3 // 默认中级
-
-        if (course.level && typeof course.level === 'string') {
-            difficulty = difficultyMap[course.level] || 3
-        } else if (course.difficulty) {
-            if (typeof course.difficulty === 'number') {
-                difficulty = Math.min(Math.max(course.difficulty, 1), 5) // 确保在1-5范围内
-            } else if (typeof course.difficulty === 'string') {
-                difficulty = difficultyMap[course.difficulty] || 3
-            }
-        }
-
-        return difficulty
-    }
-
-    // 获取注册人数
-    const getEnrollCount = (course) => {
-        const possibleFields = [
-            'enrollCount',
-            'learnerCount',
-            'studentCount',
-            'participants',
-        ]
-        for (const field of possibleFields) {
-            if (course[field] && !isNaN(parseInt(course[field]))) {
-                return parseInt(course[field])
-            }
-        }
-        return 0 // 默认0
-    }
-
-    // 构建转换后的资源对象
-    const resourceId = generateId(mocCourse)
-    const courseId = extractCourseId(mocCourse)
-
-    // 处理教材类型资源
-    const isTextbook =
-        mocCourse.type === 308 ||
-        (mocCourse.originalData && mocCourse.originalData.type === 308) ||
-        mocCourse.mocTextbookVo ||
-        (mocCourse.originalData && mocCourse.originalData.mocTextbookVo)
-
-    let title = mocCourse.name || mocCourse.title
-
-    // 从教材中提取真实标题
-    if (!title && isTextbook) {
-        if (mocCourse.mocTextbookVo && mocCourse.mocTextbookVo.name) {
-            title = mocCourse.mocTextbookVo.name
-        } else if (
-            mocCourse.originalData &&
-            mocCourse.originalData.mocTextbookVo &&
-            mocCourse.originalData.mocTextbookVo.name
-        ) {
-            title = mocCourse.originalData.mocTextbookVo.name
-        } else if (
-            mocCourse.originalData &&
-            mocCourse.originalData.highlightName
-        ) {
-            // 处理高亮标题，移除高亮标记
-            title = mocCourse.originalData.highlightName
-                .replace(/{##/g, '')
-                .replace(/##}/g, '')
-        }
-    }
-
-    // 清理标题中的HTML标签
-    title = cleanHtmlAndWhitespace(title)
-
+    // 转换为系统资源模型
     const resource = {
-        // 添加唯一ID
-        id: resourceId,
-
-        // 基本信息
-        title: title || '未知课程',
-        description: getDescription(mocCourse),
-        pedagogicalType: isTextbook ? 'reference' : 'courseware', // 教材类型为参考资料
-        format: isTextbook ? 'pdf' : 'interactive', // 教材格式为PDF
-        contentType: 'course', // 标记为课程类型
-
-        // 分类信息
-        subject: mocCourse.categoryName || '计算机科学',
-        grade: 'university', // 默认高等教育
-        difficulty: getDifficulty(mocCourse),
-
-        // 资源详情
-        url: courseId ? `https://www.icourse163.org/course/${courseId}` : '',
-        cover: getImageUrl(mocCourse),
-
-        // 作者与发布者信息
-        authors: getTeacherName(mocCourse),
-        publisher: '中国大学MOOC',
-        organization: getSchoolName(mocCourse),
+        title: cleanHtmlAndWhitespace(mocCourse.name),
+        description: cleanHtmlAndWhitespace(mocCourse.description),
+        contentType: 'course',
+        pedagogicalType: 'courseware',
+        format: 'url',
+        subject: mocCourse.categoryName || '未分类',
+        grade: '高等教育',
+        difficulty: difficultyMap[mocCourse.level] || 3,
+        url: mocCourse.courseUrl || '',
+        cover: mocCourse.imgUrl || '',
+        price: 0,
+        originalPrice: 0,
+        authors: mocCourse.teacherName || '',
+        publisher: mocCourse.schoolName || '',
+        organization: mocCourse.schoolName || '',
         school: getSchoolInfo(mocCourse),
-        shortName:
-            mocCourse.shortName || mocCourse.originalData?.shortName || '', // 保存学校代码
-
-        // 学习和评价数据
-        enrollCount: getEnrollCount(mocCourse),
+        enrollCount: mocCourse.enrollCount || 0,
+        studyAvatars: [],
         tags: extractTags(mocCourse),
-        averageRating: mocCourse.score ? mocCourse.score / 2 : 4.0, // 假设MOOC评分为10分制，默认4.0分
-
-        // 统计数据
-        stats: {
-            views: mocCourse.hotScore || 0,
-            downloads: 0,
-            shares: 0,
-            favorites: 0,
-        },
-
-        // 访问控制
-        access: {
-            isPublic: true,
-        },
-
-        // 额外的MOOC特定数据
+        highlightContent: cleanHtmlAndWhitespace(mocCourse.highlightContent),
         metadata: {
-            mocSourceId: courseId,
             mocSourceType: 'icourse163',
-            startTime: mocCourse.startTime,
-            endTime: mocCourse.endTime,
-            termId: mocCourse.termId,
-            originalData: mocCourse, // 保存原始数据以备后用
+            mocSourceId: extractCourseId(mocCourse),
+            originalData: mocCourse,
         },
     }
 
-    console.log(`已转换MOOC课程 "${resource.title}" (ID: ${resource.id})`)
     return resource
 }
 
 /**
- * 将MOOC API返回的课程列表转换为系统资源列表
- * @param {Array} mocCourses - MOOC API返回的课程数组
- * @returns {Array} - 符合系统资源模型的数据数组
+ * 批量转换MOOC课程数据
+ * @param {Array} mocCourses - MOOC课程数据数组
+ * @returns {Array} - 转换后的资源数组
  */
 export function convertMocCoursesToResources(mocCourses) {
     if (!Array.isArray(mocCourses)) return []
 
     return mocCourses
-        .filter((course) => course) // 过滤无效数据
         .map((course) => convertMocCourseToResource(course))
+        .filter(Boolean)
 }
 
 /**
- * 从MOOC搜索响应中提取课程列表并转换
+ * 从MOOC API响应中提取并转换课程数据
  * @param {Object} mocResponse - MOOC API响应数据
  * @returns {Array} - 转换后的资源数组
  */
 export function extractAndConvertMocSearchResults(mocResponse) {
-    try {
-        // 适应不同的MOOC API响应结构
-        let courses = []
+    if (!mocResponse || !mocResponse.result) return []
 
-        if (mocResponse && mocResponse.result) {
-            if (mocResponse.result.list) {
-                // 一种可能的响应结构
-                courses = mocResponse.result.list
-            } else if (mocResponse.result.results) {
-                // 另一种可能的响应结构
-                courses = mocResponse.result.results
-            } else if (Array.isArray(mocResponse.result)) {
-                // 直接返回数组的情况
-                courses = mocResponse.result
-            }
-        }
+    // 尝试从不同的数据结构中获取课程列表
+    let courses = []
 
-        // 转换前处理数据 - 确保每个课程对象都包含其原始数据
-        courses = courses.map((course) => {
-            // 如果是mocTextbookVo对象，则将其整体附加到课程对象上
-            if (course.mocTextbookVo) {
-                // 将mocTextbookVo的属性合并到主对象
-                const textbookData = course.mocTextbookVo
-
-                // 优先使用教材中的属性
-                if (textbookData.name && !course.name) {
-                    course.name = textbookData.name
-                }
-
-                if (textbookData.description && !course.description) {
-                    course.description = textbookData.description
-                }
-
-                if (textbookData.cover && !course.cover) {
-                    course.cover = textbookData.cover
-                }
-
-                if (textbookData.enrollCount && !course.enrollCount) {
-                    course.enrollCount = textbookData.enrollCount
-                }
-
-                if (textbookData.editorInChief && !course.organization) {
-                    course.organization = textbookData.editorInChief
-                }
-
-                if (textbookData.courseId && !course.courseId) {
-                    course.courseId = textbookData.courseId
-                }
-
-                // 设置type为308表示教材
-                course.type = 308
-            } else if (
-                course.originalData &&
-                course.originalData.mocTextbookVo
-            ) {
-                // 同样处理originalData中的mocTextbookVo
-                const textbookData = course.originalData.mocTextbookVo
-
-                if (textbookData.name && !course.name) {
-                    course.name = textbookData.name
-                }
-
-                if (textbookData.description && !course.description) {
-                    course.description = textbookData.description
-                }
-
-                if (textbookData.cover && !course.cover) {
-                    course.cover = textbookData.cover
-                }
-
-                if (textbookData.enrollCount && !course.enrollCount) {
-                    course.enrollCount = textbookData.enrollCount
-                }
-
-                if (textbookData.editorInChief && !course.organization) {
-                    course.organization = textbookData.editorInChief
-                }
-
-                if (textbookData.courseId && !course.courseId) {
-                    course.courseId = textbookData.courseId
-                }
-
-                // 设置type为308表示教材
-                course.type = 308
-            }
-
-            // 处理高亮字段
-            if (course.highlightName && !course.name) {
-                course.name = cleanHtmlAndWhitespace(
-                    course.highlightName.replace(/{##/g, '').replace(/##}/g, '')
-                )
-            }
-
-            if (course.highlightContent && !course.description) {
-                course.description = cleanHtmlAndWhitespace(
-                    course.highlightContent
-                        .replace(/spContent=/g, '')
-                        .replace(/{##/g, '')
-                        .replace(/##}/g, '')
-                )
-            }
-
-            if (course.highlightUniversity && !course.organization) {
-                course.organization = cleanHtmlAndWhitespace(
-                    course.highlightUniversity
-                )
-            }
-
-            if (course.highlightTeacherNames && !course.authors) {
-                course.authors = cleanHtmlAndWhitespace(
-                    course.highlightTeacherNames
-                )
-            }
-
-            return course
-        })
-
-        return convertMocCoursesToResources(courses)
-    } catch (error) {
-        console.error('转换MOOC搜索结果时出错:', error)
-        return []
+    if (Array.isArray(mocResponse.result)) {
+        courses = mocResponse.result
+    } else if (
+        mocResponse.result.list &&
+        Array.isArray(mocResponse.result.list)
+    ) {
+        courses = mocResponse.result.list
+    } else if (
+        mocResponse.result.termDto &&
+        Array.isArray(mocResponse.result.termDto)
+    ) {
+        courses = mocResponse.result.termDto
+    } else if (
+        mocResponse.result.result &&
+        Array.isArray(mocResponse.result.result)
+    ) {
+        courses = mocResponse.result.result
     }
+
+    return convertMocCoursesToResources(courses)
 }
 
 /**
- * 创建资源分页信息
+ * 从MOOC API响应中创建分页信息
  * @param {Object} mocResponse - MOOC API响应数据
- * @returns {Object} - 分页信息
+ * @returns {Object} - 分页信息对象
  */
 export function createPaginationFromMocResponse(mocResponse) {
-    try {
-        const pagination = {
-            pageSize: 20,
-            pageIndex: 1,
-            totalCount: 0,
-            totalPageCount: 1,
-        }
-
-        if (mocResponse && mocResponse.result) {
-            if (mocResponse.result.pagination) {
-                pagination.pageSize =
-                    mocResponse.result.pagination.pageSize || 20
-                pagination.pageIndex =
-                    mocResponse.result.pagination.pageIndex || 1
-                pagination.totalCount =
-                    mocResponse.result.pagination.totleCount || 0
-                pagination.totalPageCount =
-                    mocResponse.result.pagination.totlePageCount || 1
-            } else if (mocResponse.result.query) {
-                pagination.pageSize = mocResponse.result.query.pageSize || 20
-                pagination.pageIndex = mocResponse.result.query.pageIndex || 1
-                pagination.totalCount = mocResponse.result.totalCount || 0
-                pagination.totalPageCount = Math.ceil(
-                    pagination.totalCount / pagination.pageSize
-                )
-            }
-        }
-
-        return pagination
-    } catch (error) {
-        console.error('创建分页信息时出错:', error)
+    if (!mocResponse || !mocResponse.result) {
         return {
-            pageSize: 20,
-            pageIndex: 1,
+            page: 1,
+            limit: 20,
             totalCount: 0,
-            totalPageCount: 1,
+            totalPages: 0,
         }
+    }
+
+    const query = mocResponse.result.query || {}
+    const totalCount = mocResponse.result.totalCount || 0
+    const pageSize = query.pageSize || 20
+    const pageIndex = query.pageIndex || 1
+
+    return {
+        page: pageIndex,
+        limit: pageSize,
+        totalCount,
+        totalPages: Math.ceil(totalCount / pageSize),
     }
 }
