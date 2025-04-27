@@ -156,7 +156,7 @@ const resourceSchema = new mongoose.Schema(
             type: Date,
             default: Date.now,
         },
-        // 学习和评价数据
+        // 学习数据
         enrollCount: {
             type: Number,
             default: 0,
@@ -167,29 +167,6 @@ const resourceSchema = new mongoose.Schema(
         highlightContent: {
             type: String,
             default: '',
-        },
-        // 评分系统
-        ratings: [
-            {
-                user: {
-                    type: mongoose.Schema.ObjectId,
-                    ref: 'User',
-                },
-                rating: {
-                    type: Number,
-                    min: 1,
-                    max: 5,
-                },
-                review: String,
-                createdAt: {
-                    type: Date,
-                    default: Date.now,
-                },
-            },
-        ],
-        averageRating: {
-            type: Number,
-            default: 0,
         },
         // 使用统计
         stats: {
@@ -209,9 +186,9 @@ const resourceSchema = new mongoose.Schema(
                 type: Number,
                 default: 0,
             },
-            lastViewed: {
-                type: Date,
-                default: Date.now,
+            upvotes: {
+                type: Number,
+                default: 0,
             },
         },
         // 权限控制

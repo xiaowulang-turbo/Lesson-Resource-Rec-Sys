@@ -16,17 +16,7 @@ const userResourceInteractionSchema = new Schema(
         interactionType: {
             type: String,
             required: true,
-            enum: ['view', 'download', 'rate', 'comment', 'share'],
-        },
-        rating: {
-            type: Number,
-            min: 1,
-            max: 5,
-            default: null,
-        },
-        comment: {
-            type: String,
-            trim: true,
+            enum: ['view', 'download', 'share'],
         },
         duration: {
             type: Number, // 以秒为单位的交互时长
