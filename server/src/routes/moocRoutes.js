@@ -4,6 +4,7 @@ import {
     searchCourses,
     importCoursesToDatabase,
     getImportedCourses,
+    getCourseEvaluate,
 } from '../controllers/moocController.js'
 import { protect, restrictTo } from '../middlewares/authMiddleware.js'
 
@@ -12,6 +13,7 @@ const router = express.Router()
 // 公开路由
 router.post('/proxy', proxyMoocRequest) // 代理MOOC API请求
 router.get('/search', searchCourses) // 搜索MOOC课程
+router.get('/evaluations', getCourseEvaluate) // 获取课程评价数据
 
 // 需要登录的路由
 router.use(protect)
