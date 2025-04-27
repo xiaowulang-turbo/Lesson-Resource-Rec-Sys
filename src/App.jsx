@@ -12,7 +12,6 @@ import Settings from './pages/Settings'
 import Users from './pages/Users'
 import Resources from './pages/Resources'
 import Profile from './pages/Profile'
-import PublicProfile from './pages/PublicProfile'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Search from './pages/Search'
@@ -79,10 +78,6 @@ function App() {
                                     <Route
                                         path="profile"
                                         element={<Profile />}
-                                    />
-                                    <Route
-                                        path="users/:userId"
-                                        element={<PublicProfile />}
                                     />
                                     <Route path="search" element={<Search />} />
                                     <Route path="upload" element={<Upload />} />
