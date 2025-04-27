@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import styled from 'styled-components'
 import { getResourceById } from '../services/apiResources'
-import { getPublicUserProfile } from '../services/apiUsers'
+import { getUserById } from '../services/apiUsers'
 import Heading from '../ui/Heading'
 import Spinner from '../ui/Spinner'
 import Row from '../ui/Row'
@@ -118,10 +118,10 @@ function ResourceDetail() {
         retry: false,
     })
 
-    // 获取上传者信息 - 使用公开接口
+    // 获取上传者信息 - 使用用户接口
     const { data: creatorUser, isLoading: isLoadingCreator } = useQuery({
-        queryKey: ['publicUser', resource?.createdBy],
-        queryFn: () => getPublicUserProfile(resource.createdBy),
+        queryKey: ['user', resource?.createdBy],
+        queryFn: () => getUserById(resource.createdBy),
         enabled: !!resource?.createdBy,
     })
 
@@ -185,15 +185,11 @@ function ResourceDetail() {
                     </p>
                     <p>
                         <strong>上传者：</strong>{' '}
-                        {isLoadingCreator ? (
-                            '加载中...'
-                        ) : resource.createdBy ? (
-                            <AuthorLink to={`/users/${resource.createdBy}`}>
-                                {creatorUser?.name || '未知用户'}
-                            </AuthorLink>
-                        ) : (
-                            '未知用户'
-                        )}
+                        {isLoadingCreator
+                            ? '加载中...'
+                            : resource.createdBy
+                            ? creatorUser?.name || '未知用户'
+                            : '未知用户'}
                     </p>
                     <p>
                         <strong>上传时间：</strong> {formattedDate}
