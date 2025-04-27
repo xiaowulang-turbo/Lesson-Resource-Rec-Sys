@@ -22,3 +22,12 @@ config.env
 # 临时文件
 temp.json
 newResources.json
+
+# 资源文件
+.docx
+.pptx
+.pdf
+.doc
+.ppt
+.xls
+server/public/uploads/documents/______________________________-1745667141475-405754548.docx
