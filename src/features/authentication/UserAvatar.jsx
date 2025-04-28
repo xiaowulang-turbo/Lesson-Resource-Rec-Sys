@@ -27,7 +27,7 @@ export default function UserAvatar() {
     const navigate = useNavigate()
     const { user } = useUser()
     const displayName = user?.name || 'User'
-    const avatarSrc = 'default-user.jpg'
+    const avatarSrc = '../../public/default-user.jpg'
 
     const handleAvatarClick = () => {
         navigate('/account')
