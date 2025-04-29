@@ -350,6 +350,7 @@ function ResourceList({ resources: initialResources }) {
                     const resourceTitle = resource.title || '未知课程'
                     const resourceOrg =
                         resource.organization ||
+                        resource.publisher ||
                         (isMoocResource ? '中国大学MOOC' : '未知机构')
                     const resourceDesc = resource.description || '无描述'
                     const resourceCover = resource.cover || PLACEHOLDER_IMAGE
