@@ -4,7 +4,7 @@ import Tag from './Tag'
 
 const Card = styled(Link)`
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     border-radius: var(--border-radius-md);
     overflow: hidden;
     box-shadow: var(--shadow-sm);
@@ -21,8 +21,9 @@ const Card = styled(Link)`
 `
 
 const ImageContainer = styled.div`
-    height: 150px;
-    width: 100%;
+    height: 140px;
+    width: 120px;
+    min-width: 120px;
     overflow: hidden;
     position: relative;
 
@@ -64,6 +65,7 @@ const CardBody = styled.div`
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    justify-content: space-between;
 `
 
 const Title = styled.h3`
@@ -126,7 +128,7 @@ function ResourceCard({ resource }) {
     // 检查是否有资源数据
     if (!resource) return null
 
-    const { id, title, type, subject, tags, coverImage } = resource
+    const { id, title, type, subject, tags, cover } = resource
 
     // 如果标签是数组，只取前两个标签
     const displayTags = Array.isArray(tags) ? tags.slice(0, 2) : []
@@ -134,8 +136,8 @@ function ResourceCard({ resource }) {
     return (
         <Card to={`/resources/${id}`}>
             <ImageContainer>
-                {coverImage ? (
-                    <Image src={coverImage} alt={title} />
+                {cover ? (
+                    <Image src={cover} alt={title} />
                 ) : (
                     <NoImage>{getTypeIcon(type)}</NoImage>
                 )}

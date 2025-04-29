@@ -26,7 +26,12 @@ const GridList = styled.div`
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.6rem;
-    margin-top: 1.6rem;
+    /* margin-top: 1.6rem; */
+`
+
+const ResourceWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
 `
 
 const RecommendationReason = styled.div`
@@ -85,6 +90,8 @@ function SimilarResourceList({ resourceId }) {
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState(null)
 
+    console.log('resourceId', resourceId)
+
     useEffect(() => {
         async function fetchData() {
             if (!resourceId) return
@@ -96,6 +103,8 @@ function SimilarResourceList({ resourceId }) {
                 // 获取当前资源
                 const current = await getResourceById(resourceId)
                 setCurrentResource(current)
+
+                console.log('current', current)
 
                 // 获取相似资源
                 const data = await fetchSimilarResources(resourceId)
@@ -165,7 +174,7 @@ function SimilarResourceList({ resourceId }) {
                     const algorithmType = determineAlgorithmType(resource)
 
                     return (
-                        <div key={resource.id}>
+                        <ResourceWrapper key={resource.id}>
                             <ResourceCard resource={resource} />
 
                             {resource.recommendationReason && (
@@ -180,7 +189,7 @@ function SimilarResourceList({ resourceId }) {
                                     {resource.recommendationReason}
                                 </RecommendationReason>
                             )}
-                        </div>
+                        </ResourceWrapper>
                     )
                 })}
             </GridList>
