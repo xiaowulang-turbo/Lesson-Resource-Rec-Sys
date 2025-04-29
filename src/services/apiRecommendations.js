@@ -74,7 +74,7 @@ export const fetchHomepageRecommendations = async (limit = 8) => {
  */
 export const fetchSimilarResources = async (resourceId, limit = 4) => {
     try {
-        // 实际项目中，应该调用后端API
+        // 构造调用后端API的URL
         const url = `${API_URL}/recommendations/similar/${resourceId}?limit=${limit}`
 
         // 获取存储的用户认证信息（如果有的话）
@@ -89,176 +89,46 @@ export const fetchSimilarResources = async (resourceId, limit = 4) => {
             }
         }
 
-        // 方法1: 显式定义的资源关系 - 尝试从资源关系数据中查找相似资源
-        const resourceRelationships = await fetchResourceRelationships()
-        const currentResourceRelationship = resourceRelationships.find(
-            (r) => r.resource_id === resourceId.toString()
-        )
+        // 设置请求头
+        const headers = {
+            'Content-Type': 'application/json',
+        }
 
-        // 获取所有资源数据
-        const allResources = await fetchAllResources()
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`
+        }
 
-        // 初始化推荐结果数组
-        let recommendedResources = []
+        // 发送API请求
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: headers,
+        })
 
-        // 方法2: 使用协同过滤算法进行推荐
-        const userInteractions = await fetchUserInteractions()
-
-        if (userInteractions && userInteractions.length > 0) {
+        if (!response.ok) {
+            // 尝试解析错误消息
+            let errorMessage = `HTTP error! status: ${response.status}`
             try {
-                // 准备用户-资源评分矩阵
-                const ratingMatrix = prepareRatingMatrix(userInteractions)
-
-                // 计算物品相似度矩阵
-                const itemSimilarityMatrix =
-                    calculateItemSimilarityMatrix(ratingMatrix)
-
-                // 基于物品相似度寻找相似资源
-                const cfRecommendations = findSimilarResources(
-                    resourceId.toString(),
-                    itemSimilarityMatrix,
-                    allResources,
-                    limit
-                )
-
-                if (cfRecommendations && cfRecommendations.length > 0) {
-                    // 将协同过滤的推荐添加到结果中
-                    recommendedResources = [...cfRecommendations]
-
-                    // 如果协同过滤推荐的资源数量已经足够，直接返回
-                    if (recommendedResources.length >= limit) {
-                        return recommendedResources.slice(0, limit)
-                    }
-                }
-            } catch (error) {
-                console.error('协同过滤推荐出错:', error)
-                // 错误时继续使用其他方法
+                const errorData = await response.json()
+                errorMessage = errorData.message || errorMessage
+            } catch (e) {
+                // 无法解析响应体时忽略
             }
+            throw new Error(errorMessage)
         }
 
-        // 方法1: 如果找到显式定义的相似资源关系
-        if (
-            currentResourceRelationship &&
-            currentResourceRelationship.similar_resources &&
-            currentResourceRelationship.similar_resources.length > 0
-        ) {
-            // 处理相似资源数据
-            const similarResources =
-                currentResourceRelationship.similar_resources
-                    .map((similar) => {
-                        const resource = allResources.find(
-                            (r) =>
-                                r.id.toString() ===
-                                similar.resource_id.toString()
-                        )
+        const data = await response.json()
 
-                        if (resource) {
-                            return {
-                                ...resource,
-                                similarityScore: similar.similarity_score,
-                                commonTopics: similar.common_topics,
-                                commonSkills: similar.common_skills,
-                                recommendationReason: `基于${similar.common_topics.join(
-                                    '、'
-                                )}的内容匹配`,
-                            }
-                        }
-                        return null
-                    })
-                    .filter((item) => item !== null)
-
-            // 将显式定义的相似资源添加到推荐结果中，避免重复
-            const existingIds = recommendedResources.map((r) => r.id.toString())
-
-            for (const resource of similarResources) {
-                if (!existingIds.includes(resource.id.toString())) {
-                    recommendedResources.push(resource)
-                    existingIds.push(resource.id.toString())
-
-                    // 如果已经达到限制数量，直接返回
-                    if (recommendedResources.length >= limit) {
-                        return recommendedResources
-                    }
-                }
-            }
-
-            // 如果相似资源不足，添加共同访问的资源
-            if (
-                recommendedResources.length < limit &&
-                currentResourceRelationship.co_accessed_with &&
-                currentResourceRelationship.co_accessed_with.length > 0
-            ) {
-                const remainingSlots = limit - recommendedResources.length
-
-                // 获取已经添加的资源ID列表，避免重复
-                const addedResourceIds = recommendedResources.map((r) =>
-                    r.id.toString()
-                )
-
-                const coAccessedResources =
-                    currentResourceRelationship.co_accessed_with
-                        .filter(
-                            (item) =>
-                                !addedResourceIds.includes(
-                                    item.resource_id.toString()
-                                )
-                        )
-                        .map((coAccessed) => {
-                            const resource = allResources.find(
-                                (r) =>
-                                    r.id.toString() ===
-                                    coAccessed.resource_id.toString()
-                            )
-
-                            if (resource) {
-                                return {
-                                    ...resource,
-                                    coAccessCount: coAccessed.co_access_count,
-                                    coAccessPercentage:
-                                        coAccessed.co_access_percentage,
-                                    recommendationReason: `${coAccessed.co_access_percentage}%的用户同时访问了此资源`,
-                                }
-                            }
-                            return null
-                        })
-                        .filter((item) => item !== null)
-                        .slice(0, remainingSlots)
-
-                // 合并相似资源和共同访问资源
-                recommendedResources.push(...coAccessedResources)
-            }
+        if (data.status !== 'success') {
+            throw new Error(data.message || '获取相似资源失败')
         }
 
-        // 方法3: 如果当前推荐结果不足，使用基于内容的过滤
-        if (recommendedResources.length < limit) {
-            const remainingSlots = limit - recommendedResources.length
-            const addedResourceIds = recommendedResources.map((r) =>
-                r.id.toString()
-            )
+        console.log('从后端获取的相似资源:', data.data.recommendations)
 
-            // 查找当前资源的信息
-            const currentResource = allResources.find(
-                (r) => r.id.toString() === resourceId.toString()
-            )
-
-            if (currentResource) {
-                // 使用内容过滤方法找到额外的推荐
-                const contentBasedRecs = contentBasedFiltering(
-                    currentResource,
-                    allResources,
-                    remainingSlots,
-                    addedResourceIds
-                )
-
-                // 合并内容过滤推荐结果
-                recommendedResources.push(...contentBasedRecs)
-            }
-        }
-
-        // 确保不超过limit个推荐
-        return recommendedResources.slice(0, limit)
+        // 返回推荐结果
+        return data.data.recommendations
     } catch (error) {
         console.error('获取相似资源推荐失败:', error)
+
         // 如果API失败，返回空数组而不是抛出错误，以避免UI错误
         return []
     }

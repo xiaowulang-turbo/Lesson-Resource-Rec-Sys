@@ -234,7 +234,7 @@ export function itemBasedCollaborativeFiltering(
  * @param {Object} userRatingsMatrix - 用户评分矩阵
  * @returns {Object} - 物品相似度矩阵 [物品ID1][物品ID2] = 相似度
  */
-function calculateItemSimilarityMatrix(userRatingsMatrix) {
+export function calculateItemSimilarityMatrix(userRatingsMatrix) {
     // 创建物品-用户矩阵 (转置)
     const itemUserMatrix = {}
 
