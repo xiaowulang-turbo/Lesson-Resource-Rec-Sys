@@ -116,13 +116,6 @@ function Home() {
         ? `${user?.name || '用户'}，为你推荐`
         : '为你推荐'
 
-    console.log('[Home] Rendering - isLoading:', isLoading)
-    console.log('[Home] Rendering - error:', error)
-    console.log(
-        '[Home] Rendering - recommendedResources:',
-        recommendedResources
-    )
-
     return (
         <StyledHome>
             <Row type="horizontal" style={{ justifyContent: 'space-between' }}>

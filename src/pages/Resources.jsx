@@ -61,6 +61,8 @@ function Resources() {
                     limit: PAGE_SIZE,
                 })
 
+                console.log('[Resources] Rendering - result:', result)
+
                 setResources(result.resources)
                 setFilteredResources(result.resources)
                 setPagination(result.pagination)
