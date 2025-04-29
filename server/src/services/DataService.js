@@ -578,4 +578,46 @@ export class DataService {
             return null
         }
     }
+
+    async getResourceRelationships() {
+        try {
+            // 如果有ResourceRelationship模型，则从数据库中获取数据
+            if (mongoose.models.ResourceRelationship) {
+                const ResourceRelationship =
+                    mongoose.models.ResourceRelationship
+                const relationships = await ResourceRelationship.find()
+                return relationships.map((rel) => ({
+                    resource_id: rel.resource_id.toString(),
+                    resource_title: rel.resource_title,
+                    similar_resources: rel.similar_resources || [],
+                    co_accessed_with: rel.co_accessed_with || [],
+                    recommended_sequence: rel.recommended_sequence || [],
+                }))
+            } else {
+                // 如果没有模型，则从JSON文件中读取数据
+                const path = await import('path')
+                const fs = await import('fs/promises')
+                const { fileURLToPath } = await import('url')
+
+                const __filename = fileURLToPath(import.meta.url)
+                const __dirname = path.dirname(__filename)
+                const filePath = path.join(
+                    __dirname,
+                    '../data/resource_relationships.json'
+                )
+
+                try {
+                    const data = await fs.readFile(filePath, 'utf8')
+                    return JSON.parse(data)
+                } catch (fileError) {
+                    console.error('从文件读取资源关系数据失败:', fileError)
+                    // 返回空数组作为后备
+                    return []
+                }
+            }
+        } catch (error) {
+            console.error('获取资源关系数据失败:', error)
+            return []
+        }
+    }
 }

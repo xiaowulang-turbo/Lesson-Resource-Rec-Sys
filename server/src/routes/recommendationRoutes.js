@@ -13,6 +13,9 @@ router.get('/homepage', recommendationController.getHomepageRecommendations)
 // 根据用户ID获取推荐路由
 router.get('/user/:userId', recommendationController.getRecommendationsByUserId)
 
+// 获取与特定资源相似的资源推荐
+router.get('/similar/:resourceId', recommendationController.getSimilarResources)
+
 // Add other recommendation-related routes here
 
 export default router

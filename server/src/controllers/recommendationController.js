@@ -342,4 +342,255 @@ export const getRecommendationsByUserId = catchAsync(async (req, res, next) => {
     })
 })
 
+// 获取与特定资源相似的资源推荐
+export const getSimilarResources = catchAsync(async (req, res, next) => {
+    const { resourceId } = req.params
+    const limit = parseInt(req.query.limit) || 4
+
+    if (!resourceId) {
+        return res.status(400).json({
+            status: 'error',
+            message: '未提供资源ID',
+            results: 0,
+            data: { recommendations: [] },
+        })
+    }
+
+    console.log(
+        `[推荐系统] 获取资源ID ${resourceId} 的相似资源，数量限制为 ${limit}`
+    )
+
+    // 加载资源数据和关系数据
+    const resourcesData = await dataService.getAllResources()
+    const resources = resourcesData.resources || [] // 从返回的对象中提取resources数组
+    const resourceRelationships = await dataService.getResourceRelationships()
+
+    // 查找目标资源
+    const targetResource = resources.find(
+        (r) => r.id.toString() === resourceId.toString()
+    )
+
+    if (!targetResource) {
+        return res.status(404).json({
+            status: 'error',
+            message: '资源不存在',
+            results: 0,
+            data: { recommendations: [] },
+        })
+    }
+
+    // 初始化推荐结果数组
+    let recommendedResources = []
+
+    // 1. 从资源关系中查找显式定义的相似资源
+    const currentResourceRelationship = resourceRelationships.find(
+        (r) => r.resource_id === resourceId.toString()
+    )
+
+    if (currentResourceRelationship?.similar_resources?.length > 0) {
+        // 处理相似资源数据
+        const similarResources = currentResourceRelationship.similar_resources
+            .map((similar) => {
+                const resource = resources.find(
+                    (r) => r.id.toString() === similar.resource_id.toString()
+                )
+
+                if (resource) {
+                    return {
+                        ...resource,
+                        similarityScore: similar.similarity_score,
+                        commonTopics: similar.common_topics,
+                        commonSkills: similar.common_skills,
+                        recommendationReason: `基于${similar.common_topics.join(
+                            '、'
+                        )}的内容匹配`,
+                    }
+                }
+                return null
+            })
+            .filter((item) => item !== null)
+
+        // 添加显式定义的相似资源
+        recommendedResources = [...similarResources]
+    }
+
+    // 2. 如果相似资源不足，添加共同访问的资源
+    if (
+        recommendedResources.length < limit &&
+        currentResourceRelationship?.co_accessed_with?.length > 0
+    ) {
+        const remainingSlots = limit - recommendedResources.length
+
+        // 获取已经添加的资源ID列表，避免重复
+        const addedResourceIds = recommendedResources.map((r) =>
+            r.id.toString()
+        )
+
+        const coAccessedResources = currentResourceRelationship.co_accessed_with
+            .filter(
+                (item) =>
+                    !addedResourceIds.includes(item.resource_id.toString())
+            )
+            .map((coAccessed) => {
+                const resource = resources.find(
+                    (r) => r.id.toString() === coAccessed.resource_id.toString()
+                )
+
+                if (resource) {
+                    return {
+                        ...resource,
+                        coAccessCount: coAccessed.co_access_count,
+                        coAccessPercentage: coAccessed.co_access_percentage,
+                        recommendationReason: `${coAccessed.co_access_percentage}%的用户同时访问了此资源`,
+                    }
+                }
+                return null
+            })
+            .filter((item) => item !== null)
+            .slice(0, remainingSlots)
+
+        // 合并相似资源和共同访问资源
+        recommendedResources.push(...coAccessedResources)
+    }
+
+    // 3. 如果推荐数量仍不足，使用基于内容的过滤
+    if (recommendedResources.length < limit) {
+        const remainingSlots = limit - recommendedResources.length
+        const addedResourceIds = recommendedResources.map((r) =>
+            r.id.toString()
+        )
+
+        // 使用内容过滤方法找到额外的推荐
+        const contentBasedRecs = contentBasedSimilarityFiltering(
+            targetResource,
+            resources,
+            remainingSlots,
+            addedResourceIds
+        )
+
+        // 合并内容过滤推荐结果
+        recommendedResources.push(...contentBasedRecs)
+    }
+
+    // 确保不超过limit个推荐
+    const finalRecommendations = recommendedResources.slice(0, limit)
+
+    res.status(200).json({
+        status: 'success',
+        message: '相似资源推荐',
+        results: finalRecommendations.length,
+        data: {
+            recommendations: finalRecommendations,
+            sourceResource: {
+                id: targetResource.id,
+                title: targetResource.title,
+                subject: targetResource.subject,
+                tags: targetResource.tags,
+            },
+        },
+    })
+})
+
+/**
+ * 基于内容的相似资源过滤
+ * 辅助函数，用于基于内容相似度查找相关资源
+ */
+const contentBasedSimilarityFiltering = (
+    targetResource,
+    allResources,
+    limit,
+    excludeIds = []
+) => {
+    if (!targetResource || !allResources || allResources.length === 0) {
+        return []
+    }
+
+    // 为每个资源计算与目标资源的相似度分数
+    const scoredResources = allResources
+        .filter((r) => {
+            // 排除目标资源和已经在推荐列表中的资源
+            return (
+                r.id.toString() !== targetResource.id.toString() &&
+                !excludeIds.includes(r.id.toString())
+            )
+        })
+        .map((resource) => {
+            let score = 0
+
+            // 相同主题加分
+            if (resource.subject === targetResource.subject) {
+                score += 5
+            }
+
+            // 难度接近加分
+            if (resource.difficulty && targetResource.difficulty) {
+                const diffDelta = Math.abs(
+                    resource.difficulty - targetResource.difficulty
+                )
+                if (diffDelta === 0) {
+                    score += 3 // 完全匹配难度
+                } else if (diffDelta === 1) {
+                    score += 1 // 难度接近
+                }
+            }
+
+            // 标签重叠加分
+            if (resource.tags && targetResource.tags) {
+                const resourceTags = Array.isArray(resource.tags)
+                    ? resource.tags
+                    : []
+                const currentTags = Array.isArray(targetResource.tags)
+                    ? targetResource.tags
+                    : []
+
+                const commonTags = resourceTags.filter((tag) =>
+                    currentTags.includes(tag)
+                )
+                score += commonTags.length * 2 // 每个匹配的标签得分
+
+                // 记录共同标签用于推荐原因
+                resource.commonTags = commonTags
+            }
+
+            // 相同年级加分
+            if (resource.grade === targetResource.grade) {
+                score += 2
+            }
+
+            // 添加少量基于热门程度的分数
+            let enrollment = 0
+            try {
+                const enrollCountStr = resource.enrollCount?.toString() || '0'
+                enrollment = parseInt(
+                    enrollCountStr.replace(/[^0-9]/g, '') || '0',
+                    10
+                )
+            } catch (err) {
+                enrollment = 0
+            }
+            score += enrollment * 0.001
+
+            // 生成推荐原因
+            let recommendationReason = `与您正在查看的资源相似`
+            if (resource.subject === targetResource.subject) {
+                recommendationReason = `同样是${resource.subject}领域的资源`
+            } else if (resource.commonTags && resource.commonTags.length > 0) {
+                recommendationReason = `包含相似标签: ${resource.commonTags
+                    .slice(0, 2)
+                    .join('、')}`
+            }
+
+            return {
+                ...resource,
+                similarityScore: score,
+                recommendationReason,
+            }
+        })
+        .filter((r) => r.similarityScore > 3) // 只保留相似度较高的
+        .sort((a, b) => b.similarityScore - a.similarityScore)
+        .slice(0, limit)
+
+    return scoredResources
+}
+
 // Add other recommendation-related controllers if needed
