@@ -1,4 +1,17 @@
 import { DataService } from '../services/DataService.js'
+import FileUploadUtils from '../utils/fileUploadUtils.js'
+import multer from 'multer'
+import AppError from '../utils/appError.js'
+
+// 配置multer用于内存存储
+const storage = multer.memoryStorage()
+const upload = multer({
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 限制5MB
+})
+
+// 导出multer中间件
+export const uploadUserPhoto = upload.single('avatar')
 
 const dataService = new DataService()
 
@@ -25,6 +38,8 @@ export const getUser = async (req, res) => {
     try {
         console.log(req.params.id, 'req.params.id')
         const user = await dataService.getUserById(req.params.id)
+
+        console.log(user, 'user')
 
         if (!user) {
             return res.status(404).json({
@@ -106,6 +121,8 @@ export const deleteUser = async (req, res) => {
 // 获取当前用户信息
 export const getMe = (req, res, next) => {
     req.params.id = req.user.id
+
+    console.log(req.params.id, 'req.params.id')
     next()
 }
 
@@ -120,8 +137,37 @@ export const updateMe = async (req, res) => {
             })
         }
 
+        // 处理文件上传
+        if (req.file) {
+            try {
+                // 上传头像到images文件夹
+                const avatarPath = FileUploadUtils.uploadFile(
+                    req.file,
+                    'images'
+                )
+
+                // 将头像路径添加到更新数据中
+                req.body.avatar = avatarPath
+            } catch (err) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: `头像上传失败: ${err.message}`,
+                })
+            }
+        }
+
+        // 打印接收到的数据，用于调试
+        console.log('接收到的更新数据:', req.body)
+
         // 2) 更新用户文档
         const user = await dataService.updateUser(req.user.id, req.body)
+
+        if (!user) {
+            return res.status(404).json({
+                status: 'error',
+                message: '未找到用户或更新失败',
+            })
+        }
 
         res.status(200).json({
             status: 'success',
@@ -130,9 +176,10 @@ export const updateMe = async (req, res) => {
             },
         })
     } catch (err) {
+        console.error('更新用户时出错:', err)
         res.status(400).json({
             status: 'error',
-            message: err.message,
+            message: err.message || '更新用户信息失败',
         })
     }
 }
