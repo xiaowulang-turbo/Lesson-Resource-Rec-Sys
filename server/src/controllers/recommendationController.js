@@ -9,6 +9,7 @@ import {
     hybridRecommendation,
     getPopularRecommendations,
 } from '../recommendation/algorithms.js'
+import mongoose from 'mongoose'
 
 // 获取 dataService 实例
 const dataService = new DataService()
@@ -133,7 +134,7 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
             // 使用基于内容的推荐
             console.log('[推荐系统] 使用基于内容的推荐算法')
             usedAlgorithm = 'content'
-            recommendationsResult = contentBasedRecommendation(
+            recommendationsResult = await contentBasedRecommendation(
                 currentUser,
                 limit
             )
@@ -141,7 +142,7 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
             // 使用协同过滤推荐
             console.log('[推荐系统] 使用协同过滤推荐算法')
             usedAlgorithm = 'collaborative'
-            recommendationsResult = collaborativeFilteringRecommendation(
+            recommendationsResult = await collaborativeFilteringRecommendation(
                 currentUser,
                 limit
             )
@@ -156,7 +157,7 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
                 content: contentWeight,
                 collaborative: collaborativeWeight,
             }
-            recommendationsResult = hybridRecommendation(
+            recommendationsResult = await hybridRecommendation(
                 currentUser,
                 limit,
                 weights
@@ -169,7 +170,7 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
             ) {
                 console.log('[推荐系统] 混合推荐失败，回退到基于内容的推荐')
                 usedAlgorithm = 'content (fallback)'
-                recommendationsResult = contentBasedRecommendation(
+                recommendationsResult = await contentBasedRecommendation(
                     currentUser,
                     limit
                 )
@@ -183,7 +184,9 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
                         '[推荐系统] 基于内容的推荐也失败，回退到热门推荐'
                     )
                     usedAlgorithm = 'popular (fallback)'
-                    recommendationsResult = getPopularRecommendations(limit)
+                    recommendationsResult = await getPopularRecommendations(
+                        limit
+                    )
                 }
             }
         }
@@ -192,7 +195,7 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
         // 对于访客用户，使用热门推荐
         console.log('[推荐系统] 用户未登录，使用热门推荐')
         usedAlgorithm = 'popular'
-        recommendationsResult = getPopularRecommendations(limit)
+        recommendationsResult = await getPopularRecommendations(limit)
     }
 
     // 记录推荐结果
@@ -277,11 +280,11 @@ export const getRecommendationsByUserId = catchAsync(async (req, res, next) => {
     if (algorithmPreference === 'content') {
         console.log('[推荐系统] 使用基于内容的推荐算法')
         usedAlgorithm = 'content'
-        recommendationsResult = contentBasedRecommendation(user, limit)
+        recommendationsResult = await contentBasedRecommendation(user, limit)
     } else if (algorithmPreference === 'collaborative') {
         console.log('[推荐系统] 使用协同过滤推荐算法')
         usedAlgorithm = 'collaborative'
-        recommendationsResult = collaborativeFilteringRecommendation(
+        recommendationsResult = await collaborativeFilteringRecommendation(
             user,
             limit
         )
@@ -296,7 +299,7 @@ export const getRecommendationsByUserId = catchAsync(async (req, res, next) => {
             content: contentWeight,
             collaborative: collaborativeWeight,
         }
-        recommendationsResult = hybridRecommendation(user, limit, weights)
+        recommendationsResult = await hybridRecommendation(user, limit, weights)
 
         // 如果混合推荐失败，回退到基于内容的推荐
         if (
@@ -305,7 +308,10 @@ export const getRecommendationsByUserId = catchAsync(async (req, res, next) => {
         ) {
             console.log('[推荐系统] 混合推荐失败，回退到基于内容的推荐')
             usedAlgorithm = 'content (fallback)'
-            recommendationsResult = contentBasedRecommendation(user, limit)
+            recommendationsResult = await contentBasedRecommendation(
+                user,
+                limit
+            )
 
             // 如果基于内容的推荐也失败，则回退到热门推荐
             if (
@@ -314,7 +320,7 @@ export const getRecommendationsByUserId = catchAsync(async (req, res, next) => {
             ) {
                 console.log('[推荐系统] 基于内容的推荐也失败，回退到热门推荐')
                 usedAlgorithm = 'popular (fallback)'
-                recommendationsResult = getPopularRecommendations(limit)
+                recommendationsResult = await getPopularRecommendations(limit)
             }
         }
     }
@@ -345,7 +351,7 @@ export const getRecommendationsByUserId = catchAsync(async (req, res, next) => {
 // 获取与特定资源相似的资源推荐
 export const getSimilarResources = catchAsync(async (req, res, next) => {
     const { resourceId } = req.params
-    const limit = parseInt(req.query.limit) || 4
+    const limit = parseInt(req.query.limit) || 6
 
     if (!resourceId) {
         return res.status(400).json({
@@ -356,239 +362,342 @@ export const getSimilarResources = catchAsync(async (req, res, next) => {
         })
     }
 
-    console.log(
-        `[推荐系统] 获取资源ID ${resourceId} 的相似资源，数量限制为 ${limit}`
-    )
+    console.log(`正在获取资源ID ${resourceId} 的相似资源，数量限制为 ${limit}`)
 
-    // 加载资源数据和关系数据
-    const resourcesData = await dataService.getAllResources()
-    const resources = resourcesData.resources || [] // 从返回的对象中提取resources数组
-    const resourceRelationships = await dataService.getResourceRelationships()
+    // 获取资源数据
+    try {
+        // 使用DataService获取资源
+        const targetResource = await dataService.getResourceById(resourceId)
 
-    // 查找目标资源
-    const targetResource = resources.find(
-        (r) => r.id.toString() === resourceId.toString()
-    )
+        if (!targetResource) {
+            console.log(`未找到ID为 ${resourceId} 的资源`)
+            return res.status(404).json({
+                status: 'error',
+                message: `未找到ID为 ${resourceId} 的资源`,
+                results: 0,
+                data: { recommendations: [] },
+            })
+        }
 
-    if (!targetResource) {
-        return res.status(404).json({
+        console.log(`找到目标资源: "${targetResource.title}"`)
+
+        // 优先尝试从ResourceRelationship中获取相似资源数据
+        const ResourceRelationship = mongoose.model('ResourceRelationship')
+        const resourceRelation = await ResourceRelationship.findOne({
+            resource_id: new mongoose.Types.ObjectId(resourceId),
+        }).populate({
+            path: 'similar_resources.resource_id',
+            model: 'Resource',
+        })
+
+        // 如果找到了资源关系数据并且有相似资源
+        if (
+            resourceRelation &&
+            resourceRelation.similar_resources &&
+            resourceRelation.similar_resources.length > 0
+        ) {
+            console.log(
+                `从ResourceRelationship中找到了 ${resourceRelation.similar_resources.length} 个相似资源`
+            )
+
+            // 处理并格式化相似资源信息
+            const similarResources = resourceRelation.similar_resources
+                .filter((item) => item.resource_id) // 确保只保留有效的资源引用
+                .map((item) => {
+                    const resource = item.resource_id
+
+                    // 确保common_topics和common_skills是数组
+                    const commonTopics = Array.isArray(item.common_topics)
+                        ? item.common_topics
+                        : []
+                    const commonSkills = Array.isArray(item.common_skills)
+                        ? item.common_skills
+                        : []
+
+                    // 生成推荐原因
+                    let recommendationReason = '基于主题相关性推荐'
+                    if (commonTopics.length > 0 || commonSkills.length > 0) {
+                        const reasons = []
+
+                        if (commonTopics.length > 0) {
+                            reasons.push(`相同主题: ${commonTopics.join(', ')}`)
+                        }
+
+                        if (commonSkills.length > 0) {
+                            reasons.push(`相关技能: ${commonSkills.join(', ')}`)
+                        }
+
+                        if (reasons.length > 0) {
+                            recommendationReason = reasons.join('；')
+                        }
+                    }
+
+                    // 返回格式化后的资源数据
+                    return {
+                        ...resource._doc,
+                        score: item.similarity_score,
+                        algorithm: 'relationship-based',
+                        recommendation_reason: recommendationReason,
+                    }
+                })
+                .sort((a, b) => b.score - a.score) // 按相似度降序排序
+                .slice(0, limit) // 限制返回数量
+
+            return res.status(200).json({
+                status: 'success',
+                message: `资源 "${targetResource.title}" 的主题相关推荐`,
+                results: similarResources.length,
+                data: {
+                    recommendations: similarResources,
+                    algorithm: 'relationship-based',
+                },
+            })
+        } else {
+            console.log(
+                `未在ResourceRelationship中找到资源ID ${resourceId} 的相似资源数据，回退到内容相似度计算`
+            )
+        }
+
+        // 如果没有找到预定义的关系数据，回退到基于内容的相似度计算
+        // 添加forSimilarResources标志，确保获取所有资源
+        const allResources = await dataService.getAllResources({
+            forSimilarResources: true,
+        })
+
+        console.log(`为相似度计算获取了 ${allResources.length} 个资源`)
+
+        if (!allResources || allResources.length === 0) {
+            console.log('没有找到任何资源用于比较')
+            return res.status(200).json({
+                status: 'success',
+                message: '数据库中没有可用资源进行推荐',
+                results: 0,
+                data: { recommendations: [] },
+            })
+        }
+
+        // 如果数据库中只有当前资源，无法推荐
+        if (
+            allResources.length === 1 &&
+            allResources[0]._id.toString() === resourceId
+        ) {
+            console.log('数据库中只有当前资源，无法进行推荐')
+            return res.status(200).json({
+                status: 'success',
+                message: '没有其他资源可供推荐',
+                results: 0,
+                data: { recommendations: [] },
+            })
+        }
+
+        // 使用ContentBased相似度过滤函数
+        const excludeIds = [resourceId] // 排除当前资源
+        const similarResources = await contentBasedSimilarityFiltering(
+            targetResource,
+            allResources,
+            limit,
+            excludeIds
+        )
+
+        // 如果无法找到类似资源，返回所有资源（排除当前资源）
+        if (similarResources.length === 0) {
+            console.log('找不到类似资源，返回随机推荐')
+
+            // 过滤掉当前资源
+            const randomResources = allResources
+                .filter((res) => res._id.toString() !== resourceId)
+                .sort(() => 0.5 - Math.random()) // 随机排序
+                .slice(0, limit)
+                .map((res) => ({
+                    ...res,
+                    algorithm: 'random',
+                    recommendation_reason: '随机推荐',
+                }))
+
+            return res.status(200).json({
+                status: 'success',
+                message: `未找到与"${targetResource.title}"相似的资源，显示随机推荐`,
+                results: randomResources.length,
+                data: {
+                    recommendations: randomResources,
+                    algorithm: 'random-fallback',
+                },
+            })
+        }
+
+        console.log(`成功找到 ${similarResources.length} 个相似资源`)
+
+        return res.status(200).json({
+            status: 'success',
+            message: `资源 "${targetResource.title}" 的相似推荐`,
+            results: similarResources.length,
+            data: {
+                recommendations: similarResources,
+                algorithm: 'content-similarity',
+            },
+        })
+    } catch (error) {
+        console.error('获取相似资源时出错:', error)
+        return res.status(500).json({
             status: 'error',
-            message: '资源不存在',
+            message: '获取相似资源推荐时出错: ' + error.message,
             results: 0,
             data: { recommendations: [] },
         })
     }
-
-    // 初始化推荐结果数组
-    let recommendedResources = []
-
-    // 1. 从资源关系中查找显式定义的相似资源
-    const currentResourceRelationship = resourceRelationships.find(
-        (r) => r.resource_id === resourceId.toString()
-    )
-
-    if (currentResourceRelationship?.similar_resources?.length > 0) {
-        // 处理相似资源数据
-        const similarResources = currentResourceRelationship.similar_resources
-            .map((similar) => {
-                const resource = resources.find(
-                    (r) => r.id.toString() === similar.resource_id.toString()
-                )
-
-                if (resource) {
-                    return {
-                        ...resource,
-                        similarityScore: similar.similarity_score,
-                        commonTopics: similar.common_topics,
-                        commonSkills: similar.common_skills,
-                        recommendationReason: `基于${similar.common_topics.join(
-                            '、'
-                        )}的内容匹配`,
-                    }
-                }
-                return null
-            })
-            .filter((item) => item !== null)
-
-        // 添加显式定义的相似资源
-        recommendedResources = [...similarResources]
-    }
-
-    // 2. 如果相似资源不足，添加共同访问的资源
-    if (
-        recommendedResources.length < limit &&
-        currentResourceRelationship?.co_accessed_with?.length > 0
-    ) {
-        const remainingSlots = limit - recommendedResources.length
-
-        // 获取已经添加的资源ID列表，避免重复
-        const addedResourceIds = recommendedResources.map((r) =>
-            r.id.toString()
-        )
-
-        const coAccessedResources = currentResourceRelationship.co_accessed_with
-            .filter(
-                (item) =>
-                    !addedResourceIds.includes(item.resource_id.toString())
-            )
-            .map((coAccessed) => {
-                const resource = resources.find(
-                    (r) => r.id.toString() === coAccessed.resource_id.toString()
-                )
-
-                if (resource) {
-                    return {
-                        ...resource,
-                        coAccessCount: coAccessed.co_access_count,
-                        coAccessPercentage: coAccessed.co_access_percentage,
-                        recommendationReason: `${coAccessed.co_access_percentage}%的用户同时访问了此资源`,
-                    }
-                }
-                return null
-            })
-            .filter((item) => item !== null)
-            .slice(0, remainingSlots)
-
-        // 合并相似资源和共同访问资源
-        recommendedResources.push(...coAccessedResources)
-    }
-
-    // 3. 如果推荐数量仍不足，使用基于内容的过滤
-    if (recommendedResources.length < limit) {
-        const remainingSlots = limit - recommendedResources.length
-        const addedResourceIds = recommendedResources.map((r) =>
-            r.id.toString()
-        )
-
-        // 使用内容过滤方法找到额外的推荐
-        const contentBasedRecs = contentBasedSimilarityFiltering(
-            targetResource,
-            resources,
-            remainingSlots,
-            addedResourceIds
-        )
-
-        // 合并内容过滤推荐结果
-        recommendedResources.push(...contentBasedRecs)
-    }
-
-    // 确保不超过limit个推荐
-    const finalRecommendations = recommendedResources.slice(0, limit)
-
-    res.status(200).json({
-        status: 'success',
-        message: '相似资源推荐',
-        results: finalRecommendations.length,
-        data: {
-            recommendations: finalRecommendations,
-            sourceResource: {
-                id: targetResource.id,
-                title: targetResource.title,
-                subject: targetResource.subject,
-                tags: targetResource.tags,
-            },
-        },
-    })
 })
 
 /**
- * 基于内容的相似资源过滤
- * 辅助函数，用于基于内容相似度查找相关资源
+ * 基于内容的相似度过滤
+ * 用于找到与目标资源相似的其他资源
  */
-const contentBasedSimilarityFiltering = (
+const contentBasedSimilarityFiltering = async (
     targetResource,
     allResources,
     limit,
     excludeIds = []
 ) => {
-    if (!targetResource || !allResources || allResources.length === 0) {
-        return []
+    console.log(`目标资源: ${targetResource.title}, ID: ${targetResource._id}`)
+    console.log(`排除资源ID列表: ${JSON.stringify(excludeIds)}`)
+    console.log(`可用资源总数: ${allResources.length}`)
+
+    // 提取目标资源的特征
+    const targetSubject = targetResource.subject || ''
+    const targetTags = Array.isArray(targetResource.tags)
+        ? targetResource.tags
+        : []
+    const targetDifficulty = targetResource.difficulty || 3
+    const targetGrade = targetResource.grade || ''
+
+    // 将排除ID列表转换为字符串数组，便于比较
+    const excludeIdStrings = excludeIds.map((id) => id.toString())
+
+    // 为调试输出资源_id格式
+    if (allResources.length > 0) {
+        console.log(
+            `资源ID示例: ${allResources[0]._id}, 类型: ${typeof allResources[0]
+                ._id}`
+        )
     }
 
-    // 为每个资源计算与目标资源的相似度分数
+    // 计算所有资源的相似性分数
     const scoredResources = allResources
-        .filter((r) => {
-            // 排除目标资源和已经在推荐列表中的资源
-            return (
-                r.id.toString() !== targetResource.id.toString() &&
-                !excludeIds.includes(r.id.toString())
-            )
+        .filter((resource) => {
+            // 确保资源有_id字段
+            if (!resource._id) {
+                console.log(
+                    '发现没有_id字段的资源:',
+                    resource.title || '未知标题'
+                )
+                return false
+            }
+
+            // 排除当前资源
+            const resourceId = resource._id.toString()
+            const shouldInclude = !excludeIdStrings.includes(resourceId)
+
+            // 调试输出
+            if (!shouldInclude) {
+                console.log(
+                    `排除资源: ${
+                        resource.title || '未知标题'
+                    }, ID: ${resourceId}`
+                )
+            }
+
+            return shouldInclude
         })
         .map((resource) => {
             let score = 0
+            const resourceTags = Array.isArray(resource.tags)
+                ? resource.tags
+                : []
 
-            // 相同主题加分
-            if (resource.subject === targetResource.subject) {
-                score += 5
+            // 放宽相似度计算条件 - 相同学科得分
+            if (resource.subject === targetSubject) {
+                score += 3
             }
 
-            // 难度接近加分
-            if (resource.difficulty && targetResource.difficulty) {
+            // 标签重叠得分 - 降低权重，防止过滤过多
+            const commonTags = resourceTags.filter((tag) =>
+                targetTags.includes(tag)
+            )
+            score += commonTags.length * 1
+
+            // 难度相似性得分 - 扩大难度差异容忍度
+            if (
+                resource.difficulty !== undefined &&
+                targetDifficulty !== undefined
+            ) {
                 const diffDelta = Math.abs(
-                    resource.difficulty - targetResource.difficulty
+                    resource.difficulty - targetDifficulty
                 )
                 if (diffDelta === 0) {
-                    score += 3 // 完全匹配难度
-                } else if (diffDelta === 1) {
+                    score += 2 // 难度完全匹配
+                } else if (diffDelta <= 2) {
                     score += 1 // 难度接近
                 }
             }
 
-            // 标签重叠加分
-            if (resource.tags && targetResource.tags) {
-                const resourceTags = Array.isArray(resource.tags)
-                    ? resource.tags
-                    : []
-                const currentTags = Array.isArray(targetResource.tags)
-                    ? targetResource.tags
-                    : []
-
-                const commonTags = resourceTags.filter((tag) =>
-                    currentTags.includes(tag)
-                )
-                score += commonTags.length * 2 // 每个匹配的标签得分
-
-                // 记录共同标签用于推荐原因
-                resource.commonTags = commonTags
+            // 年级匹配得分
+            if (resource.grade === targetGrade) {
+                score += 1
             }
 
-            // 相同年级加分
-            if (resource.grade === targetResource.grade) {
-                score += 2
-            }
-
-            // 添加少量基于热门程度的分数
-            let enrollment = 0
-            try {
-                const enrollCountStr = resource.enrollCount?.toString() || '0'
-                enrollment = parseInt(
-                    enrollCountStr.replace(/[^0-9]/g, '') || '0',
-                    10
-                )
-            } catch (err) {
-                enrollment = 0
-            }
-            score += enrollment * 0.001
+            // 额外加分 - 确保至少有一些推荐
+            score += 0.5
 
             // 生成推荐原因
-            let recommendationReason = `与您正在查看的资源相似`
-            if (resource.subject === targetResource.subject) {
-                recommendationReason = `同样是${resource.subject}领域的资源`
-            } else if (resource.commonTags && resource.commonTags.length > 0) {
-                recommendationReason = `包含相似标签: ${resource.commonTags
-                    .slice(0, 2)
-                    .join('、')}`
+            let reason = '基于'
+            let reasonParts = []
+
+            if (resource.subject === targetSubject) {
+                reasonParts.push(`相同学科 (${targetSubject})`)
             }
+
+            if (commonTags.length > 0) {
+                reasonParts.push(`相同标签 (${commonTags.join(', ')})`)
+            }
+
+            if (resource.grade === targetGrade) {
+                reasonParts.push(`相同年级 (${targetGrade})`)
+            }
+
+            if (
+                Math.abs(resource.difficulty - targetDifficulty) <= 2 &&
+                resource.difficulty !== undefined
+            ) {
+                reasonParts.push(`相近难度级别`)
+            }
+
+            // 如果没有特定原因，添加一个通用原因
+            if (reasonParts.length === 0) {
+                reasonParts.push('内容匹配')
+            }
+
+            reason += reasonParts.join('、')
 
             return {
                 ...resource,
-                similarityScore: score,
-                recommendationReason,
+                score,
+                algorithm: 'content-similarity',
+                recommendation_reason: reason,
             }
         })
-        .filter((r) => r.similarityScore > 3) // 只保留相似度较高的
-        .sort((a, b) => b.similarityScore - a.similarityScore)
-        .slice(0, limit)
+        // 修改过滤条件，允许任何有分数的资源
+        // .filter((r) => r.score > 0)
+        .sort((a, b) => b.score - a.score) // 按相似度排序
+        .slice(0, limit) // 限制数量
+
+    console.log(`找到符合条件的资源数: ${scoredResources.length}`)
+    if (scoredResources.length > 0) {
+        console.log(
+            `前三个推荐资源: ${scoredResources
+                .slice(0, 3)
+                .map((r) => r.title)
+                .join(', ')}`
+        )
+    }
 
     return scoredResources
 }
