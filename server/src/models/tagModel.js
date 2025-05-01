@@ -12,12 +12,24 @@ const tagSchema = new Schema(
         type: {
             type: String,
             required: true,
-            enum: ['subject', 'skill', 'topic', 'grade', 'difficulty'],
+            enum: [
+                'subject',
+                'skill',
+                'topic',
+                'grade',
+                'difficulty',
+                'interest',
+            ],
             default: 'topic',
         },
         description: {
             type: String,
             trim: true,
+        },
+        category: {
+            type: String,
+            enum: ['geometry', 'function', 'statistics', 'teaching', 'other'],
+            default: 'other',
         },
         createdAt: {
             type: Date,
