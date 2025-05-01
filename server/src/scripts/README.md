@@ -1,6 +1,69 @@
-# 数据管理脚本
+# 脚本文件目录
 
-本目录包含各种用于数据管理的脚本。
+本目录包含各种用于系统维护、数据管理和测试的脚本文件。
+
+## 主要脚本文件
+
+### 1. dataMigration.js
+
+用户数据迁移脚本，用于批量导入用户数据。
+
+使用方法：
+
+```bash
+npm run migrate:users
+```
+
+### 2. updateEnrollmentCounts.js
+
+更新资源的报名/使用计数的脚本。
+
+使用方法：
+
+```bash
+npm run update-enrollment
+```
+
+### 3. seedResourceRelationships.js
+
+填充资源关系数据的脚本，用于在资源间建立相似关系、共同访问关系和推荐序列。
+
+使用方法：
+
+```bash
+npm run seed:resource-relationships
+```
+
+该脚本会：
+
+-   为每个资源创建与其他资源的相似度关系
+-   基于学科、年级、教学类型和难度计算相似度
+-   生成随机的共同访问数据
+-   为每个资源创建推荐序列
+-   输出详细的统计信息
+
+### 4. convertTempResources.js
+
+临时资源转换脚本，用于将旧格式资源转换为新格式。
+
+### 5. initMockData.js
+
+初始化模拟数据的脚本，用于开发和测试环境。
+
+### 6. seedData.js
+
+填充基础示例数据的脚本，包括标签、收藏和用户交互等。
+
+### 7. testHybridRecommendation.js
+
+混合推荐算法测试脚本，用于测试和优化推荐系统。
+
+## 使用注意事项
+
+1. 在执行数据修改脚本前，请确保已备份重要数据
+2. 部分脚本可能需要管理员权限执行
+3. 生产环境执行脚本前，建议先在测试环境验证
+4. 大型数据操作可能需要较长执行时间，请耐心等待
 
 ## 数据上传脚本 (uploadData.js)
 
@@ -74,10 +137,4 @@ node src/scripts/uploadData.js --file=resources.json --model=Resource --clear
 ## 其他脚本
 
 -   `migrateAccounts.js`: 用于迁移账户数据
--   `initMockData.js`: 初始化模拟数据
--   `dataMigration.js`: 数据迁移工具
--   `convertTempResources.js`: 转换临时资源数据
 -   `migrateFromNewFormat.js`: 从新格式迁移数据
--   `seedData.js`: 种子数据初始化
--   `updateEnrollmentCounts.js`: 更新课程注册计数
--   `testHybridRecommendation.js`: 测试混合推荐算法
