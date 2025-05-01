@@ -3,30 +3,18 @@
  * 实现基于内容的推荐、协同过滤推荐以及混合推荐算法
  */
 
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
-
-// ES Module equivalent for __dirname
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-// 数据文件路径
-const RESOURCES_PATH = path.join(__dirname, '../data/resources.json')
-const RELATIONSHIPS_PATH = path.join(
-    __dirname,
-    '../data/resource_relationships.json'
-)
-const USERS_PATH = path.join(__dirname, '../data/accounts.json')
+import Resource from '../models/resourceModel.js'
+import ResourceRelationship from '../models/resourceRelationshipModel.js'
+import User from '../models/userModel.js'
 
 /**
  * 加载资源数据
- * @returns {Array} 资源数据数组
+ * @returns {Promise<Array>} 资源数据数组
  */
-const loadResourcesData = () => {
+const loadResourcesData = async () => {
     try {
-        const jsonData = fs.readFileSync(RESOURCES_PATH, 'utf8')
-        return JSON.parse(jsonData)
+        const resources = await Resource.find({}).lean()
+        return resources
     } catch (error) {
         console.error('加载资源数据失败:', error)
         return []
@@ -35,12 +23,36 @@ const loadResourcesData = () => {
 
 /**
  * 加载资源关系数据
- * @returns {Array} 资源关系数据数组
+ * @param {Boolean} populate 是否填充关联的资源数据
+ * @returns {Promise<Array>} 资源关系数据数组
  */
-const loadRelationshipsData = () => {
+const loadRelationshipsData = async (populate = false) => {
     try {
-        const jsonData = fs.readFileSync(RELATIONSHIPS_PATH, 'utf8')
-        return JSON.parse(jsonData)
+        let query = ResourceRelationship.find({})
+
+        if (populate) {
+            query = query
+                .populate({
+                    path: 'similar_resources.resource_id',
+                    model: 'Resource',
+                })
+                .populate({
+                    path: 'co_accessed_with.resource_id',
+                    model: 'Resource',
+                })
+                .populate({
+                    path: 'recommended_sequence',
+                    model: 'Resource',
+                })
+        }
+
+        const relationships = await query.lean()
+        console.log(
+            `加载了 ${relationships.length} 条资源关系数据${
+                populate ? '(包含关联资源)' : ''
+            }`
+        )
+        return relationships
     } catch (error) {
         console.error('加载资源关系数据失败:', error)
         return []
@@ -49,12 +61,12 @@ const loadRelationshipsData = () => {
 
 /**
  * 加载用户数据
- * @returns {Array} 用户数据数组
+ * @returns {Promise<Array>} 用户数据数组
  */
-const loadUsersData = () => {
+const loadUsersData = async () => {
     try {
-        const jsonData = fs.readFileSync(USERS_PATH, 'utf8')
-        return JSON.parse(jsonData)
+        const users = await User.find({}).lean()
+        return users
     } catch (error) {
         console.error('加载用户数据失败:', error)
         return []
@@ -67,9 +79,9 @@ const loadUsersData = () => {
  *
  * @param {Object} user 用户对象（包含偏好）
  * @param {Number} limit 推荐数量限制
- * @returns {Object} 推荐结果对象
+ * @returns {Promise<Object>} 推荐结果对象
  */
-export const contentBasedRecommendation = (user, limit = 10) => {
+export const contentBasedRecommendation = async (user, limit = 10) => {
     if (!user) {
         return {
             success: false,
@@ -92,7 +104,7 @@ export const contentBasedRecommendation = (user, limit = 10) => {
     })
 
     // 加载资源数据
-    const resources = loadResourcesData()
+    const resources = await loadResourcesData()
     if (!resources || resources.length === 0) {
         return {
             success: false,
@@ -178,9 +190,12 @@ export const contentBasedRecommendation = (user, limit = 10) => {
  *
  * @param {Object} user 用户对象
  * @param {Number} limit 推荐数量限制
- * @returns {Object} 推荐结果对象
+ * @returns {Promise<Object>} 推荐结果对象
  */
-export const collaborativeFilteringRecommendation = (user, limit = 10) => {
+export const collaborativeFilteringRecommendation = async (
+    user,
+    limit = 10
+) => {
     if (!user) {
         return {
             success: false,
@@ -240,8 +255,8 @@ export const collaborativeFilteringRecommendation = (user, limit = 10) => {
     }
 
     // 加载资源关系数据和资源数据
-    const relationships = loadRelationshipsData()
-    const resources = loadResourcesData()
+    const relationships = await loadRelationshipsData()
+    const resources = await loadResourcesData()
 
     if (
         !relationships ||
@@ -389,14 +404,14 @@ export const collaborativeFilteringRecommendation = (user, limit = 10) => {
 
 /**
  * 混合推荐算法
- * 结合基于内容和协同过滤的推荐结果
+ * 结合基于内容的推荐和协同过滤推荐结果
  *
  * @param {Object} user 用户对象
  * @param {Number} limit 推荐数量限制
- * @param {Object} weights 不同算法的权重配置 {content: 数值, collaborative: 数值}
- * @returns {Object} 混合推荐结果
+ * @param {Object} weights 权重对象 { content: 0.5, collaborative: 0.5 }
+ * @returns {Promise<Object>} 推荐结果对象
  */
-export const hybridRecommendation = (
+export const hybridRecommendation = async (
     user,
     limit = 10,
     weights = { content: 0.5, collaborative: 0.5 }
@@ -409,108 +424,293 @@ export const hybridRecommendation = (
         }
     }
 
-    // 权重归一化
-    const totalWeight = weights.content + weights.collaborative
-    const normalizedWeights = {
-        content: weights.content / totalWeight,
-        collaborative: weights.collaborative / totalWeight,
-    }
-
-    // 获取基于内容的推荐结果
-    const contentResult = contentBasedRecommendation(user, limit * 2)
-
-    // 获取协同过滤的推荐结果
-    const collaborativeResult = collaborativeFilteringRecommendation(
-        user,
-        limit * 2
+    console.log('[hybrid] 开始混合推荐计算...')
+    console.log(
+        `[hybrid] 权重设置: 内容推荐=${weights.content}, 协同过滤=${weights.collaborative}`
     )
 
-    // 如果任一方法失败且没有推荐结果，则使用另一方法的结果
-    if (!contentResult.success || contentResult.recommendations.length === 0) {
-        return collaborativeResult
-    }
+    // 获取各算法的推荐结果
+    const [contentRecommendations, collaborativeRecommendations] =
+        await Promise.all([
+            contentBasedRecommendation(user, Math.floor(limit * 2)), // 获取更多候选项
+            collaborativeFilteringRecommendation(user, Math.floor(limit * 2)), // 获取更多候选项
+        ])
 
+    // 如果两种算法都失败，返回错误
     if (
-        !collaborativeResult.success ||
-        collaborativeResult.recommendations.length === 0
+        (!contentRecommendations.success &&
+            !collaborativeRecommendations.success) ||
+        (contentRecommendations.recommendations.length === 0 &&
+            collaborativeRecommendations.recommendations.length === 0)
     ) {
-        return contentResult
+        return {
+            success: false,
+            message: '无法获取推荐结果',
+            recommendations: [],
+        }
     }
 
-    // 合并两种推荐结果，并重新计算得分
-    // 使用Map来跟踪资源ID，避免重复
-    const resourceMap = new Map()
+    // 合并并重新评分候选资源
+    const recommendationMap = new Map()
 
     // 处理基于内容的推荐
-    contentResult.recommendations.forEach((item) => {
-        resourceMap.set(item.id.toString(), {
-            ...item,
-            contentScore: item.score * normalizedWeights.content,
-            collaborativeScore: 0,
-            totalScore: item.score * normalizedWeights.content,
-        })
-    })
-
-    // 处理协同过滤的推荐
-    collaborativeResult.recommendations.forEach((item) => {
-        const resourceId = item.id.toString()
-        if (resourceMap.has(resourceId)) {
-            // 更新已有资源的协同过滤得分
-            const existingItem = resourceMap.get(resourceId)
-            existingItem.collaborativeScore =
-                item.score * normalizedWeights.collaborative
-            existingItem.totalScore =
-                existingItem.contentScore + existingItem.collaborativeScore
-
-            // 更新推荐原因
-            existingItem.recommendation_reason = `混合推荐 (内容匹配: ${existingItem.contentScore.toFixed(
-                2
-            )}, 协同过滤: ${existingItem.collaborativeScore.toFixed(2)})`
-            existingItem.algorithm = 'hybrid'
-
-            resourceMap.set(resourceId, existingItem)
-        } else {
-            // 添加新资源
-            resourceMap.set(resourceId, {
-                ...item,
-                contentScore: 0,
-                collaborativeScore:
-                    item.score * normalizedWeights.collaborative,
-                totalScore: item.score * normalizedWeights.collaborative,
-                recommendation_reason: `混合推荐 (主要基于协同过滤: ${(
-                    item.score * normalizedWeights.collaborative
-                ).toFixed(2)})`,
-                algorithm: 'hybrid',
+    if (
+        contentRecommendations.success &&
+        contentRecommendations.recommendations.length > 0
+    ) {
+        for (const rec of contentRecommendations.recommendations) {
+            recommendationMap.set(rec._id.toString(), {
+                ...rec,
+                contentScore: rec.score || 0,
+                collaborativeScore: 0,
+                totalScore: 0,
+                algorithms: ['content'],
+                originalReasons: [rec.recommendation_reason],
             })
         }
-    })
+    }
 
-    // 转换为数组，按总分排序，并截取前limit个
-    const hybridRecommendations = Array.from(resourceMap.values())
-        .sort((a, b) => b.totalScore - a.totalScore)
+    // 处理协同过滤推荐
+    if (
+        collaborativeRecommendations.success &&
+        collaborativeRecommendations.recommendations.length > 0
+    ) {
+        for (const rec of collaborativeRecommendations.recommendations) {
+            const resourceId = rec._id.toString()
+            const existing = recommendationMap.get(resourceId)
+
+            if (existing) {
+                // 更新已有记录
+                existing.collaborativeScore = rec.score || 0
+                existing.algorithms.push('collaborative')
+                existing.originalReasons.push(rec.recommendation_reason)
+            } else {
+                // 添加新记录
+                recommendationMap.set(resourceId, {
+                    ...rec,
+                    contentScore: 0,
+                    collaborativeScore: rec.score || 0,
+                    totalScore: 0,
+                    algorithms: ['collaborative'],
+                    originalReasons: [rec.recommendation_reason],
+                })
+            }
+        }
+    }
+
+    // 检查用户最近交互的资源，获取预定义的关联资源
+    const userInteractions = user.course_interactions || []
+    if (userInteractions.length > 0) {
+        // 获取用户最近交互的3个资源ID
+        const recentInteractions = userInteractions
+            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+            .slice(0, 3)
+            .map((interaction) => interaction.resource_id?.toString())
+            .filter(Boolean)
+
+        if (recentInteractions.length > 0) {
+            console.log(
+                `[hybrid] 找到${recentInteractions.length}个最近交互资源，查找预定义关系`
+            )
+
+            // 从ResourceRelationship中加载相关资源关系
+            const relationships = await loadRelationshipsData(true)
+
+            // 遍历用户最近交互的资源，查找关联资源
+            for (const resourceId of recentInteractions) {
+                const relationship = relationships.find(
+                    (r) =>
+                        r.resource_id && r.resource_id.toString() === resourceId
+                )
+
+                if (relationship) {
+                    console.log(`[hybrid] 找到资源 ${resourceId} 的关系数据`)
+
+                    // 处理相似资源
+                    if (
+                        relationship.similar_resources &&
+                        relationship.similar_resources.length > 0
+                    ) {
+                        relationship.similar_resources.forEach((similar) => {
+                            if (
+                                similar.resource_id &&
+                                typeof similar.resource_id === 'object'
+                            ) {
+                                const similarResource = similar.resource_id
+                                const resourceId =
+                                    similarResource._id.toString()
+
+                                // 相似度分数
+                                const similarityScore =
+                                    similar.similarity_score || 0.5
+                                // 给予关系型推荐更高的权重
+                                const relationshipScore = similarityScore * 10
+
+                                // 生成推荐原因
+                                let reason = '基于您最近查看过的内容推荐'
+                                if (
+                                    similar.common_topics &&
+                                    similar.common_topics.length > 0
+                                ) {
+                                    reason += `；相同主题: ${similar.common_topics.join(
+                                        ', '
+                                    )}`
+                                }
+
+                                // 添加或更新推荐
+                                const existing =
+                                    recommendationMap.get(resourceId)
+                                if (existing) {
+                                    // 增加额外的关系分数
+                                    existing.relationshipScore =
+                                        (existing.relationshipScore || 0) +
+                                        relationshipScore
+                                    existing.algorithms.push('relationship')
+                                    existing.originalReasons.push(reason)
+                                } else {
+                                    // 添加新的推荐
+                                    recommendationMap.set(resourceId, {
+                                        ...similarResource,
+                                        contentScore: 0,
+                                        collaborativeScore: 0,
+                                        relationshipScore: relationshipScore,
+                                        totalScore: 0,
+                                        algorithms: ['relationship'],
+                                        originalReasons: [reason],
+                                    })
+                                }
+                            }
+                        })
+                    }
+
+                    // 处理共同访问资源 (给予较低权重)
+                    if (
+                        relationship.co_accessed_with &&
+                        relationship.co_accessed_with.length > 0
+                    ) {
+                        relationship.co_accessed_with.forEach((coAccessed) => {
+                            if (
+                                coAccessed.resource_id &&
+                                typeof coAccessed.resource_id === 'object'
+                            ) {
+                                const coAccessedResource =
+                                    coAccessed.resource_id
+                                const resourceId =
+                                    coAccessedResource._id.toString()
+
+                                // 计算共同访问得分
+                                const coAccessScore =
+                                    ((coAccessed.co_access_percentage || 0) /
+                                        100) *
+                                    5
+
+                                // 添加或更新推荐
+                                const existing =
+                                    recommendationMap.get(resourceId)
+                                if (existing) {
+                                    existing.coAccessScore =
+                                        (existing.coAccessScore || 0) +
+                                        coAccessScore
+                                    existing.algorithms.push('co-access')
+                                    existing.originalReasons.push(
+                                        `其他用户在查看相似内容后也浏览了此资源`
+                                    )
+                                } else {
+                                    recommendationMap.set(resourceId, {
+                                        ...coAccessedResource,
+                                        contentScore: 0,
+                                        collaborativeScore: 0,
+                                        coAccessScore: coAccessScore,
+                                        totalScore: 0,
+                                        algorithms: ['co-access'],
+                                        originalReasons: [
+                                            `其他用户在查看相似内容后也浏览了此资源`,
+                                        ],
+                                    })
+                                }
+                            }
+                        })
+                    }
+                }
+            }
+        }
+    }
+
+    // 计算总分并生成最终推荐列表
+    const finalRecommendations = Array.from(recommendationMap.values()).map(
+        (rec) => {
+            // 计算加权总分
+            const contentWeightedScore =
+                (rec.contentScore || 0) * weights.content
+            const collaborativeWeightedScore =
+                (rec.collaborativeScore || 0) * weights.collaborative
+            const relationshipScore = (rec.relationshipScore || 0) * 1.5 // 给予关系推荐更高的权重
+            const coAccessScore = (rec.coAccessScore || 0) * 0.8 // 给予共同访问推荐适当的权重
+
+            const totalScore =
+                contentWeightedScore +
+                collaborativeWeightedScore +
+                relationshipScore +
+                coAccessScore
+
+            // 生成混合推荐原因
+            let recommendationReason = ''
+            const usedAlgorithms = rec.algorithms.join('-')
+
+            if (rec.algorithms.length > 1) {
+                // 如果使用了多种算法，生成混合原因
+                recommendationReason = `基于多种推荐算法(${usedAlgorithms})匹配: ${rec.originalReasons[0]}`
+            } else if (rec.algorithms.includes('relationship')) {
+                // 主题关系推荐
+                recommendationReason = rec.originalReasons[0]
+            } else if (rec.algorithms.includes('co-access')) {
+                // 共同访问推荐
+                recommendationReason = rec.originalReasons[0]
+            } else {
+                // 单一算法推荐
+                recommendationReason = rec.originalReasons[0]
+            }
+
+            return {
+                ...rec,
+                score: totalScore,
+                algorithm: usedAlgorithms,
+                recommendation_reason: recommendationReason,
+                // 移除中间计算字段
+                contentScore: undefined,
+                collaborativeScore: undefined,
+                relationshipScore: undefined,
+                coAccessScore: undefined,
+                algorithms: undefined,
+                originalReasons: undefined,
+            }
+        }
+    )
+
+    // 按总分排序并限制数量
+    const sortedRecommendations = finalRecommendations
+        .sort((a, b) => b.score - a.score)
         .slice(0, limit)
-        .map((item) => ({
-            ...item,
-            score: item.totalScore,
-        }))
 
     return {
-        success: hybridRecommendations.length > 0,
+        success: true,
         message: '混合推荐结果',
-        recommendations: hybridRecommendations,
+        recommendations: sortedRecommendations,
     }
 }
 
 /**
- * 根据用户ID获取用户推荐
- * 包装函数，处理用户ID查找和推荐生成
- *
+ * 获取特定用户的推荐
  * @param {String} userId 用户ID
- * @param {Number} limit 推荐数量
- * @param {Object} options 推荐选项，包含算法权重等
- * @returns {Object} 推荐结果
+ * @param {Number} limit 推荐数量限制
+ * @param {Object} options 选项（算法偏好、权重）
+ * @returns {Promise<Object>} 推荐结果对象
  */
-export const getUserRecommendations = (userId, limit = 10, options = {}) => {
+export const getUserRecommendations = async (
+    userId,
+    limit = 10,
+    options = {}
+) => {
     if (!userId) {
         return {
             success: false,
@@ -520,7 +720,7 @@ export const getUserRecommendations = (userId, limit = 10, options = {}) => {
     }
 
     // 加载用户数据
-    const users = loadUsersData()
+    const users = await loadUsersData()
     const user = users.find((u) => u.user_id === userId)
 
     if (!user) {
@@ -553,82 +753,47 @@ export const getUserRecommendations = (userId, limit = 10, options = {}) => {
 }
 
 /**
- * 为访客用户生成基于热门的推荐
- *
- * @param {Number} limit 推荐数量
- * @returns {Object} 推荐结果
+ * 获取热门资源推荐
+ * @param {Number} limit 推荐数量限制
+ * @returns {Promise<Object>} 推荐结果对象
  */
-export const getPopularRecommendations = (limit = 10) => {
-    console.log('[getPopularRecommendations] 开始获取热门推荐...')
+export const getPopularRecommendations = async (limit = 10) => {
+    try {
+        // 从数据库获取资源并按enrollCount排序
+        const popularResources = await Resource.find({})
+            .sort({ enrollCount: -1 })
+            .limit(limit)
+            .lean()
 
-    // 加载资源数据
-    const resources = loadResourcesData()
+        if (!popularResources || popularResources.length === 0) {
+            return {
+                success: false,
+                message: '无法获取热门资源',
+                recommendations: [],
+            }
+        }
 
-    if (!resources || resources.length === 0) {
+        // 为每个资源添加算法标识和推荐原因
+        const recommendedResources = popularResources.map((resource) => ({
+            ...resource,
+            algorithm: 'popular',
+            recommendation_reason: `热门资源 (已有${
+                resource.enrollCount || 0
+            }人学习)`,
+        }))
+
+        return {
+            success: true,
+            message: '热门资源推荐结果',
+            recommendations: recommendedResources,
+        }
+    } catch (error) {
+        console.error('获取热门推荐失败:', error)
         return {
             success: false,
-            message: '无法加载资源数据',
+            message: '获取热门推荐时出错',
             recommendations: [],
         }
-    }
-
-    // 按选课人数排序
-    const popularResources = resources
-        .sort((a, b) => {
-            let enrollmentA = 0
-            let enrollmentB = 0
-
-            try {
-                const enrollAStr = a.enrollCount?.toString() || '0'
-                enrollmentA = parseInt(
-                    enrollAStr.replace(/[^0-9]/g, '') || '0',
-                    10
-                )
-            } catch (err) {
-                console.error('处理enrollCount A时出错:', err)
-            }
-
-            try {
-                const enrollBStr = b.enrollCount?.toString() || '0'
-                enrollmentB = parseInt(
-                    enrollBStr.replace(/[^0-9]/g, '') || '0',
-                    10
-                )
-            } catch (err) {
-                console.error('处理enrollCount B时出错:', err)
-            }
-
-            return enrollmentB - enrollmentA
-        })
-        .slice(0, limit)
-        .map((resource) => {
-            let enrollment = 0
-            try {
-                const enrollStr = resource.enrollCount?.toString() || '0'
-                enrollment = parseInt(
-                    enrollStr.replace(/[^0-9]/g, '') || '0',
-                    10
-                )
-            } catch (err) {
-                console.error('处理最终enrollCount时出错:', err)
-            }
-
-            return {
-                ...resource,
-                score: enrollment * 0.01, // 用于保持与其他推荐格式一致
-                algorithm: 'popular',
-                recommendation_reason: `热门课程 (${enrollment}人学习)`,
-            }
-        })
-
-    console.log(
-        `[getPopularRecommendations] 获取到 ${popularResources.length} 个热门推荐`
-    )
-
-    return {
-        success: popularResources.length > 0,
-        message: '热门课程推荐',
-        recommendations: popularResources,
     }
 }
 
