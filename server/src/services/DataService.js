@@ -45,6 +45,7 @@ export class DataService {
                 id: user._id,
                 name: user.name || account.name,
                 email: account.email,
+                avatar: user.avatar,
                 role: account.role,
                 preferred_subjects: preferredSubjects,
                 preferred_difficulty: preferredDifficulty,
@@ -100,7 +101,42 @@ export class DataService {
 
     async updateUser(id, userData) {
         try {
-            const user = await User.findByIdAndUpdate(id, userData, {
+            // 过滤掉不需要的字段，防止用户更新敏感信息
+            const allowedFields = [
+                'name',
+                'phone',
+                'subject',
+                'grade',
+                'experience',
+                'bio',
+                'preferred_subjects',
+                'preferences',
+                'avatar', // 添加头像字段
+            ]
+
+            const filteredData = {}
+            Object.keys(userData).forEach((key) => {
+                if (allowedFields.includes(key)) {
+                    filteredData[key] = userData[key]
+                }
+            })
+
+            // 处理前端传过来的分散字段，映射到数据库结构
+            if (userData.fullName) {
+                filteredData.name = userData.fullName
+            }
+
+            if (userData.subject) {
+                if (!filteredData.preferences) filteredData.preferences = {}
+                filteredData.preferences.preferredSubjects = [userData.subject]
+            }
+
+            if (userData.grade) {
+                if (!filteredData.preferences) filteredData.preferences = {}
+                filteredData.preferences.preferredGrades = [userData.grade]
+            }
+
+            const user = await User.findByIdAndUpdate(id, filteredData, {
                 new: true,
                 runValidators: true,
             }).populate('account')
@@ -109,9 +145,17 @@ export class DataService {
 
             const account = user.account || {}
 
+            // 返回更新后的用户信息
             return {
                 id: user._id,
                 name: user.name || account.name,
+                email: account.email || '',
+                phone: user.phone || '',
+                avatar: user.avatar || null,
+                subject: user.preferences?.preferredSubjects?.[0] || '',
+                grade: user.preferences?.preferredGrades?.[0] || '',
+                experience: user.experience || '',
+                bio: user.bio || '',
                 preferred_subjects: user.preferred_subjects || [],
                 preferred_difficulty: user.preferred_difficulty,
                 preferred_resource_types: user.preferred_resource_types || [],
@@ -359,84 +403,126 @@ export class DataService {
     }
 
     async getResourceById(id) {
-        const resource = await Resource.findById(id).populate(
-            'createdBy',
-            'name email'
-        )
-        if (!resource) return null
-        return {
-            id: resource._id,
-            title: resource.title,
-            description: resource.description,
-            type: resource.type,
-            subject: resource.subject,
-            grade: resource.grade,
-            difficulty: resource.difficulty,
-            url: resource.url,
-            createdBy: resource.createdBy,
-            tags: resource.tags,
-            ratings: resource.ratings,
-            averageRating: resource.averageRating,
+        try {
+            console.log(`正在获取资源ID: ${id}`)
+
+            // 验证ID格式是否有效
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                console.error(`无效的资源ID格式: ${id}`)
+                return null
+            }
+
+            const resource = await Resource.findById(id).lean()
+
+            if (!resource) {
+                console.log(`未找到ID为 ${id} 的资源`)
+                return null
+            }
+
+            console.log(`成功获取资源: "${resource.title}"`)
+            return resource
+        } catch (error) {
+            console.error(`获取资源(ID: ${id})失败:`, error)
+            return null
         }
     }
 
     async getAllResources(filters = {}) {
         try {
-            // 提取分页参数
-            const page = filters.page ? parseInt(filters.page) : 1
-            const limit = filters.limit ? parseInt(filters.limit) : 10
+            console.log('正在获取所有资源，过滤条件:', JSON.stringify(filters))
+
+            const query = {}
+
+            // 应用过滤条件
+            if (filters.subject) {
+                query.subject = filters.subject
+            }
+
+            if (filters.grade) {
+                query.grade = filters.grade
+            }
+
+            if (filters.difficulty) {
+                query.difficulty = parseInt(filters.difficulty)
+            }
+
+            if (filters.format) {
+                query.format = filters.format
+            }
+
+            if (filters.pedagogicalType) {
+                query.pedagogicalType = filters.pedagogicalType
+            }
+
+            if (filters.price === 'free') {
+                query.price = 0
+            } else if (filters.price === 'paid') {
+                query.price = { $gt: 0 }
+            }
+
+            if (filters.search) {
+                query.$or = [
+                    { title: { $regex: filters.search, $options: 'i' } },
+                    { description: { $regex: filters.search, $options: 'i' } },
+                    { tags: { $regex: filters.search, $options: 'i' } },
+                ]
+            }
+
+            // 当在getSimilarResources中使用时，不应用任何过滤条件，获取所有资源
+            if (filters.forSimilarResources) {
+                console.log('为相似资源推荐获取所有资源，不应用过滤条件')
+                // 清空所有过滤条件
+                Object.keys(query).forEach((key) => delete query[key])
+            }
+
+            // 构建排序选项
+            let sortOption = {}
+            if (filters.sortBy) {
+                if (filters.sortBy === 'newest') {
+                    sortOption = { createdAt: -1 }
+                } else if (filters.sortBy === 'popularity') {
+                    sortOption = { enrollCount: -1 }
+                } else if (filters.sortBy === 'rating') {
+                    sortOption = { 'stats.rating': -1 }
+                }
+            } else {
+                // 默认排序
+                sortOption = { createdAt: -1 }
+            }
+
+            // 设置分页 - 在获取相似资源时禁用分页
+            let page = parseInt(filters.page) || 1
+            let limit = parseInt(filters.limit) || 20
+
+            if (filters.forSimilarResources) {
+                // 相似资源不应用分页，确保获取所有资源
+                page = 1
+                limit = 0 // 0表示无限制
+            }
+
             const skip = (page - 1) * limit
 
-            // 提取除分页参数外的其他过滤条件
-            const otherFilters = { ...filters } // 复制 filters 对象
-            delete otherFilters.page // 删除 page 属性
-            delete otherFilters.limit // 删除 limit 属性
+            // 执行查询
+            let resourcesQuery = Resource.find(query).sort(sortOption)
 
-            // 构建查询，计算总记录数
-            const query = Resource.find(otherFilters)
-            const total = await Resource.countDocuments(otherFilters)
-
-            // 应用分页并关联创建者
-            const resources = await query
-                .populate('createdBy', 'name email')
-                .skip(skip)
-                .limit(limit)
-
-            // 返回资源数组和分页信息
-            return {
-                resources: resources.map((resource) => ({
-                    id: resource._id,
-                    title: resource.title,
-                    description: resource.description,
-                    type: resource.type,
-                    subject: resource.subject,
-                    grade: resource.grade,
-                    difficulty: resource.difficulty,
-                    url: resource.url,
-                    createdBy: resource.createdBy,
-                    tags: resource.tags,
-                    ratings: resource.ratings,
-                    averageRating: resource.averageRating,
-                    cover: resource.cover,
-                    price: resource.price,
-                    originalPrice: resource.originalPrice,
-                    authors: resource.authors,
-                    publisher: resource.publisher,
-                    enrollCount: resource.enrollCount,
-                    studyAvatars: resource.studyAvatars,
-                    createdAt: resource.createdAt,
-                    updatedAt: resource.updatedAt,
-                })),
-                pagination: {
-                    total,
-                    page,
-                    limit,
-                    pages: Math.ceil(total / limit),
-                },
+            // 只在需要分页时应用skip和limit
+            if (limit > 0) {
+                resourcesQuery = resourcesQuery.skip(skip).limit(limit)
             }
+
+            const resources = await resourcesQuery.lean()
+
+            // 获取总数
+            const total = await Resource.countDocuments(query)
+
+            console.log(
+                `查询到 ${resources.length} 个资源，总共有 ${total} 个匹配资源`
+            )
+
+            return { resources, total }
         } catch (error) {
-            console.error('获取资源列表失败:', error)
-            throw new Error('获取资源列表失败')
+            console.error('获取所有资源失败:', error)
+            return []
         }
     }
 
@@ -552,29 +638,37 @@ export class DataService {
 
     async verifyAuthToken(token) {
         try {
-            const decoded = jwt.verify(
-                token,
-                process.env.JWT_SECRET || 'your-secret-key'
-            )
+            if (!token) {
+                console.log('无效的令牌：token为空')
+                return null
+            }
 
-            // 检查密码是否在签发token后更改
-            const account = await Account.findById(decoded.accountId)
-            if (!account) return null
+            // 打印收到的token前几位，便于调试
+            console.log(`验证令牌: ${token.substring(0, 10)}...`)
 
-            // 如果密码在token签发后更改，则token无效
-            if (account.passwordChangedAt) {
-                const changedTimestamp = parseInt(
-                    account.passwordChangedAt.getTime() / 1000,
-                    10
-                )
-                if (decoded.iat < changedTimestamp) {
-                    return null
-                }
+            // 从.env获取JWT_SECRET，如果未定义则使用默认值
+            const JWT_SECRET =
+                process.env.JWT_SECRET || 'your-default-secret-key-for-jwt'
+
+            const decoded = jwt.verify(token, JWT_SECRET)
+
+            // 验证通过，打印解码后的信息(去除敏感数据)
+            console.log('令牌解码成功:', {
+                id: decoded.id,
+                iat: decoded.iat,
+                exp: decoded.exp,
+            })
+
+            // 检查令牌是否过期
+            const now = Math.floor(Date.now() / 1000)
+            if (decoded.exp && decoded.exp < now) {
+                console.log('令牌已过期')
+                return null
             }
 
             return decoded
         } catch (error) {
-            console.error('验证token失败:', error)
+            console.error('验证令牌失败:', error.message)
             return null
         }
     }
