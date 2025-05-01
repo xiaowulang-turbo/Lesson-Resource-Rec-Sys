@@ -47,18 +47,19 @@ function Resources() {
         sort: 'newest',
     })
 
-    // 获取当前页码
+    // 获取当前页码和排序方式
     const currentPage = parseInt(searchParams.get('page') || 1)
 
-    // 当页码变化时重新获取数据
+    // 当页码或排序方式变化时重新获取数据
     useEffect(() => {
         const fetchResources = async () => {
             try {
                 setLoading(true)
-                // 添加页码和每页数量到请求
+                // 添加页码、每页数量和排序参数到请求
                 const result = await getAllResources({
                     page: currentPage,
                     limit: PAGE_SIZE,
+                    sortBy: filters.sort,
                 })
 
                 console.log('[Resources] Rendering - result:', result)
@@ -75,7 +76,7 @@ function Resources() {
         }
 
         fetchResources()
-    }, [currentPage])
+    }, [currentPage, filters.sort])
 
     // 当过滤条件改变时，应用客户端过滤
     useEffect(() => {
@@ -122,6 +123,7 @@ function Resources() {
         // 排序
         switch (filters.sort) {
             case 'newest':
+                // 确保按照创建时间降序排列（最新的在前面）
                 result.sort(
                     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
                 )
@@ -139,6 +141,10 @@ function Resources() {
                 result.sort((a, b) => b.price - a.price)
                 break
             default:
+                // 默认情况下仍然按照创建时间降序排列
+                result.sort(
+                    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                )
                 break
         }
 
