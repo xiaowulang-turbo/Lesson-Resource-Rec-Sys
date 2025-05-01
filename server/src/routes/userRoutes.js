@@ -7,6 +7,7 @@ import {
     getMe,
     updateMe,
     deleteMe,
+    uploadUserPhoto,
 } from '../controllers/userController.js'
 import { protect, restrictTo } from '../middlewares/authMiddleware.js'
 
@@ -17,7 +18,7 @@ router.use(protect)
 
 // 当前用户路由
 router.get('/me', getMe, getUser)
-router.patch('/updateMe', updateMe)
+router.patch('/updateMe', uploadUserPhoto, updateMe)
 router.delete('/deleteMe', deleteMe)
 
 // 限制以下路由仅管理员可访问
