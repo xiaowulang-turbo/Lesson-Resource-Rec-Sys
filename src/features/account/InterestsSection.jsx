@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useEffect, useState, useCallback } from 'react'
 import styled from 'styled-components'
 import Button from '../../ui/Button'
 import FormRow from '../../ui/FormRow'
@@ -15,6 +15,7 @@ import {
 import { HiOutlineSearch } from 'react-icons/hi'
 import Tag from '../../ui/Tag'
 import useInterestTags from '../../hooks/useInterestTags'
+import { debounce } from '../../utils/debounce'
 
 const AccountSection = styled.div`
     background-color: var(--color-grey-0);
@@ -119,143 +120,97 @@ const InterestTag = styled(Tag)`
 `
 
 const InterestCategories = styled.div`
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 2rem;
-    margin-bottom: 2.4rem;
+    margin-bottom: 2rem;
 `
 
 const CategoryBox = styled.div`
-    background-color: var(--color-grey-50);
+    border: 1px solid var(--color-grey-200);
     border-radius: var(--border-radius-md);
-    padding: 1.6rem;
-    border-left: 4px solid;
-    transition: all 0.3s;
-
-    ${(props) =>
-        props.category === 'geometry' &&
-        `
-        border-left-color: #0050b3;
-    `}
-
-    ${(props) =>
-        props.category === 'function' &&
-        `
-        border-left-color: #389e0d;
-    `}
-    
-    ${(props) =>
-        props.category === 'statistics' &&
-        `
-        border-left-color: #d4380d;
-    `}
-    
-    ${(props) =>
-        props.category === 'teaching' &&
-        `
-        border-left-color: #531dab;
-    `}
-    
-    ${(props) =>
-        props.category === 'other' &&
-        `
-        border-left-color: #1d39c4;
-    `}
-    
-    &:hover {
-        box-shadow: var(--shadow-md);
-        transform: translateY(-2px);
-    }
+    padding: 1.2rem;
+    background-color: ${(props) =>
+        props.category === 'geometry'
+            ? 'var(--color-indigo-100)'
+            : props.category === 'function'
+            ? 'var(--color-blue-100)'
+            : props.category === 'statistics'
+            ? 'var(--color-green-100)'
+            : props.category === 'teaching'
+            ? 'var(--color-yellow-100)'
+            : 'var(--color-grey-50)'};
 `
 
 const CategoryTitle = styled.div`
     display: flex;
     align-items: center;
     gap: 0.8rem;
+    font-size: 1.4rem;
     font-weight: 600;
-    font-size: 1.6rem;
-    margin-bottom: 1.2rem;
+    margin-bottom: 0.8rem;
     color: var(--color-grey-700);
 `
 
 const EmptyTagsMessage = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.6rem;
-    background-color: var(--color-grey-50);
-    border-radius: var(--border-radius-md);
+    text-align: center;
     color: var(--color-grey-500);
-    font-style: italic;
+    padding: 2rem;
+    font-size: 1.6rem;
 `
 
 const NewInterestSection = styled.div`
-    background-color: var(--color-grey-50);
-    border-radius: var(--border-radius-md);
-    padding: 2rem;
-    margin-top: 2.4rem;
-`
-
-const QuickAddTags = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 1.6rem;
-`
-
-const QuickAddTag = styled.button`
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.6rem 1.2rem;
-    background-color: var(--color-grey-0);
-    border: 1px dashed var(--color-grey-300);
-    border-radius: var(--border-radius-sm);
-    color: var(--color-grey-600);
-    font-size: 1.4rem;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-        background-color: var(--color-grey-100);
-        border-color: var(--color-grey-400);
-    }
-
-    &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    & svg {
-        color: var(--color-brand-600);
-    }
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-grey-200);
 `
 
 const SectionSubTitle = styled.h3`
     font-size: 1.6rem;
-    font-weight: 500;
-    color: var(--color-grey-700);
+    font-weight: 600;
     margin-bottom: 1.2rem;
+    color: var(--color-grey-700);
 `
 
 const AutocompleteContainer = styled.div`
     position: relative;
-    flex: 1;
+    flex-grow: 1;
 `
 
 const InputWithIcon = styled.div`
     position: relative;
-    display: flex;
-    align-items: center;
 
-    & svg {
+    svg {
         position: absolute;
+        top: 50%;
         left: 1rem;
+        transform: translateY(-50%);
         color: var(--color-grey-500);
+        width: 2rem;
+        height: 2rem;
     }
 
-    & input {
+    input {
         padding-left: 3.6rem;
+    }
+
+    .search-loading {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        width: 1.6rem;
+        height: 1.6rem;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: translateY(-50%) rotate(0deg);
+        }
+        100% {
+            transform: translateY(-50%) rotate(360deg);
+        }
     }
 `
 
@@ -270,35 +225,67 @@ const AutocompleteDropdown = styled.div`
     box-shadow: var(--shadow-md);
     max-height: 20rem;
     overflow-y: auto;
-    z-index: 100;
-    margin-top: 0.4rem;
+    z-index: 10;
 `
 
-const AutocompleteItem = styled.div`
-    padding: 1rem 1.4rem;
+const SuggestionItem = styled.div`
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: ${(props) =>
+        props.highlighted ? 'var(--color-brand-100)' : 'transparent'};
+
+    &:hover {
+        background-color: var(--color-brand-100);
+    }
+`
+
+const NoResults = styled.div`
+    padding: 1rem;
+    color: var(--color-grey-500);
+    text-align: center;
+    font-style: italic;
+`
+
+const QuickAddTags = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: 1.2rem;
+`
+
+const QuickAddTag = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1rem;
+    background-color: var(--color-grey-100);
+    color: var(--color-grey-700);
+    border-radius: var(--border-radius-sm);
+    font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.2s;
 
     &:hover {
-        background-color: var(--color-grey-100);
+        background-color: var(--color-brand-100);
+        transform: translateY(-1px);
     }
 
-    ${(props) =>
-        props.highlighted &&
-        `
-        background-color: var(--color-brand-50);
-    `}
-`
-
-const NoResults = styled.div`
-    padding: 1rem 1.4rem;
-    color: var(--color-grey-500);
-    font-style: italic;
+    svg {
+        width: 1.6rem;
+        height: 1.6rem;
+    }
 `
 
 function InterestsSection({ user, onUpdate }) {
     const inputRef = useRef(null)
     const interestTags = useInterestTags()
+    const [isLoading, setIsLoading] = useState(true)
+    const [error, setError] = useState(null)
+    const [filteredSuggestions, setFilteredSuggestions] = useState([])
+    const [isSearching, setIsSearching] = useState(false)
+    const [localInputValue, setLocalInputValue] = useState('')
+
     const {
         inputValue,
         setInputValue,
@@ -310,117 +297,262 @@ function InterestsSection({ user, onUpdate }) {
         getInterestCategory,
         groupInterestsByCategory,
         getRecommendedTags,
+        getFilteredSuggestions,
     } = interestTags
 
-    // 过滤可用的兴趣标签
-    const filteredSuggestions = inputValue
-        ? interestTags.getFilteredSuggestions(
-              interestTags.availableInterests,
-              inputValue,
-              user.interests
-          )
-        : []
+    // 防抖处理搜索输入
+    const debouncedHandleSearch = useCallback(
+        debounce((value) => {
+            if (!value) {
+                setFilteredSuggestions([])
+                return
+            }
+
+            try {
+                setIsSearching(true)
+                getFilteredSuggestions(
+                    interestTags.availableInterests,
+                    value,
+                    user?.interests || []
+                )
+                    .then((suggestions) => {
+                        setFilteredSuggestions(suggestions)
+                        setIsSearching(false)
+                    })
+                    .catch((err) => {
+                        console.error('获取建议标签失败:', err)
+                        setFilteredSuggestions([])
+                        setIsSearching(false)
+                    })
+            } catch (err) {
+                console.error('处理搜索输入时出错:', err)
+                setFilteredSuggestions([])
+                setIsSearching(false)
+            }
+        }, 300),
+        [
+            getFilteredSuggestions,
+            interestTags.availableInterests,
+            user?.interests,
+        ]
+    )
+
+    // 处理输入变化
+    const handleLocalInputChange = (e) => {
+        const value = e.target.value
+        setLocalInputValue(value)
+        setInputValue(value)
+        debouncedHandleSearch(value)
+    }
+
+    useEffect(() => {
+        // 当用户数据加载完成后
+        if (user && user.interests) {
+            setIsLoading(false)
+        } else {
+            // 如果没有user数据，尝试从API获取
+            const fetchUserData = async () => {
+                try {
+                    setIsLoading(true)
+                    setError(null)
+                    // 这里可以根据实际API调用获取用户数据
+                    // 示例：const userData = await getCurrentUser();
+                    // 等待数据加载完成
+                    setIsLoading(false)
+                } catch (err) {
+                    console.error('加载用户数据时出错:', err)
+                    setError('加载用户数据失败，请稍后再试')
+                    setIsLoading(false)
+                }
+            }
+
+            fetchUserData()
+        }
+    }, [user])
+
+    // 添加组件卸载时的清理逻辑
+    useEffect(() => {
+        // 组件挂载时初始化
+        if (localInputValue === '' && inputValue !== '') {
+            setLocalInputValue(inputValue)
+        }
+
+        // 组件卸载时清理
+        return () => {
+            // 取消任何正在进行的防抖搜索
+            debouncedHandleSearch.cancel && debouncedHandleSearch.cancel()
+        }
+    }, [inputValue, localInputValue, debouncedHandleSearch])
 
     // 处理添加兴趣
-    const handleAddInterest = () => {
-        const interestToAdd = inputValue.trim()
-        if (interestToAdd && !user.interests.includes(interestToAdd)) {
+    const handleAddInterest = useCallback(() => {
+        const interestToAdd = localInputValue.trim()
+        if (
+            interestToAdd &&
+            user?.interests &&
+            !user.interests.includes(interestToAdd)
+        ) {
             // 如果输入的兴趣不在可用列表中，添加到可用列表
             interestTags.addToAvailableInterests(interestToAdd)
 
+            // 直接更新interests数组
+            const updatedInterests = [...(user.interests || []), interestToAdd]
             onUpdate({
-                interests: [...user.interests, interestToAdd],
+                interests: updatedInterests,
             })
+
+            setLocalInputValue('')
             setInputValue('')
             handleSuggestionsVisibility(false)
             setHighlightedIndex(-1)
         }
-    }
+    }, [
+        localInputValue,
+        user?.interests,
+        interestTags,
+        onUpdate,
+        setLocalInputValue,
+        setInputValue,
+        handleSuggestionsVisibility,
+        setHighlightedIndex,
+    ])
 
     // 处理键盘导航
-    const handleKeyDown = (e) => {
-        if (!showSuggestions) return
+    const handleKeyDown = useCallback(
+        (e) => {
+            if (!showSuggestions) return
 
-        switch (e.key) {
-            case 'ArrowDown':
-                e.preventDefault()
-                setHighlightedIndex((prevIndex) =>
-                    prevIndex < filteredSuggestions.length - 1
-                        ? prevIndex + 1
-                        : prevIndex
-                )
-                break
-            case 'ArrowUp':
-                e.preventDefault()
-                setHighlightedIndex((prevIndex) =>
-                    prevIndex > 0 ? prevIndex - 1 : prevIndex
-                )
-                break
-            case 'Enter':
-                e.preventDefault()
-                if (
-                    highlightedIndex >= 0 &&
-                    highlightedIndex < filteredSuggestions.length
-                ) {
-                    setInputValue(filteredSuggestions[highlightedIndex])
-                    setTimeout(() => {
-                        const interestToAdd =
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault()
+                    setHighlightedIndex((prevIndex) =>
+                        prevIndex < filteredSuggestions.length - 1
+                            ? prevIndex + 1
+                            : prevIndex
+                    )
+                    break
+                case 'ArrowUp':
+                    e.preventDefault()
+                    setHighlightedIndex((prevIndex) =>
+                        prevIndex > 0 ? prevIndex - 1 : prevIndex
+                    )
+                    break
+                case 'Enter':
+                    e.preventDefault()
+                    if (
+                        highlightedIndex >= 0 &&
+                        highlightedIndex < filteredSuggestions.length
+                    ) {
+                        setLocalInputValue(
                             filteredSuggestions[highlightedIndex]
-                        if (
-                            interestToAdd &&
-                            !user.interests.includes(interestToAdd)
-                        ) {
-                            onUpdate({
-                                interests: [...user.interests, interestToAdd],
-                            })
-                            setInputValue('')
-                        }
-                    }, 0)
-                } else {
-                    handleAddInterest()
-                }
-                handleSuggestionsVisibility(false)
-                setHighlightedIndex(-1)
-                break
-            case 'Escape':
-                handleSuggestionsVisibility(false)
-                setHighlightedIndex(-1)
-                break
-            default:
-                break
-        }
-    }
+                        )
+                        setInputValue(filteredSuggestions[highlightedIndex])
+                        setTimeout(() => {
+                            const interestToAdd =
+                                filteredSuggestions[highlightedIndex]
+                            if (
+                                interestToAdd &&
+                                user?.interests &&
+                                !user.interests.includes(interestToAdd)
+                            ) {
+                                onUpdate({
+                                    interests: [
+                                        ...user.interests,
+                                        interestToAdd,
+                                    ],
+                                })
+                                setLocalInputValue('')
+                                setInputValue('')
+                            }
+                        }, 0)
+                    } else {
+                        handleAddInterest()
+                    }
+                    handleSuggestionsVisibility(false)
+                    setHighlightedIndex(-1)
+                    break
+                case 'Escape':
+                    handleSuggestionsVisibility(false)
+                    setHighlightedIndex(-1)
+                    break
+                default:
+                    break
+            }
+        },
+        [
+            showSuggestions,
+            filteredSuggestions,
+            highlightedIndex,
+            user?.interests,
+            handleAddInterest,
+            handleSuggestionsVisibility,
+            setHighlightedIndex,
+            setLocalInputValue,
+            setInputValue,
+            onUpdate,
+        ]
+    )
 
     // 点击建议项
-    const handleSuggestionClick = (suggestion) => {
-        setInputValue(suggestion)
-        setTimeout(() => {
-            if (suggestion && !user.interests.includes(suggestion)) {
-                onUpdate({
-                    interests: [...user.interests, suggestion],
-                })
-                setInputValue('')
-            }
-        }, 0)
-        handleSuggestionsVisibility(false)
-        setHighlightedIndex(-1)
-        inputRef.current?.focus()
-    }
+    const handleSuggestionClick = useCallback(
+        (suggestion) => {
+            setLocalInputValue(suggestion)
+            setInputValue(suggestion)
+            setTimeout(() => {
+                if (
+                    suggestion &&
+                    user?.interests &&
+                    !user.interests.includes(suggestion)
+                ) {
+                    onUpdate({
+                        interests: [...user.interests, suggestion],
+                    })
+                    setLocalInputValue('')
+                    setInputValue('')
+                }
+            }, 0)
+            handleSuggestionsVisibility(false)
+        },
+        [
+            user?.interests,
+            onUpdate,
+            setLocalInputValue,
+            setInputValue,
+            handleSuggestionsVisibility,
+        ]
+    )
 
     // 处理快速添加标签
-    const handleQuickAddClick = (tag) => {
-        if (tag && !user.interests.includes(tag)) {
-            onUpdate({
-                interests: [...user.interests, tag],
-            })
-        }
-    }
+    const handleQuickAddTag = useCallback(
+        (tag) => {
+            if (user?.interests && !user.interests.includes(tag)) {
+                // 直接更新interests数组
+                const updatedInterests = [...user.interests, tag]
+                onUpdate({
+                    interests: updatedInterests,
+                })
+                setLocalInputValue('')
+                setInputValue('')
+            }
+        },
+        [user?.interests, onUpdate, setLocalInputValue, setInputValue]
+    )
 
-    const handleRemoveInterest = (interest) => {
-        onUpdate({
-            interests: user.interests.filter((item) => item !== interest),
-        })
-    }
+    // 处理移除兴趣
+    const handleRemoveInterest = useCallback(
+        (interest) => {
+            if (user?.interests) {
+                // 直接更新interests数组
+                const updatedInterests = user.interests.filter(
+                    (item) => item !== interest
+                )
+                onUpdate({
+                    interests: updatedInterests,
+                })
+            }
+        },
+        [user?.interests, onUpdate]
+    )
 
     // 根据分类获取图标
     const getCategoryIcon = (category) => {
@@ -455,7 +587,18 @@ function InterestsSection({ user, onUpdate }) {
     }
 
     // 将兴趣按分类进行分组
-    const groupedInterests = groupInterestsByCategory(user.interests)
+    const groupedInterests =
+        user?.interests?.length > 0
+            ? groupInterestsByCategory(user.interests)
+            : {}
+
+    if (isLoading) {
+        return <EmptyTagsMessage>正在加载兴趣标签数据...</EmptyTagsMessage>
+    }
+
+    if (error) {
+        return <EmptyTagsMessage>{error}</EmptyTagsMessage>
+    }
 
     return (
         <AccountSection>
@@ -467,7 +610,7 @@ function InterestsSection({ user, onUpdate }) {
             </SectionHeader>
 
             {/* 分类显示兴趣标签 */}
-            {user.interests.length > 0 ? (
+            {user?.interests && user.interests.length > 0 ? (
                 <InterestCategories>
                     {Object.entries(groupedInterests).map(
                         ([category, interests]) => (
@@ -525,10 +668,8 @@ function InterestsSection({ user, onUpdate }) {
                                     type="text"
                                     id="newInterest"
                                     placeholder="输入或搜索兴趣标签"
-                                    value={inputValue}
-                                    onChange={(e) =>
-                                        handleInputChange(e.target.value)
-                                    }
+                                    value={localInputValue}
+                                    onChange={handleLocalInputChange}
                                     onFocus={() =>
                                         handleSuggestionsVisibility(true)
                                     }
@@ -537,38 +678,52 @@ function InterestsSection({ user, onUpdate }) {
                                     }
                                     onKeyDown={handleKeyDown}
                                 />
+                                {isSearching && (
+                                    <div className="search-loading">
+                                        <svg
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12"
+                                                stroke="var(--color-brand-600)"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                )}
                             </InputWithIcon>
 
                             {showSuggestions && (
                                 <AutocompleteDropdown>
-                                    {filteredSuggestions.length > 0 ? (
+                                    {isSearching ? (
+                                        <NoResults>正在搜索标签...</NoResults>
+                                    ) : filteredSuggestions.length > 0 ? (
                                         filteredSuggestions.map(
                                             (suggestion, index) => (
-                                                <AutocompleteItem
+                                                <SuggestionItem
                                                     key={suggestion}
                                                     highlighted={
                                                         index ===
                                                         highlightedIndex
                                                     }
-                                                    onMouseEnter={() =>
-                                                        setHighlightedIndex(
-                                                            index
-                                                        )
-                                                    }
-                                                    onClick={() =>
+                                                    onMouseDown={() =>
                                                         handleSuggestionClick(
                                                             suggestion
                                                         )
                                                     }
                                                 >
                                                     {suggestion}
-                                                </AutocompleteItem>
+                                                </SuggestionItem>
                                             )
                                         )
                                     ) : (
                                         <NoResults>
-                                            {inputValue
-                                                ? '没有找到匹配的标签，按回车创建新标签'
+                                            {localInputValue
+                                                ? `没有找到匹配"${localInputValue}"的标签，按回车创建新标签`
                                                 : '输入关键词搜索标签'}
                                         </NoResults>
                                     )}
@@ -578,7 +733,7 @@ function InterestsSection({ user, onUpdate }) {
 
                         <Button
                             onClick={handleAddInterest}
-                            disabled={!inputValue.trim()}
+                            disabled={!localInputValue.trim()}
                         >
                             <HiOutlinePlusCircle /> 添加
                         </Button>
@@ -588,10 +743,10 @@ function InterestsSection({ user, onUpdate }) {
                 {/* 快速添加推荐标签 */}
                 <SectionSubTitle>推荐标签</SectionSubTitle>
                 <QuickAddTags>
-                    {getRecommendedTags(user.interests).map((tag) => (
+                    {getRecommendedTags(user?.interests || []).map((tag) => (
                         <QuickAddTag
                             key={tag}
-                            onClick={() => handleQuickAddClick(tag)}
+                            onClick={() => handleQuickAddTag(tag)}
                         >
                             <HiOutlinePlusCircle /> {tag}
                         </QuickAddTag>
