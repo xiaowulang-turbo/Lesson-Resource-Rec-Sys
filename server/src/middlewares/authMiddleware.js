@@ -2,18 +2,23 @@ import { DataService } from '../services/DataService.js'
 
 const dataService = new DataService()
 
+// 保护路由中间件，确保用户已登录
 export const protect = async (req, res, next) => {
     try {
-        // 1) 获取token
         let token
-        if (req.headers.authorization?.startsWith('Bearer')) {
+
+        // 1) 获取token并检查是否存在
+        if (
+            req.headers.authorization &&
+            req.headers.authorization.startsWith('Bearer')
+        ) {
             token = req.headers.authorization.split(' ')[1]
         }
 
         if (!token) {
             return res.status(401).json({
                 status: 'error',
-                message: '您尚未登录，请先登录',
+                message: '您未登录，请登录以获取访问权限',
             })
         }
 
@@ -27,39 +32,34 @@ export const protect = async (req, res, next) => {
         }
 
         // 3) 检查用户是否仍然存在
-        const user = await dataService.getUserById(decoded.id)
-        if (!user) {
+        const currentUser = await dataService.getUserById(decoded.id)
+        if (!currentUser) {
             return res.status(401).json({
                 status: 'error',
-                message: '此令牌的用户已不存在',
+                message: '此令牌对应的用户不再存在',
             })
         }
 
-        // 4) 获取账户信息
-        const account = await dataService.getAccountById(decoded.accountId)
-        if (!account) {
-            return res.status(401).json({
-                status: 'error',
-                message: '此令牌的账户已不存在',
-            })
-        }
+        // 4) 将用户添加到请求对象中
+        req.user = currentUser
 
-        // 5) 将用户信息附加到请求对象
-        req.user = user
-        req.account = account
+        // 打印认证成功信息，用于调试
+        console.log(`用户 ${currentUser.name} (ID: ${currentUser.id}) 认证成功`)
+
         next()
-    } catch (err) {
+    } catch (error) {
+        console.error('认证中间件错误:', error)
         res.status(401).json({
             status: 'error',
-            message: '认证失败',
+            message: '认证失败，请重新登录',
         })
     }
 }
 
+// 限制特定角色访问的中间件
 export const restrictTo = (...roles) => {
     return (req, res, next) => {
-        // 保护中间件已将用户附加到请求对象
-        if (!req.account || !roles.includes(req.account.role)) {
+        if (!roles.includes(req.user.role)) {
             return res.status(403).json({
                 status: 'error',
                 message: '您没有执行此操作的权限',
