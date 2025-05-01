@@ -10,11 +10,13 @@ export const getAllResources = async (req, res) => {
         const filters = req.query
         const result = await dataService.getAllResources(filters)
 
+        console.log('获取资源列表成功:', result)
+
         res.status(200).json({
             status: 'success',
-            results: result.resources.length,
-            total: result.pagination.total,
-            pagination: result.pagination,
+            // results: result.length,
+            total: result.total,
+            // pagination: result.pagination,
             data: {
                 resources: result.resources,
             },

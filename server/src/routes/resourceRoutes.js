@@ -9,7 +9,7 @@ import {
     getResourceFile,
     downloadResourceFile,
 } from '../controllers/resourceController.js'
-import { protect, restrictTo } from '../middlewares/authMiddleware.js'
+// import { protect, restrictTo } from '../middlewares/authMiddleware.js'
 import {
     resourceUpload,
     handleUploadErrors,
