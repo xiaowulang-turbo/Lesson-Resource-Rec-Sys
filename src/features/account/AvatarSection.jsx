@@ -2,6 +2,8 @@ import styled from 'styled-components'
 import Button from '../../ui/Button'
 import FileInput from '../../ui/FileInput'
 import { HiOutlineUserCircle } from 'react-icons/hi2'
+import { useState, useEffect } from 'react'
+import { API_URL } from '../../utils/constants'
 
 const AccountSection = styled.div`
     background-color: var(--color-grey-0);
@@ -68,11 +70,35 @@ const AvatarPreview = styled.div`
 `
 
 function AvatarSection({ user, onUpdate }) {
+    const [avatarPreview, setAvatarPreview] = useState(null)
+
+    // 初始化时如果用户有头像，设置预览
+    useEffect(() => {
+        if (user.avatar && typeof user.avatar === 'string') {
+            // 处理头像URL
+            const avatarUrl = user.avatar.startsWith('http')
+                ? user.avatar
+                : `${API_URL.replace('/api/v1', '')}${user.avatar}`
+
+            console.log('头像URL:', avatarUrl)
+            setAvatarPreview(avatarUrl)
+        }
+    }, [user.avatar])
+
     const handleAvatarChange = (e) => {
-        onUpdate({ avatar: e.target.files[0] })
+        const file = e.target.files[0]
+        if (file) {
+            // 创建本地预览URL
+            const previewUrl = URL.createObjectURL(file)
+            setAvatarPreview(previewUrl)
+
+            // 传递文件给父组件处理上传
+            onUpdate({ avatar: file })
+        }
     }
 
     const handleRemoveAvatar = () => {
+        setAvatarPreview(null)
         onUpdate({ avatar: null })
     }
 
@@ -87,11 +113,8 @@ function AvatarSection({ user, onUpdate }) {
 
             <AvatarContainer>
                 <AvatarPreview>
-                    {user.avatar ? (
-                        <img
-                            src={URL.createObjectURL(user.avatar)}
-                            alt="用户头像"
-                        />
+                    {avatarPreview ? (
+                        <img src={avatarPreview} alt="用户头像" />
                     ) : (
                         <HiOutlineUserCircle />
                     )}
