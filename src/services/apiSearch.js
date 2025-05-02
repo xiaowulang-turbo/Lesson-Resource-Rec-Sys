@@ -1,7 +1,25 @@
 import { BASE_URL } from './apiConfig' // 从 apiConfig.js 导入 BASE_URL
 
+// 缓存最近的搜索结果
+const searchCache = new Map()
+const CACHE_EXPIRY = 5 * 60 * 1000 // 缓存5分钟
+
+// 生成缓存键
+function generateCacheKey(query, filters = {}) {
+    return `${query}:${JSON.stringify(filters)}`
+}
+
 // 搜索资源
 export async function searchResources(query, filters = {}) {
+    // 检查缓存
+    const cacheKey = generateCacheKey(query, filters)
+    const cachedResult = searchCache.get(cacheKey)
+
+    if (cachedResult && Date.now() - cachedResult.timestamp < CACHE_EXPIRY) {
+        console.log('使用缓存搜索结果:', query)
+        return cachedResult.data
+    }
+
     // 构建查询字符串
     const params = new URLSearchParams()
 
@@ -47,6 +65,12 @@ export async function searchResources(query, filters = {}) {
             data.data &&
             Array.isArray(data.data.resources)
         ) {
+            // 将结果存入缓存
+            searchCache.set(cacheKey, {
+                data: data.data.resources,
+                timestamp: Date.now(),
+            })
+
             return data.data.resources // 返回资源数组
         } else {
             console.error('Unexpected API response structure:', data)
