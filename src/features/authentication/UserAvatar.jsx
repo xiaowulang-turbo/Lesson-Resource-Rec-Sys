@@ -1,6 +1,8 @@
 import styled from 'styled-components'
 import useUser from './useUser'
 import { useNavigate } from 'react-router-dom'
+import { API_URL } from '../../utils/constants'
+import { HiOutlineUserCircle } from 'react-icons/hi2'
 
 const StyledUserAvatar = styled.div`
     display: flex;
@@ -23,11 +25,38 @@ const Avatar = styled.img`
     outline: 2px solid var(--color-grey-100);
 `
 
+const DefaultAvatar = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 50%;
+    background-color: var(--color-grey-200);
+    color: var(--color-grey-600);
+    outline: 2px solid var(--color-grey-100);
+
+    & svg {
+        width: 2.4rem;
+        height: 2.4rem;
+    }
+`
+
 export default function UserAvatar() {
     const navigate = useNavigate()
     const { user } = useUser()
     const displayName = user?.name || 'User'
-    const avatarSrc = '../../public/default-user.jpg'
+
+    // 处理用户头像URL
+    const getAvatarUrl = () => {
+        if (!user?.avatar) return null
+
+        return user.avatar.startsWith('http')
+            ? user.avatar
+            : `${API_URL.replace('/api/v1', '')}${user.avatar}`
+    }
+
+    const avatarUrl = getAvatarUrl()
 
     const handleAvatarClick = () => {
         navigate('/account')
@@ -35,7 +64,13 @@ export default function UserAvatar() {
 
     return (
         <StyledUserAvatar onClick={handleAvatarClick}>
-            <Avatar src={avatarSrc} alt={`Avatar of ${displayName}`} />
+            {avatarUrl ? (
+                <Avatar src={avatarUrl} alt={`Avatar of ${displayName}`} />
+            ) : (
+                <DefaultAvatar>
+                    <HiOutlineUserCircle />
+                </DefaultAvatar>
+            )}
             <span>{displayName}</span>
         </StyledUserAvatar>
     )
