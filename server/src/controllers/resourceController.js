@@ -2,7 +2,9 @@ import mongoose from 'mongoose' // Import mongoose
 import { DataService } from '../services/DataService.js'
 import Resource from '../models/resourceModel.js' // Import the Resource model
 import { getFileUrl } from '../middlewares/fileMiddleware.js' // 导入文件URL生成方法
+import cacheService from '../services/CacheService.js'
 
+// 创建 DataService 实例
 const dataService = new DataService()
 
 export const getAllResources = async (req, res) => {
@@ -184,6 +186,10 @@ export const updateResource = async (req, res) => {
             })
         }
 
+        // 清除相关推荐缓存，因为资源内容已更新
+        cacheService.clear()
+        console.log(`[资源控制器] 资源 ${req.params.id} 已更新，已清除相关缓存`)
+
         res.status(200).json({
             status: 'success',
             data: {
@@ -208,6 +214,10 @@ export const deleteResource = async (req, res) => {
                 message: '未找到该资源',
             })
         }
+
+        // 清除相关推荐缓存，因为资源已被删除
+        cacheService.clear()
+        console.log(`[资源控制器] 资源 ${req.params.id} 已删除，已清除相关缓存`)
 
         res.status(204).json({
             status: 'success',
