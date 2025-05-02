@@ -9,6 +9,7 @@ import settingsRoutes from './routes/settingsRoutes.js'
 import statsRoutes from './routes/statsRoutes.js'
 import recommendationRoutes from './routes/recommendationRoutes.js'
 import moocRoutes from './routes/moocRoutes.js'
+import tagRoutes from './routes/tagRoutes.js'
 import rateLimit from 'express-rate-limit'
 import cookieParser from 'cookie-parser'
 import globalErrorHandler from './middlewares/errorMiddleware.js'
@@ -16,6 +17,8 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import mongoose from 'mongoose'
 import 'dotenv/config'
+import fs from 'fs'
+import cacheService from './services/CacheService.js'
 
 // 获取 __dirname 在 ES Modules 中的等效值
 const __filename = fileURLToPath(import.meta.url)
@@ -63,7 +66,7 @@ app.use(
     cors({
         origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
         credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: [
             'Content-Type',
             'Authorization',
@@ -71,6 +74,9 @@ app.use(
             'Origin',
             'Accept',
         ],
+        exposedHeaders: ['Content-Length', 'Content-Type'],
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
     })
 )
 app.use(express.json({ limit: '10kb' }))
@@ -78,6 +84,27 @@ app.use(morgan('dev'))
 
 // 添加静态文件服务中间件，用于访问上传的文件
 app.use('/public', express.static(path.join(__dirname, '..', 'public')))
+
+// 确保public/uploads/images目录存在
+const imagesDir = path.join(__dirname, '..', 'public', 'uploads', 'images')
+if (!fs.existsSync(imagesDir)) {
+    fs.mkdirSync(imagesDir, { recursive: true })
+}
+
+// 复制默认头像到images目录
+const defaultUserSrc = path.join(
+    __dirname,
+    '..',
+    '..',
+    'src',
+    'public',
+    'default-user.jpg'
+)
+const defaultUserDest = path.join(imagesDir, 'default-user.jpg')
+if (fs.existsSync(defaultUserSrc) && !fs.existsSync(defaultUserDest)) {
+    fs.copyFileSync(defaultUserSrc, defaultUserDest)
+    console.log('默认头像已复制到:', defaultUserDest)
+}
 
 // 设置文件下载头的中间件
 app.use('/public/uploads', (req, res, next) => {
@@ -103,7 +130,7 @@ app.use((req, res, next) => {
 
 // 限制请求
 const limiter = rateLimit({
-    max: 200,
+    max: 500,
     windowMs: 15 * 60 * 1000,
     message: '来自此IP的请求过多，请稍后再试',
 })
@@ -120,6 +147,7 @@ app.use('/api/v1/settings', settingsRoutes)
 app.use('/api/v1/stats', statsRoutes)
 app.use('/api/v1/recommendations', recommendationRoutes)
 app.use('/api/v1/mooc', moocRoutes)
+app.use('/api/v1/tags', tagRoutes)
 
 // 添加中国大学慕课的API代理路由
 app.post('/api/course/search', async (req, res) => {
@@ -140,5 +168,13 @@ app.use(globalErrorHandler)
 app.get('*', (req, res) => {
     res.sendFile(path.join(path.join(__dirname, '..', 'public'), 'index.html'))
 })
+
+// 设置定时清理过期缓存
+setInterval(() => {
+    const cleanedCount = cacheService.cleanup()
+    if (cleanedCount > 0) {
+        console.log(`[系统] 自动清理了 ${cleanedCount} 条过期缓存`)
+    }
+}, 3600000) // 每小时清理一次
 
 export default app
