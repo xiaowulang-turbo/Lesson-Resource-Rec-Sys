@@ -23,6 +23,7 @@ config.env
 temp.json
 newResources.json
 .json
+.tmp
 
 # 资源文件
 .docx
