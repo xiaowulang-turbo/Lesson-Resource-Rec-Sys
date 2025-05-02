@@ -8,7 +8,7 @@ import {
     getUserInterestTags,
     createManyTags,
 } from '../controllers/tagController.js'
-import { protect, restrictTo } from '../controllers/authController.js'
+import { protect, restrictTo } from '../middlewares/authMiddleware.js'
 
 const router = express.Router()
 
