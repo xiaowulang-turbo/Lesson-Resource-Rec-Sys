@@ -16,6 +16,10 @@ router.get('/user/:userId', recommendationController.getRecommendationsByUserId)
 // 获取与特定资源相似的资源推荐
 router.get('/similar/:resourceId', recommendationController.getSimilarResources)
 
+// 缓存控制路由
+router.get('/cache/clear', recommendationController.clearRecommendationCache)
+router.get('/cache/stats', recommendationController.getCacheStats)
+
 // Add other recommendation-related routes here
 
 export default router
