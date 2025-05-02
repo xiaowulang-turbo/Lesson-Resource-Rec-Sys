@@ -93,6 +93,8 @@ function useUserProfile() {
             setIsLoading(true)
             setError(null)
 
+            console.log(userData, 'userData')
+
             const auth = getStoredAuth()
             if (!auth?.token) {
                 setError('未登录')
@@ -126,6 +128,7 @@ function useUserProfile() {
                 email: userData.email,
                 phone: userData.phone,
                 bio: userData.bio,
+                interests: userData.interests,
                 experience: userData.experience,
                 preferences: {
                     preferredSubjects: userData.subject
