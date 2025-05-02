@@ -10,7 +10,8 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "update-enrollment": "node src/scripts/updateEnrollmentCounts.js",
         "migrate:users": "node src/scripts/dataMigration.js",
-        "seed:resource-relationships": "node src/scripts/seedResourceRelationships.js"
+        "seed:resource-relationships": "node src/scripts/seedResourceRelationships.js",
+        "test:redis": "node src/scripts/testRedisCache.js"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
@@ -26,6 +27,7 @@
         "multer": "^1.4.5-lts.2",
         "natural": "^8.0.1",
         "node-fetch": "^3.3.2",
+        "redis": "^5.0.0",
         "uuid": "^11.1.0",
         "validator": "^13.11.0"
     },
