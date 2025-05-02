@@ -2,8 +2,8 @@ import jwt from 'jsonwebtoken'
 import { promisify } from 'util'
 import catchAsync from '../utils/catchAsync.js'
 import { DataService } from '../services/DataService.js' // 导入 DataService
-// 导入缓存服务
-import cacheService from '../services/CacheService.js'
+// 导入Redis缓存服务
+import cacheService from '../services/RedisCacheService.js'
 // 导入推荐算法模块
 import {
     contentBasedRecommendation,
@@ -39,7 +39,6 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
     let recommendationsResult
     let currentUser = null
     let usedAlgorithm = 'unknown'
-    let fromCache = false
 
     // console.log(req.headers, 'req.headers')
 
@@ -143,10 +142,9 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
 
     // 如果不跳过缓存，尝试从缓存获取
     if (!skipCache) {
-        const cachedResult = cacheService.get(cacheKey)
+        const cachedResult = await cacheService.get(cacheKey)
         if (cachedResult) {
             console.log(`[推荐系统] 从缓存获取首页推荐结果`)
-            fromCache = true
             recommendationsResult = cachedResult.result
             usedAlgorithm = cachedResult.algorithm
 
@@ -257,17 +255,12 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
         })
     }
 
-    // 如果成功，将结果缓存起来（如果不是从缓存中获取的）
-    if (recommendationsResult.success && !fromCache) {
-        cacheService.set(
-            cacheKey,
-            {
-                result: recommendationsResult,
-                algorithm: usedAlgorithm,
-            },
-            1800000
-        ) // 缓存30分钟
+    // 将结果缓存(注意：秒为单位)
+    const cacheData = {
+        result: recommendationsResult,
+        algorithm: usedAlgorithm,
     }
+    await cacheService.set(cacheKey, cacheData, 180) // 缓存3分钟
 
     res.status(200).json({
         status: 'success',
@@ -287,7 +280,6 @@ export const getRecommendationsByUserId = catchAsync(async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10
     const skipCache = req.query.skipCache === 'true' // 获取是否跳过缓存
     let usedAlgorithm = 'unknown'
-    let fromCache = false
 
     if (!userId) {
         return res.status(400).json({
@@ -318,11 +310,10 @@ export const getRecommendationsByUserId = catchAsync(async (req, res, next) => {
 
     // 如果不跳过缓存，尝试从缓存获取
     if (!skipCache) {
-        const cachedResult = cacheService.get(cacheKey)
+        const cachedResult = await cacheService.get(cacheKey)
         if (cachedResult) {
             console.log(`[推荐系统] 从缓存获取用户 ${userId} 的推荐结果`)
-            fromCache = true
-            let recommendationsResult = cachedResult.result
+            recommendationsResult = cachedResult.result
             usedAlgorithm = cachedResult.algorithm
 
             // 直接返回缓存结果
@@ -431,17 +422,12 @@ export const getRecommendationsByUserId = catchAsync(async (req, res, next) => {
         })
     }
 
-    // 如果成功，将结果缓存起来（如果不是从缓存中获取的）
-    if (recommendationsResult.success && !fromCache) {
-        cacheService.set(
-            cacheKey,
-            {
-                result: recommendationsResult,
-                algorithm: usedAlgorithm,
-            },
-            1800000
-        ) // 缓存30分钟
+    // 将结果缓存(注意：秒为单位)
+    const cacheData = {
+        result: recommendationsResult,
+        algorithm: usedAlgorithm,
     }
+    await cacheService.set(cacheKey, cacheData, 180) // 缓存3分钟
 
     // 返回结果
     res.status(200).json({
@@ -460,21 +446,39 @@ export const getRecommendationsByUserId = catchAsync(async (req, res, next) => {
 export const getSimilarResources = catchAsync(async (req, res, next) => {
     const { resourceId } = req.params
     const limit = parseInt(req.query.limit) || 6
+    const skipCache = req.query.skipCache === 'true' // 获取是否跳过缓存
 
     if (!resourceId) {
         return res.status(400).json({
             status: 'error',
-            message: '未提供资源ID',
-            results: 0,
-            data: { recommendations: [] },
+            message: '必须提供资源ID',
         })
     }
 
-    console.log(`正在获取资源ID ${resourceId} 的相似资源，数量限制为 ${limit}`)
+    // 创建缓存键
+    const cacheKey = cacheService.generateKey('similar_resources', {
+        resourceId,
+        limit,
+    })
 
-    // 获取资源数据
+    // 如果不跳过缓存，尝试从缓存获取
+    if (!skipCache) {
+        const cachedResult = await cacheService.get(cacheKey)
+        if (cachedResult) {
+            console.log(`[推荐系统] 从缓存获取相似资源推荐结果`)
+            return res.status(200).json({
+                status: 'success',
+                results: cachedResult.length,
+                fromCache: true,
+                data: {
+                    recommendations: cachedResult,
+                },
+            })
+        }
+    }
+
     try {
-        // 使用DataService获取资源
+        // 获取资源数据
         const targetResource = await dataService.getResourceById(resourceId)
 
         if (!targetResource) {
@@ -635,22 +639,23 @@ export const getSimilarResources = catchAsync(async (req, res, next) => {
 
         console.log(`成功找到 ${similarResources.length} 个相似资源`)
 
+        // 缓存结果
+        await cacheService.set(cacheKey, similarResources, 3600) // 缓存1小时
+
         return res.status(200).json({
             status: 'success',
             message: `资源 "${targetResource.title}" 的相似推荐`,
             results: similarResources.length,
+            fromCache: false,
             data: {
                 recommendations: similarResources,
-                algorithm: 'content-similarity',
             },
         })
     } catch (error) {
         console.error('获取相似资源时出错:', error)
-        return res.status(500).json({
+        return res.status(404).json({
             status: 'error',
-            message: '获取相似资源推荐时出错: ' + error.message,
-            results: 0,
-            data: { recommendations: [] },
+            message: '获取相似资源失败',
         })
     }
 })
@@ -814,44 +819,18 @@ const contentBasedSimilarityFiltering = async (
 
 // 清除推荐缓存
 export const clearRecommendationCache = catchAsync(async (req, res, next) => {
-    const { userId, all } = req.query
-
-    if (all === 'true') {
-        // 清除所有缓存
-        cacheService.clear()
-        console.log('[推荐系统] 已清除所有推荐缓存')
-        return res.status(200).json({
-            status: 'success',
-            message: '已清除所有推荐缓存',
-        })
-    } else if (userId) {
-        // 清除特定用户的缓存
-        // 由于我们使用的是内存缓存，无法直接按前缀删除
-        // 我们需要清除所有缓存并在日志中记录
-        console.log(`[推荐系统] 清除用户 ${userId} 的推荐缓存`)
-        cacheService.clear()
-        return res.status(200).json({
-            status: 'success',
-            message: `已清除用户 ${userId} 的推荐缓存`,
-        })
-    } else {
-        // 清除过期缓存
-        const cleanedCount = cacheService.cleanup()
-        return res.status(200).json({
-            status: 'success',
-            message: `已清理 ${cleanedCount} 条过期缓存`,
-        })
-    }
+    await cacheService.clear()
+    return res.status(200).json({
+        status: 'success',
+        message: '推荐缓存已清除',
+    })
 })
 
 // 获取缓存统计信息
 export const getCacheStats = catchAsync(async (req, res, next) => {
-    const stats = cacheService.getStats()
-
+    const stats = await cacheService.getStats()
     return res.status(200).json({
         status: 'success',
-        data: {
-            stats,
-        },
+        data: stats,
     })
 })

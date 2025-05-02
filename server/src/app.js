@@ -18,7 +18,7 @@ import { fileURLToPath } from 'url'
 import mongoose from 'mongoose'
 import 'dotenv/config'
 import fs from 'fs'
-import cacheService from './services/CacheService.js'
+import cacheService from './services/RedisCacheService.js'
 
 // 获取 __dirname 在 ES Modules 中的等效值
 const __filename = fileURLToPath(import.meta.url)
@@ -169,12 +169,9 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(path.join(__dirname, '..', 'public'), 'index.html'))
 })
 
-// 设置定时清理过期缓存
-setInterval(() => {
-    const cleanedCount = cacheService.cleanup()
-    if (cleanedCount > 0) {
-        console.log(`[系统] 自动清理了 ${cleanedCount} 条过期缓存`)
-    }
-}, 3600000) // 每小时清理一次
+// 设置定时清理过期缓存（Redis会自动处理，此部分仅为保持API兼容）
+setInterval(async () => {
+    await cacheService.cleanup()
+}, 3600000) // 每小时检查一次
 
 export default app
