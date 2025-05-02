@@ -2,6 +2,8 @@ import jwt from 'jsonwebtoken'
 import { promisify } from 'util'
 import catchAsync from '../utils/catchAsync.js'
 import { DataService } from '../services/DataService.js' // 导入 DataService
+// 导入缓存服务
+import cacheService from '../services/CacheService.js'
 // 导入推荐算法模块
 import {
     contentBasedRecommendation,
@@ -37,6 +39,7 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
     let recommendationsResult
     let currentUser = null
     let usedAlgorithm = 'unknown'
+    let fromCache = false
 
     // console.log(req.headers, 'req.headers')
 
@@ -118,11 +121,48 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
 
     // 2. 根据用户状态选择推荐算法
     const limit = parseInt(req.query.limit) || 10 // 获取limit参数，默认为10
+    const skipCache = req.query.skipCache === 'true' // 获取是否跳过缓存
 
     // 从请求参数中获取算法偏好（如果有的话）
     const algorithmPreference = req.query.algorithm || 'hybrid'
     const contentWeight = parseFloat(req.query.contentWeight) || 0.5
     const collaborativeWeight = parseFloat(req.query.collaborativeWeight) || 0.5
+
+    // 创建缓存键
+    const cacheParams = {
+        userId: currentUser?.user_id || 'guest',
+        algorithm: algorithmPreference,
+        limit,
+        contentWeight,
+        collaborativeWeight,
+    }
+    const cacheKey = cacheService.generateKey(
+        'homepage_recommendations',
+        cacheParams
+    )
+
+    // 如果不跳过缓存，尝试从缓存获取
+    if (!skipCache) {
+        const cachedResult = cacheService.get(cacheKey)
+        if (cachedResult) {
+            console.log(`[推荐系统] 从缓存获取首页推荐结果`)
+            fromCache = true
+            recommendationsResult = cachedResult.result
+            usedAlgorithm = cachedResult.algorithm
+
+            // 直接返回缓存结果
+            return res.status(200).json({
+                status: 'success',
+                message: recommendationsResult.message,
+                results: recommendationsResult.recommendations.length,
+                fromCache: true,
+                data: {
+                    recommendations: recommendationsResult.recommendations,
+                    algorithm: usedAlgorithm,
+                },
+            })
+        }
+    }
 
     if (currentUser) {
         console.log(
@@ -210,16 +250,30 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
             status: 'success', // Or 'error' depending on desired frontend handling
             message: recommendationsResult?.message || '无法生成推荐',
             results: 0,
+            fromCache: false,
             data: {
                 recommendations: [],
             },
         })
     }
 
+    // 如果成功，将结果缓存起来（如果不是从缓存中获取的）
+    if (recommendationsResult.success && !fromCache) {
+        cacheService.set(
+            cacheKey,
+            {
+                result: recommendationsResult,
+                algorithm: usedAlgorithm,
+            },
+            1800000
+        ) // 缓存30分钟
+    }
+
     res.status(200).json({
         status: 'success',
         message: recommendationsResult.message,
         results: recommendationsResult.recommendations.length,
+        fromCache: false,
         data: {
             recommendations: recommendationsResult.recommendations,
             algorithm: usedAlgorithm,
@@ -231,7 +285,9 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
 export const getRecommendationsByUserId = catchAsync(async (req, res, next) => {
     const { userId } = req.params
     const limit = parseInt(req.query.limit) || 10
+    const skipCache = req.query.skipCache === 'true' // 获取是否跳过缓存
     let usedAlgorithm = 'unknown'
+    let fromCache = false
 
     if (!userId) {
         return res.status(400).json({
@@ -246,6 +302,42 @@ export const getRecommendationsByUserId = catchAsync(async (req, res, next) => {
     const algorithmPreference = req.query.algorithm || 'hybrid'
     const contentWeight = parseFloat(req.query.contentWeight) || 0.5
     const collaborativeWeight = parseFloat(req.query.collaborativeWeight) || 0.5
+
+    // 创建缓存键
+    const cacheParams = {
+        userId,
+        algorithm: algorithmPreference,
+        limit,
+        contentWeight,
+        collaborativeWeight,
+    }
+    const cacheKey = cacheService.generateKey(
+        'user_recommendations',
+        cacheParams
+    )
+
+    // 如果不跳过缓存，尝试从缓存获取
+    if (!skipCache) {
+        const cachedResult = cacheService.get(cacheKey)
+        if (cachedResult) {
+            console.log(`[推荐系统] 从缓存获取用户 ${userId} 的推荐结果`)
+            fromCache = true
+            let recommendationsResult = cachedResult.result
+            usedAlgorithm = cachedResult.algorithm
+
+            // 直接返回缓存结果
+            return res.status(200).json({
+                status: 'success',
+                message: recommendationsResult.message,
+                results: recommendationsResult.recommendations.length,
+                fromCache: true,
+                data: {
+                    recommendations: recommendationsResult.recommendations,
+                    algorithm: usedAlgorithm,
+                },
+            })
+        }
+    }
 
     // 加载用户数据
     let user = null
@@ -328,19 +420,35 @@ export const getRecommendationsByUserId = catchAsync(async (req, res, next) => {
     // 记录推荐结果
     logRecommendation(user, usedAlgorithm, recommendationsResult)
 
-    if (!recommendationsResult.success) {
+    // 处理推荐结果不成功的情况
+    if (!recommendationsResult || !recommendationsResult.success) {
         return res.status(200).json({
             status: 'success',
-            message: recommendationsResult.message || '无法生成推荐',
+            message: recommendationsResult?.message || '无法生成推荐',
             results: 0,
+            fromCache: false,
             data: { recommendations: [] },
         })
     }
 
+    // 如果成功，将结果缓存起来（如果不是从缓存中获取的）
+    if (recommendationsResult.success && !fromCache) {
+        cacheService.set(
+            cacheKey,
+            {
+                result: recommendationsResult,
+                algorithm: usedAlgorithm,
+            },
+            1800000
+        ) // 缓存30分钟
+    }
+
+    // 返回结果
     res.status(200).json({
         status: 'success',
         message: recommendationsResult.message,
         results: recommendationsResult.recommendations.length,
+        fromCache: false,
         data: {
             recommendations: recommendationsResult.recommendations,
             algorithm: usedAlgorithm,
@@ -703,3 +811,47 @@ const contentBasedSimilarityFiltering = async (
 }
 
 // Add other recommendation-related controllers if needed
+
+// 清除推荐缓存
+export const clearRecommendationCache = catchAsync(async (req, res, next) => {
+    const { userId, all } = req.query
+
+    if (all === 'true') {
+        // 清除所有缓存
+        cacheService.clear()
+        console.log('[推荐系统] 已清除所有推荐缓存')
+        return res.status(200).json({
+            status: 'success',
+            message: '已清除所有推荐缓存',
+        })
+    } else if (userId) {
+        // 清除特定用户的缓存
+        // 由于我们使用的是内存缓存，无法直接按前缀删除
+        // 我们需要清除所有缓存并在日志中记录
+        console.log(`[推荐系统] 清除用户 ${userId} 的推荐缓存`)
+        cacheService.clear()
+        return res.status(200).json({
+            status: 'success',
+            message: `已清除用户 ${userId} 的推荐缓存`,
+        })
+    } else {
+        // 清除过期缓存
+        const cleanedCount = cacheService.cleanup()
+        return res.status(200).json({
+            status: 'success',
+            message: `已清理 ${cleanedCount} 条过期缓存`,
+        })
+    }
+})
+
+// 获取缓存统计信息
+export const getCacheStats = catchAsync(async (req, res, next) => {
+    const stats = cacheService.getStats()
+
+    return res.status(200).json({
+        status: 'success',
+        data: {
+            stats,
+        },
+    })
+})
