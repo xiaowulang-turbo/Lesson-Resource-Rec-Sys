@@ -111,7 +111,8 @@ export class DataService {
                 'bio',
                 'preferred_subjects',
                 'preferences',
-                'avatar', // 添加头像字段
+                'avatar',
+                'interests',
             ]
 
             const filteredData = {}
@@ -135,6 +136,13 @@ export class DataService {
                 if (!filteredData.preferences) filteredData.preferences = {}
                 filteredData.preferences.preferredGrades = [userData.grade]
             }
+
+            // 确保interests是一个数组
+            if (userData.interests && !Array.isArray(userData.interests)) {
+                filteredData.interests = [userData.interests]
+            }
+
+            console.log('更新用户前的数据:', filteredData)
 
             const user = await User.findByIdAndUpdate(id, filteredData, {
                 new: true,
