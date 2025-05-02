@@ -138,3 +138,52 @@ node src/scripts/uploadData.js --file=resources.json --model=Resource --clear
 
 -   `migrateAccounts.js`: 用于迁移账户数据
 -   `migrateFromNewFormat.js`: 从新格式迁移数据
+
+# 推荐系统标签导入脚本说明
+
+本目录下包含了用于推荐系统标签管理的几个脚本:
+
+## 标签导入脚本
+
+1. `seedRecommendationTags.js` - 导入基础推荐系统相关标签
+
+    - 包括算法相关标签（协同过滤、基于内容推荐等）
+    - 包括技能相关标签（Python 推荐系统、TensorFlow 推荐等）
+    - 包括兴趣相关标签（个性化推荐、推荐系统评估等）
+    - 包括教育领域标签（教育资源推荐、学习路径推荐等）
+
+2. `seedAdditionalRecommendationTags.js` - 导入元数据相关标签
+    - 包括推荐系统元数据标签（资源类型、时长、难度级别等）
+    - 包括教育领域元数据标签（教育阶段、学科、教学目标等）
+
+## 标签查询脚本
+
+-   `checkTags.js` - 查询并显示当前数据库中的标签信息
+    -   显示功能相关标签
+    -   显示教学相关标签
+    -   显示标签统计信息
+
+## 使用方法
+
+```bash
+# 导入基础推荐系统标签
+node src/scripts/seedRecommendationTags.js
+
+# 导入元数据相关标签
+node src/scripts/seedAdditionalRecommendationTags.js
+
+# 查询当前标签信息
+node src/scripts/checkTags.js
+```
+
+## 标签分类
+
+标签按以下分类组织:
+
+-   类型(type): topic(主题)、skill(技能)、interest(兴趣)等
+-   分类(category): function(功能)、teaching(教学)等
+
+当前系统中共有:
+
+-   功能相关标签: 27 个
+-   教学相关标签: 10 个
