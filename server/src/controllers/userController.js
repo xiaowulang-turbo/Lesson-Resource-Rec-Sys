@@ -137,6 +137,10 @@ export const updateMe = async (req, res) => {
             })
         }
 
+        // 打印接收到的数据，用于调试
+        console.log('接收到的更新数据:', req.body)
+        console.log('用户ID:', req.user.id)
+
         // 处理文件上传
         if (req.file) {
             try {
@@ -156,9 +160,6 @@ export const updateMe = async (req, res) => {
             }
         }
 
-        // 打印接收到的数据，用于调试
-        console.log('接收到的更新数据:', req.body)
-
         // 2) 更新用户文档
         const user = await dataService.updateUser(req.user.id, req.body)
 
@@ -168,6 +169,9 @@ export const updateMe = async (req, res) => {
                 message: '未找到用户或更新失败',
             })
         }
+
+        // 打印更新后的用户数据，用于调试
+        console.log('更新后的用户数据:', user)
 
         res.status(200).json({
             status: 'success',
