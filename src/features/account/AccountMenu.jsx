@@ -3,7 +3,6 @@ import {
     HiOutlineUserCircle,
     HiOutlineLockClosed,
     HiOutlineHeart,
-    HiOutlineBell,
 } from 'react-icons/hi2'
 
 const SideMenu = styled.div`
@@ -49,7 +48,6 @@ function AccountMenu({ activeTab, onTabChange }) {
         { id: 'profile', label: '个人信息', icon: <HiOutlineUserCircle /> },
         { id: 'security', label: '安全设置', icon: <HiOutlineLockClosed /> },
         { id: 'preferences', label: '兴趣喜好', icon: <HiOutlineHeart /> },
-        { id: 'notifications', label: '通知设置', icon: <HiOutlineBell /> },
     ]
 
     return (
