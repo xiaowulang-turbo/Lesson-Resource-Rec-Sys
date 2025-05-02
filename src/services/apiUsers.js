@@ -1,5 +1,5 @@
 import { BASE_URL } from './apiConfig'
-import { API_URL } from '../utils/constants'
+// import { API_URL } from '../utils/constants'
 
 // 辅助函数：获取存储的认证信息
 function getStoredAuth() {
@@ -60,7 +60,7 @@ export async function updateCurrentUser(userData) {
             }
         })
 
-        const res = await fetch(`${API_URL}/users/updateMe`, {
+        const res = await fetch(`${BASE_URL}/users/updateMe`, {
             method: 'PATCH',
             credentials: 'include',
             headers: authHeaders,
@@ -76,7 +76,7 @@ export async function updateCurrentUser(userData) {
         return res.json()
     } else {
         // 普通数据更新，使用JSON格式
-        const res = await fetch(`${API_URL}/users/updateMe`, {
+        const res = await fetch(`${BASE_URL}/users/updateMe`, {
             method: 'PATCH',
             credentials: 'include',
             headers: {
@@ -98,7 +98,7 @@ export async function updateCurrentUser(userData) {
 export async function getCurrentUser() {
     const authHeaders = getAuthHeaders()
 
-    const res = await fetch(`${API_URL}/users/me`, {
+    const res = await fetch(`${BASE_URL}/users/me`, {
         credentials: 'include',
         headers: authHeaders,
     })
@@ -114,7 +114,7 @@ export async function getCurrentUser() {
 export async function getUser(userId) {
     const authHeaders = getAuthHeaders()
 
-    const res = await fetch(`${API_URL}/users/${userId}`, {
+    const res = await fetch(`${BASE_URL}/users/${userId}`, {
         credentials: 'include',
         headers: authHeaders,
     })
@@ -130,7 +130,7 @@ export async function getUser(userId) {
 export async function deleteCurrentUser() {
     const authHeaders = getAuthHeaders()
 
-    const res = await fetch(`${API_URL}/users/deleteMe`, {
+    const res = await fetch(`${BASE_URL}/users/deleteMe`, {
         method: 'DELETE',
         credentials: 'include',
         headers: authHeaders,

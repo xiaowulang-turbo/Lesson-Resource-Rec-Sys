@@ -1,9 +1,9 @@
-import { API_URL } from '../utils/constants'
+import { BASE_URL } from './apiConfig'
 
 // 获取所有兴趣标签
 export async function getAllInterestTags() {
     try {
-        const res = await fetch(`${API_URL}/tags/interests`, {
+        const res = await fetch(`${BASE_URL}/tags/interests`, {
             credentials: 'include',
         })
 
@@ -23,7 +23,7 @@ export async function getAllInterestTags() {
 export async function searchInterestTags(query) {
     try {
         const res = await fetch(
-            `${API_URL}/tags/search?query=${encodeURIComponent(
+            `${BASE_URL}/tags/search?query=${encodeURIComponent(
                 query
             )}&type=interest`,
             {
@@ -46,7 +46,7 @@ export async function searchInterestTags(query) {
 // 创建兴趣标签（仅限管理员）
 export async function createInterestTag(tagData) {
     try {
-        const res = await fetch(`${API_URL}/tags`, {
+        const res = await fetch(`${BASE_URL}/tags`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -75,7 +75,7 @@ export async function createInterestTag(tagData) {
 // 批量创建兴趣标签（仅限管理员）
 export async function createManyInterestTags(tags) {
     try {
-        const res = await fetch(`${API_URL}/tags/batch`, {
+        const res = await fetch(`${BASE_URL}/tags/batch`, {
             method: 'POST',
             credentials: 'include',
             headers: {

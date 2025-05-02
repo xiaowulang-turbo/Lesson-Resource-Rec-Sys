@@ -3,7 +3,7 @@ import Button from '../../ui/Button'
 import FileInput from '../../ui/FileInput'
 import { HiOutlineUserCircle } from 'react-icons/hi2'
 import { useState, useEffect } from 'react'
-import { API_URL } from '../../utils/constants'
+import { BASE_URL } from '../../services/apiConfig'
 
 const AccountSection = styled.div`
     background-color: var(--color-grey-0);
@@ -78,7 +78,7 @@ function AvatarSection({ user, onUpdate }) {
             // 处理头像URL
             const avatarUrl = user.avatar.startsWith('http')
                 ? user.avatar
-                : `${API_URL.replace('/api/v1', '')}${user.avatar}`
+                : `${BASE_URL.replace('/api/v1', '')}${user.avatar}`
 
             console.log('头像URL:', avatarUrl)
             setAvatarPreview(avatarUrl)

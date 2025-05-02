@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import useUser from './useUser'
 import { useNavigate } from 'react-router-dom'
-import { API_URL } from '../../utils/constants'
+import { BASE_URL } from '../../services/apiConfig'
 import { HiOutlineUserCircle } from 'react-icons/hi2'
 
 const StyledUserAvatar = styled.div`
@@ -53,7 +53,7 @@ export default function UserAvatar() {
 
         return user.avatar.startsWith('http')
             ? user.avatar
-            : `${API_URL.replace('/api/v1', '')}${user.avatar}`
+            : `${BASE_URL.replace('/api/v1', '')}${user.avatar}`
     }
 
     const avatarUrl = getAvatarUrl()
