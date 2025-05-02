@@ -9,7 +9,8 @@ import Empty from '../ui/Empty'
 import { useQuery } from '@tanstack/react-query'
 import { searchResources } from '../services/apiSearch'
 import { searchMoocCoursesDirectly } from '../services/apiMooc'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { debounce } from '../utils/debounce'
 
 const SearchPageLayout = styled.div`
     padding: 3.2rem 4.8rem;
@@ -60,17 +61,17 @@ function Search() {
         enabled: !!query && searchType === 'local',
     })
 
-    // MOOC搜索使用普通fetch
-    useEffect(() => {
-        async function fetchMoocResults() {
-            if (!query || searchType !== 'mooc') return
+    // 防抖处理MOOC搜索
+    const debouncedFetchMooc = useCallback(
+        debounce(async (searchQuery) => {
+            if (!searchQuery || searchType !== 'mooc') return
 
             setIsLoading(true)
             setError(null)
 
             try {
-                console.log('开始搜索MOOC资源:', query)
-                const moocResults = await searchMoocCoursesDirectly(query)
+                console.log('开始搜索MOOC资源:', searchQuery)
+                const moocResults = await searchMoocCoursesDirectly(searchQuery)
                 console.log('获取到MOOC资源数量:', moocResults?.length || 0)
 
                 // 确保每个资源都有id字段和必要属性
@@ -103,18 +104,32 @@ function Search() {
             } finally {
                 setIsLoading(false)
             }
-        }
+        }, 500),
+        [searchType]
+    )
 
-        fetchMoocResults()
-    }, [query, searchType])
+    // MOOC搜索使用普通fetch
+    useEffect(() => {
+        if (query && searchType === 'mooc') {
+            debouncedFetchMooc(query)
+        }
+    }, [query, searchType, debouncedFetchMooc])
+
+    // 切换搜索类型 - 防抖处理
+    const debouncedSetSearchType = useCallback(
+        debounce((type) => {
+            setSearchType(type)
+            setSearchParams({
+                q: query,
+                type,
+            })
+        }, 300),
+        [query, setSearchParams]
+    )
 
     // 切换搜索类型
     const handleSearchTypeChange = (type) => {
-        setSearchType(type)
-        setSearchParams({
-            q: query,
-            type,
-        })
+        debouncedSetSearchType(type)
     }
 
     // 根据当前搜索类型决定显示的资源和状态

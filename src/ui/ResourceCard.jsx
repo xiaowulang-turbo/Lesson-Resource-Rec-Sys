@@ -128,13 +128,13 @@ function ResourceCard({ resource }) {
     // 检查是否有资源数据
     if (!resource) return null
 
-    const { id, title, type, subject, tags, cover } = resource
+    const { _id, title, type, subject, tags, cover } = resource
 
     // 如果标签是数组，只取前两个标签
     const displayTags = Array.isArray(tags) ? tags.slice(0, 2) : []
 
     return (
-        <Card to={`/resources/${id}`}>
+        <Card to={`/resources/${_id}`}>
             <ImageContainer>
                 {cover ? (
                     <Image src={cover} alt={title} />

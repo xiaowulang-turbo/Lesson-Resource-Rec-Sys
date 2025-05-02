@@ -11,8 +11,9 @@ import ButtonIcon from './ButtonIcon'
 import { useLayout } from '../context/LayoutContext'
 import MainNav from './MainNav'
 import Logo from './Logo'
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { debounce } from '../utils/debounce'
 
 const StyleHeader = styled.div`
     background-color: var(--color-grey-0);
@@ -114,7 +115,23 @@ const LogoImage = styled.div`
 function Header({ showNavInHeader = false }) {
     const { isNavbarOnTop, toggleNavbarPosition } = useLayout()
     const [searchQuery, setSearchQuery] = useState('')
+    const [inputValue, setInputValue] = useState('')
     const navigate = useNavigate()
+
+    // 防抖处理搜索查询更新
+    const debouncedSetSearchQuery = useCallback(
+        debounce((value) => {
+            setSearchQuery(value)
+        }, 300),
+        []
+    )
+
+    // 处理输入变化
+    const handleInputChange = (e) => {
+        const value = e.target.value
+        setInputValue(value)
+        debouncedSetSearchQuery(value)
+    }
 
     const handleSearchSubmit = (e) => {
         e.preventDefault()
@@ -150,8 +167,8 @@ function Header({ showNavInHeader = false }) {
                     <SearchInput
                         type="text"
                         placeholder="搜索资源..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        value={inputValue}
+                        onChange={handleInputChange}
                     />
                 </SearchContainer>
 
