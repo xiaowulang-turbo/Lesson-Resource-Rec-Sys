@@ -1,5 +1,5 @@
 import Tag from '../models/tagModel.js'
-import { catchAsync } from '../utils/catchAsync.js'
+import catchAsync from '../utils/catchAsync.js'
 import AppError from '../utils/appError.js'
 
 // 获取所有标签
