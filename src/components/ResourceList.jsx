@@ -329,7 +329,7 @@ function ResourceList({ resources: initialResources }) {
         <>
             <ResourceGrid layout={layout}>
                 {resources.map((resource, index) => {
-                    const resourceId = resource.id
+                    const resourceId = resource._id
                     if (!resourceId) {
                         console.error(
                             'Resource missing a unique identifier (id):',
