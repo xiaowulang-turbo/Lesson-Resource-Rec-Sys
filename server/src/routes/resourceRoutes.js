@@ -9,7 +9,7 @@ import {
     getResourceFile,
     downloadResourceFile,
 } from '../controllers/resourceController.js'
-// import { protect, restrictTo } from '../middlewares/authMiddleware.js'
+import { protect, restrictTo } from '../middlewares/authMiddleware.js'
 import {
     resourceUpload,
     handleUploadErrors,
@@ -26,13 +26,13 @@ router.get('/:id/file', getResourceFile)
 router.get('/:id/download', downloadResourceFile)
 
 // 保护后续所有路由
-// router.use(protect)
+router.use(protect)
 
 // 评分路由
 router.post('/:id/ratings', addRating)
 
 // 限制创建、更新、删除资源的权限
-// router.use(restrictTo('admin', 'teacher'))
+router.use(restrictTo('admin', 'teacher'))
 
 // 使用新的文件上传中间件
 router.post('/', resourceUpload, handleUploadErrors, createResource)

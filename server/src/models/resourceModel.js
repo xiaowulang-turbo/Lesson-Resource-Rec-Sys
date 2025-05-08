@@ -283,7 +283,7 @@ resourceSchema.virtual('popularityScore').get(function () {
 
 // 计算平均评分的中间件
 resourceSchema.pre('save', function (next) {
-    if (this.ratings.length > 0) {
+    if (this.ratings?.length > 0) {
         this.averageRating =
             this.ratings.reduce((acc, item) => acc + item.rating, 0) /
             this.ratings.length
