@@ -156,7 +156,8 @@ function SimilarResourceList({ resourceId }) {
 
     // 无数据状态
     if (!similarResources || similarResources.length === 0) {
-        return <Empty resourceName="相似资源" />
+        // return <Empty resourceName="相似资源" />
+        return <p>暂无相似资源推荐</p>
     }
 
     return (
