@@ -44,6 +44,8 @@ export async function getResourceById(id) {
         const res = await fetch(`${BASE_URL}${ENDPOINTS.RESOURCES.BASE}/${id}`)
         const data = await res.json()
 
+        console.log(data, 'data')
+
         if (!res.ok) throw new Error(data.message || '获取资源详情失败')
 
         return data.data.resource
@@ -331,4 +333,83 @@ function getMockUserResources(userId, type) {
     }
 
     return resources
+}
+
+// 更新资源
+export async function updateResource(formData) {
+    try {
+        // 获取存储的认证信息
+        const auth = getStoredAuth()
+        const token = auth?.token
+
+        if (!token) {
+            throw new Error('您尚未登录，请先登录')
+        }
+
+        const id = formData.get('id')
+
+        const res = await fetch(
+            `${BASE_URL}${ENDPOINTS.RESOURCES.BASE}/${id}`,
+            {
+                method: 'PATCH',
+                body: formData,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        )
+
+        const data = await res.json()
+
+        if (!res.ok) {
+            console.error('API Error Response:', data)
+            throw new Error(data.message || '更新资源失败')
+        }
+
+        // 检查返回的数据结构
+        if (data.status === 'success' && data.data && data.data.resource) {
+            return data.data.resource // 返回更新后的资源对象
+        } else {
+            console.error('Unexpected API response structure on update:', data)
+            throw new Error('更新资源成功，但返回数据格式不正确')
+        }
+    } catch (error) {
+        console.error('更新资源失败:', error)
+        throw new Error(error.message || '网络请求错误，无法更新资源')
+    }
+}
+
+// 删除资源
+export async function deleteResource(id) {
+    try {
+        // 获取存储的认证信息
+        const auth = getStoredAuth()
+        const token = auth?.token
+
+        if (!token) {
+            throw new Error('您尚未登录，请先登录')
+        }
+
+        const res = await fetch(
+            `${BASE_URL}${ENDPOINTS.RESOURCES.BASE}/${id}`,
+            {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        )
+
+        const data = await res.json()
+
+        if (!res.ok) {
+            console.error('API Error Response:', data)
+            throw new Error(data.message || '删除资源失败')
+        }
+
+        return { success: true, message: '资源已成功删除' }
+    } catch (error) {
+        console.error('删除资源失败:', error)
+        throw new Error(error.message || '网络请求错误，无法删除资源')
+    }
 }
