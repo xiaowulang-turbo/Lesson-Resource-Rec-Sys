@@ -607,6 +607,46 @@ export class DataService {
         return !!resource
     }
 
+    // 更新资源统计信息
+    async incrementResourceStat(resourceId, statName, incrementValue) {
+        try {
+            const validStats = [
+                'views',
+                'downloads',
+                'shares',
+                'favorites',
+                'upvotes',
+            ]
+            if (!validStats.includes(statName)) {
+                throw new Error(`无效的统计字段: ${statName}`)
+            }
+
+            const update = { $inc: {} }
+            update.$inc[`stats.${statName}`] = incrementValue
+
+            const resource = await Resource.findByIdAndUpdate(
+                resourceId,
+                update,
+                {
+                    new: true,
+                }
+            )
+
+            if (!resource) {
+                console.warn(`尝试更新不存在的资源统计: ${resourceId}`)
+                return null
+            }
+            return resource.stats
+        } catch (error) {
+            console.error(
+                `更新资源统计 (${statName}) 失败 for ${resourceId}:`,
+                error
+            )
+            throw error
+        }
+    }
+
+    // 添加资源评分
     async addResourceRating(resourceId, ratingData) {
         const resource = await Resource.findById(resourceId)
         if (!resource) return null

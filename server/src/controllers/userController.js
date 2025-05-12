@@ -1,7 +1,7 @@
 import { DataService } from '../services/DataService.js'
 import FileUploadUtils from '../utils/fileUploadUtils.js'
 import multer from 'multer'
-import AppError from '../utils/appError.js'
+import mongoose from 'mongoose'
 
 // 配置multer用于内存存储
 const storage = multer.memoryStorage()
@@ -36,7 +36,7 @@ export const getAllUsers = async (req, res) => {
 
 export const getUser = async (req, res) => {
     try {
-        console.log(req.params.id, 'req.params.id')
+        // console.log(req.params.id, 'req.params.id')
         const user = await dataService.getUserById(req.params.id)
 
         // console.log(user, 'user')
@@ -122,7 +122,7 @@ export const deleteUser = async (req, res) => {
 export const getMe = (req, res, next) => {
     req.params.id = req.user.id
 
-    console.log(req.params.id, 'req.params.id')
+    // console.log(req.params.id, 'req.params.id')
     next()
 }
 
@@ -171,7 +171,7 @@ export const updateMe = async (req, res) => {
         }
 
         // 打印更新后的用户数据，用于调试
-        console.log('更新后的用户数据:', user)
+        // console.log('更新后的用户数据:', user)
 
         res.status(200).json({
             status: 'success',
@@ -201,6 +201,92 @@ export const deleteMe = async (req, res) => {
         res.status(400).json({
             status: 'error',
             message: err.message,
+        })
+    }
+}
+
+// 添加资源到收藏夹
+export const addFavoriteResource = async (req, res) => {
+    try {
+        const userId = req.user.id
+        const resourceId = req.params.resourceId
+
+        console.log(userId, resourceId, 'userId, resourceId')
+
+        if (!mongoose.Types.ObjectId.isValid(resourceId)) {
+            return res
+                .status(400)
+                .json({ status: 'error', message: '无效的资源ID' })
+        }
+
+        // 使用 $addToSet 防止重复添加
+        const user = await dataService.updateUser(userId, {
+            $addToSet: { favoriteResources: resourceId },
+        })
+
+        if (!user) {
+            return res
+                .status(404)
+                .json({ status: 'error', message: '未找到用户' })
+        }
+
+        // 可选：更新资源的收藏计数
+        await dataService.incrementResourceStat(resourceId, 'favorites', 1)
+
+        res.status(200).json({
+            status: 'success',
+            message: '资源已添加到收藏夹',
+            data: {
+                favoriteResources: user.favoriteResources, // 返回更新后的收藏列表
+            },
+        })
+    } catch (err) {
+        console.error('添加收藏失败:', err)
+        res.status(500).json({
+            status: 'error',
+            message: err.message || '添加收藏失败',
+        })
+    }
+}
+
+// 从收藏夹移除资源
+export const removeFavoriteResource = async (req, res) => {
+    try {
+        const userId = req.user.id
+        const resourceId = req.params.resourceId
+
+        if (!mongoose.Types.ObjectId.isValid(resourceId)) {
+            return res
+                .status(400)
+                .json({ status: 'error', message: '无效的资源ID' })
+        }
+
+        // 使用 $pull 从数组中移除
+        const user = await dataService.updateUser(userId, {
+            $pull: { favoriteResources: resourceId },
+        })
+
+        if (!user) {
+            return res
+                .status(404)
+                .json({ status: 'error', message: '未找到用户' })
+        }
+
+        // 可选：更新资源的收藏计数
+        await dataService.incrementResourceStat(resourceId, 'favorites', -1)
+
+        res.status(200).json({
+            status: 'success',
+            message: '资源已从收藏夹移除',
+            data: {
+                favoriteResources: user.favoriteResources, // 返回更新后的收藏列表
+            },
+        })
+    } catch (err) {
+        console.error('移除收藏失败:', err)
+        res.status(500).json({
+            status: 'error',
+            message: err.message || '移除收藏失败',
         })
     }
 }

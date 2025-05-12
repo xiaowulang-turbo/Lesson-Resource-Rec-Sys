@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useState, useContext } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import styled from 'styled-components'
 import { getResourceById } from '../services/apiResources'
-import { getUserById } from '../services/apiUsers'
+import { addFavorite, removeFavorite } from '../services/apiUsers'
+import { AuthContext } from '../context/AuthContext'
 import Heading from '../ui/Heading'
 import Spinner from '../ui/Spinner'
 import Row from '../ui/Row'
@@ -11,6 +12,7 @@ import Tag from '../ui/Tag'
 import Button from '../ui/Button'
 import Empty from '../ui/Empty'
 import SimilarResourceList from '../ui/SimilarResourceList'
+import toast from 'react-hot-toast'
 
 // --- 样式化组件 ---
 const DetailLayout = styled.div`
@@ -98,27 +100,80 @@ const AuthorLink = styled(Link)`
 `
 
 function ResourceDetail() {
-    const { id } = useParams()
+    const { id: resourceId } = useParams()
+    const queryClient = useQueryClient()
+    const { user: currentUser, isAuthenticated } = useContext(AuthContext)
 
     const {
         data: resource,
         isLoading,
         error,
     } = useQuery({
-        queryKey: ['resource', id],
-        queryFn: () => getResourceById(id),
+        queryKey: ['resource', resourceId],
+        queryFn: () => getResourceById(resourceId),
         retry: false,
     })
 
-    // 获取上传者信息 - 使用用户接口
-    const { data: creatorUser, isLoading: isLoadingCreator } = useQuery({
-        queryKey: ['user', resource?.createdBy],
-        queryFn: () => getUserById(resource.createdBy),
-        enabled: !!resource?.createdBy,
+    const [isFavorited, setIsFavorited] = useState(() => {
+        if (!isAuthenticated || !currentUser?.favoriteResources) return false
+        return currentUser.favoriteResources.includes(resourceId)
     })
 
+    const { mutate: addFavMutate, isLoading: isAddingFavorite } = useMutation({
+        mutationFn: () => addFavorite(currentUser.id, resourceId),
+        onSuccess: (data) => {
+            toast.success('已添加到收藏夹！')
+            setIsFavorited(true)
+            queryClient.setQueryData(['user', currentUser.id], (oldData) => {
+                return {
+                    ...oldData,
+                    favoriteResources: data.favoriteResources,
+                }
+            })
+            queryClient.invalidateQueries(['resource', resourceId])
+        },
+        onError: (err) => {
+            toast.error(`添加收藏失败: ${err.message}`)
+        },
+    })
+
+    const { mutate: removeFavMutate, isLoading: isRemovingFavorite } =
+        useMutation({
+            mutationFn: () => removeFavorite(currentUser.id, resourceId),
+            onSuccess: (data) => {
+                toast.success('已从收藏夹移除')
+                setIsFavorited(false)
+                queryClient.setQueryData(
+                    ['user', currentUser.id],
+                    (oldData) => {
+                        return {
+                            ...oldData,
+                            favoriteResources: data.favoriteResources,
+                        }
+                    }
+                )
+                queryClient.invalidateQueries(['resource', resourceId])
+            },
+            onError: (err) => {
+                toast.error(`移除收藏失败: ${err.message}`)
+            },
+        })
+
+    const handleToggleFavorite = () => {
+        if (!isAuthenticated) {
+            toast.error('请先登录才能收藏资源')
+            return
+        }
+
+        if (isFavorited) {
+            removeFavMutate()
+        } else {
+            addFavMutate()
+        }
+    }
+
     if (isLoading) return <Spinner />
-    if (error) return <Empty resourceName={`资源 (ID: ${id})`} />
+    if (error) return <Empty resourceName={`资源 (ID: ${resourceId})`} />
     if (!resource) return <Empty resourceName="资源" />
 
     // 格式化日期等 (可选)
@@ -177,11 +232,7 @@ function ResourceDetail() {
                     </p>
                     <p>
                         <strong>上传者：</strong>{' '}
-                        {isLoadingCreator
-                            ? '加载中...'
-                            : resource.createdBy
-                            ? creatorUser?.name || '未知用户'
-                            : '未知用户'}
+                        {resource.createdBy ? resource.createdBy : '未知用户'}
                     </p>
                     <p>
                         <strong>上传时间：</strong> {formattedDate}
@@ -232,8 +283,14 @@ function ResourceDetail() {
                     <Button variation="secondary" size="small">
                         👍 点赞 ({resource.upvotes || 0})
                     </Button>
-                    <Button variation="secondary" size="small">
-                        ⭐ 收藏
+                    <Button
+                        variation={isFavorited ? 'primary' : 'secondary'}
+                        size="small"
+                        onClick={handleToggleFavorite}
+                        disabled={isAddingFavorite || isRemovingFavorite}
+                    >
+                        {isFavorited ? '★ 已收藏' : '⭐ 收藏'} (
+                        {resource.stats?.favorites || 0})
                     </Button>
                     <Button variation="danger" size="small">
                         举报
@@ -242,7 +299,7 @@ function ResourceDetail() {
             </MainContent>
 
             <Sidebar>
-                <SimilarResourceList resourceId={id} />
+                <SimilarResourceList resourceId={resourceId} />
             </Sidebar>
         </DetailLayout>
     )

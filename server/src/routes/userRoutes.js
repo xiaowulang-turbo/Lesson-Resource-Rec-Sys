@@ -8,6 +8,8 @@ import {
     updateMe,
     deleteMe,
     uploadUserPhoto,
+    addFavoriteResource,
+    removeFavoriteResource,
 } from '../controllers/userController.js'
 import { protect, restrictTo } from '../middlewares/authMiddleware.js'
 
@@ -20,6 +22,10 @@ router.use(protect)
 router.get('/me', getMe, getUser)
 router.patch('/updateMe', uploadUserPhoto, updateMe)
 router.delete('/deleteMe', deleteMe)
+
+// 新增：收藏和取消收藏资源的路由
+router.patch('/:userId/favorites/:resourceId', addFavoriteResource)
+router.delete('/:userId/favorites/:resourceId', removeFavoriteResource)
 
 // 限制以下路由仅管理员可访问
 router.use(restrictTo('admin'))

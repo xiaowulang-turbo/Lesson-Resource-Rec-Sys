@@ -1,7 +1,7 @@
 import { BASE_URL, ENDPOINTS } from './apiConfig'
 
 // 辅助函数：获取存储的认证信息
-function getStoredAuth() {
+export function getStoredAuth() {
     const auth = localStorage.getItem('auth')
     return auth ? JSON.parse(auth) : null
 }

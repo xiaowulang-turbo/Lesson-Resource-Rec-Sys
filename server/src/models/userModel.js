@@ -105,6 +105,12 @@ const userSchema = new mongoose.Schema(
                 default: Date.now,
             },
         },
+        favoriteResources: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Resource',
+            },
+        ],
         avatar: {
             type: String,
             default: 'default.jpg',

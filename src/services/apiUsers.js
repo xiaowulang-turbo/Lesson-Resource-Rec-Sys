@@ -1,12 +1,7 @@
 import { BASE_URL } from './apiConfig'
-// import { API_URL } from '../utils/constants'
+import { API_URL } from '../utils/constants'
 import axiosInstance from './axiosInstance' // 假设你有一个配置好的 axios 实例
-
-// 辅助函数：获取存储的认证信息
-function getStoredAuth() {
-    const auth = localStorage.getItem('auth')
-    return auth ? JSON.parse(auth) : null
-}
+import { getStoredAuth } from './apiAuth.js'
 
 // 辅助函数：获取授权头
 function getAuthHeaders() {
@@ -154,4 +149,73 @@ export async function getUsers() {
         // 确保在错误情况下也抛出错误，让 React Query 处理
         throw new Error(error.response?.data?.message || '无法加载用户数据')
     }
+}
+
+export async function deleteMe() {
+    const auth = getStoredAuth()
+    if (!auth || !auth.token) throw new Error('用户未登录')
+
+    const res = await fetch(`${BASE_URL}/users/deleteMe`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${auth.token}`,
+        },
+    })
+
+    if (!res.ok) {
+        const data = await res.json().catch(() => ({})) // 尝试解析JSON，失败则返回空对象
+        throw new Error(data.message || '删除账户失败')
+    }
+
+    // 对于204 No Content，通常没有响应体
+    return null // 或者返回一个表示成功的特定对象，如 { status: 'success' }
+}
+
+// 新增：添加资源到收藏夹
+export async function addFavorite(userId, resourceId) {
+    const auth = getStoredAuth()
+    if (!auth || !auth.token) throw new Error('用户未登录')
+
+    const res = await fetch(
+        `${BASE_URL}/users/${userId}/favorites/${resourceId}`,
+        {
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${auth.token}`,
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+
+    const data = await res.json()
+
+    if (!res.ok) {
+        throw new Error(data.message || '添加收藏失败')
+    }
+
+    return data.data // 返回更新后的收藏列表等信息
+}
+
+// 新增：从收藏夹移除资源
+export async function removeFavorite(userId, resourceId) {
+    const auth = getStoredAuth()
+    if (!auth || !auth.token) throw new Error('用户未登录')
+
+    const res = await fetch(
+        `${BASE_URL}/users/${userId}/favorites/${resourceId}`,
+        {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${auth.token}`,
+            },
+        }
+    )
+
+    const data = await res.json()
+
+    if (!res.ok) {
+        throw new Error(data.message || '移除收藏失败')
+    }
+
+    return data.data // 返回更新后的收藏列表等信息
 }
