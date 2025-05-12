@@ -1,5 +1,6 @@
 import { BASE_URL } from './apiConfig'
 // import { API_URL } from '../utils/constants'
+import axiosInstance from './axiosInstance' // 假设你有一个配置好的 axios 实例
 
 // 辅助函数：获取存储的认证信息
 function getStoredAuth() {
@@ -141,4 +142,16 @@ export async function deleteCurrentUser() {
     }
 
     return true
+}
+
+export async function getUsers() {
+    try {
+        const response = await axiosInstance.get('/users')
+        // 后端 API 将用户数据包装在 response.data.data.users 中
+        return response.data.data.users
+    } catch (error) {
+        console.error('获取用户列表失败:', error)
+        // 确保在错误情况下也抛出错误，让 React Query 处理
+        throw new Error(error.response?.data?.message || '无法加载用户数据')
+    }
 }

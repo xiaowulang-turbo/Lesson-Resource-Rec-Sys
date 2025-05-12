@@ -12,6 +12,7 @@ import Settings from './pages/Settings'
 import Users from './pages/Users'
 import Resources from './pages/Resources'
 import ResourceManagement from './pages/admin/ResourceManagement'
+import UserManagement from './pages/admin/UserManagement'
 import Profile from './pages/Profile'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -48,6 +49,8 @@ function App() {
                             <Routes>
                                 <Route path="login" element={<Login />} />
                                 <Route path="register" element={<Register />} />
+                                {/* TEMPORARY: Move admin route outside protection */}
+                                {/* <Route path="admin/resource-management" element={<ResourceManagement />} /> */}
                                 <Route
                                     element={
                                         <ProtectedRoute>
@@ -70,12 +73,16 @@ function App() {
                                     />
                                     <Route path="users" element={<Users />} />
                                     <Route
-                                        path="resources"
-                                        element={<Resources />}
+                                        path="admin/resource-management"
+                                        element={<ResourceManagement />}
                                     />
                                     <Route
-                                        path="resource-management"
-                                        element={<ResourceManagement />}
+                                        path="admin/user-management"
+                                        element={<UserManagement />}
+                                    />
+                                    <Route
+                                        path="resources"
+                                        element={<Resources />}
                                     />
                                     <Route
                                         path="resources/:id"

@@ -89,12 +89,6 @@ function MainNav({ isHorizontal = false }) {
     return (
         <nav>
             <NavList>
-                <li>
-                    <StyledNavLink to="/home" isHorizontal={isHorizontal}>
-                        <HiOutlineHome />
-                        首页
-                    </StyledNavLink>
-                </li>
                 {/* <li>
                     <StyledNavLink to="/courses" isHorizontal={isHorizontal}>
                         <HiOutlineAcademicCap />
@@ -105,7 +99,7 @@ function MainNav({ isHorizontal = false }) {
                     <>
                         <li>
                             <StyledNavLink
-                                to="/resource-management"
+                                to="/admin/resource-management"
                                 isHorizontal={isHorizontal}
                             >
                                 <HiOutlineBookOpen />
@@ -114,7 +108,7 @@ function MainNav({ isHorizontal = false }) {
                         </li>
                         <li>
                             <StyledNavLink
-                                to="/users"
+                                to="/admin/user-management"
                                 isHorizontal={isHorizontal}
                             >
                                 <HiOutlineUsers />
@@ -124,6 +118,16 @@ function MainNav({ isHorizontal = false }) {
                     </>
                 ) : (
                     <>
+                        {' '}
+                        <li>
+                            <StyledNavLink
+                                to="/home"
+                                isHorizontal={isHorizontal}
+                            >
+                                <HiOutlineHome />
+                                首页
+                            </StyledNavLink>
+                        </li>
                         <li>
                             <StyledNavLink
                                 to="/resources"

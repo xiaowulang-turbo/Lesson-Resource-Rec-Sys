@@ -62,6 +62,40 @@ export class DataService {
         }
     }
 
+    async getAllUsers() {
+        try {
+            // 获取所有账户信息
+            const accounts = await Account.find().lean() // 使用 lean() 获取普通 JS 对象
+            // 获取所有用户信息
+            const users = await User.find().lean()
+
+            // 创建 accountId 到 account 的映射
+            const accountMap = new Map()
+            accounts.forEach((acc) => accountMap.set(acc._id.toString(), acc))
+
+            // 合并用户信息和账户信息
+            const combinedUsers = users.map((user) => {
+                const account = user.accountId
+                    ? accountMap.get(user.accountId.toString())
+                    : {}
+                return {
+                    _id: user._id, // 保留 user 的 _id 作为主键
+                    name: user.name || account?.name || '未知',
+                    email: account?.email || '未知',
+                    role: account?.role || 'user',
+                    photo: user.avatar || account?.avatar, // 优先用 user.avatar
+                    createdAt: account?.createdAt || user.createdAt, // 使用 account 的注册时间
+                    // 可以根据需要添加其他字段
+                }
+            })
+
+            return combinedUsers
+        } catch (error) {
+            console.error('获取所有用户失败:', error)
+            throw new Error('无法获取用户列表: ' + error.message)
+        }
+    }
+
     async getUserByEmail(email) {
         try {
             // 先通过email查找账户
