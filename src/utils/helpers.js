@@ -28,3 +28,10 @@ export const formatCurrency = (value) =>
     new Intl.NumberFormat('en', { style: 'currency', currency: 'USD' }).format(
         value
     )
+
+// 格式化日期
+export function formatDate(dateString) {
+    const date = new Date(dateString)
+    const options = { year: 'numeric', month: 'short', day: 'numeric' }
+    return date.toLocaleDateString('zh-CN', options)
+}
