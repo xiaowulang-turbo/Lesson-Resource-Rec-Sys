@@ -10,6 +10,7 @@ import {
 import { HiOutlineBeaker } from 'react-icons/hi'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
+import { useAuth } from '../context/AuthContext'
 
 const VerticalNavList = styled.ul`
     display: flex;
@@ -82,6 +83,8 @@ const StyledNavLink = styled(NavLink)`
 
 function MainNav({ isHorizontal = false }) {
     const NavList = isHorizontal ? HorizontalNavList : VerticalNavList
+    const { user } = useAuth()
+    const isAdmin = user && user.role === 'admin'
 
     return (
         <nav>
@@ -98,18 +101,49 @@ function MainNav({ isHorizontal = false }) {
                         课程
                     </StyledNavLink>
                 </li> */}
-                <li>
-                    <StyledNavLink to="/resources" isHorizontal={isHorizontal}>
-                        <HiOutlineBookOpen />
-                        资源中心
-                    </StyledNavLink>
-                </li>
-                <li>
-                    <StyledNavLink to="/profile" isHorizontal={isHorizontal}>
-                        <HiOutlineUserCircle />
-                        个人中心
-                    </StyledNavLink>
-                </li>
+                {isAdmin ? (
+                    <>
+                        <li>
+                            <StyledNavLink
+                                to="/resource-management"
+                                isHorizontal={isHorizontal}
+                            >
+                                <HiOutlineBookOpen />
+                                资源管理
+                            </StyledNavLink>
+                        </li>
+                        <li>
+                            <StyledNavLink
+                                to="/users"
+                                isHorizontal={isHorizontal}
+                            >
+                                <HiOutlineUsers />
+                                用户管理
+                            </StyledNavLink>
+                        </li>
+                    </>
+                ) : (
+                    <>
+                        <li>
+                            <StyledNavLink
+                                to="/resources"
+                                isHorizontal={isHorizontal}
+                            >
+                                <HiOutlineBookOpen />
+                                资源中心
+                            </StyledNavLink>
+                        </li>
+                        <li>
+                            <StyledNavLink
+                                to="/profile"
+                                isHorizontal={isHorizontal}
+                            >
+                                <HiOutlineUserCircle />
+                                个人中心
+                            </StyledNavLink>
+                        </li>
+                    </>
+                )}
                 {/* <li>
                     <StyledNavLink to="/api-test" isHorizontal={isHorizontal}>
                         <HiOutlineBeaker />
