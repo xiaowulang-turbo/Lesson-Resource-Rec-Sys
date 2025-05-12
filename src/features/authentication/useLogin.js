@@ -22,8 +22,13 @@ export default function useLogin() {
             // 2. Update React Query cache (if still needed, depends on useUser implementation)
             // queryClient.setQueryData(['user'], data.data.user) // Keep or remove based on how useUser works
 
-            // 3. Navigate
-            navigate('/home', { replace: true })
+            // 3. Navigate based on user role
+            const userRole = data?.data?.user?.role
+            if (userRole === 'admin') {
+                navigate('/admin/resource-management', { replace: true })
+            } else {
+                navigate('/home', { replace: true })
+            }
         },
 
         onError: (error) => {
