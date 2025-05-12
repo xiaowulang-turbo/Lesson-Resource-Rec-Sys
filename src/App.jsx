@@ -11,6 +11,8 @@ import Account from './pages/Account'
 import Settings from './pages/Settings'
 import Users from './pages/Users'
 import Resources from './pages/Resources'
+import ResourceManagement from './pages/admin/ResourceManagement'
+import ResourceEdit from './pages/admin/ResourceEdit'
 import Profile from './pages/Profile'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -72,8 +74,16 @@ function App() {
                                         element={<Resources />}
                                     />
                                     <Route
+                                        path="resource-management"
+                                        element={<ResourceManagement />}
+                                    />
+                                    <Route
                                         path="resources/:id"
                                         element={<ResourceDetail />}
+                                    />
+                                    <Route
+                                        path="resources/edit/:id"
+                                        element={<ResourceEdit />}
                                     />
                                     <Route
                                         path="profile"
