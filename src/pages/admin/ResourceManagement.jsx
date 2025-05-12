@@ -27,11 +27,11 @@ import {
     HiOutlineDocument,
     HiXMark,
     HiCheck,
+    // HiOutlineRefresh,
 } from 'react-icons/hi2'
 import { HiOutlineDownload } from 'react-icons/hi'
 import ResourceFilter from '../../components/ResourceFilter'
 import Checkbox from '../../ui/Checkbox'
-import EditResourceForm from '../../components/EditResourceForm'
 import ConfirmDelete from '../../components/ConfirmDelete'
 
 const StyledResourceManagement = styled.div`
@@ -147,17 +147,16 @@ function ResourceManagement() {
     })
     const [selectedResources, setSelectedResources] = useState([])
     const [selectAll, setSelectAll] = useState(false)
-
-    // 添加当前编辑和删除的资源ID状态
-    const [editingResourceId, setEditingResourceId] = useState(null)
-    const [deletingResourceId, setDeletingResourceId] = useState(null)
-
-    // 查询单个资源详情 (用于编辑)
-    const { data: editingResource, isLoading: isLoadingResource } = useQuery({
-        queryKey: ['resource', editingResourceId],
-        queryFn: () => getResourceById(editingResourceId),
-        enabled: !!editingResourceId,
+    const [stats, setStats] = useState({
+        total: 0,
+        documents: 0,
+        videos: 0,
+        exercises: 0,
+        others: 0,
     })
+
+    // 删除资源相关状态
+    const [deletingResourceId, setDeletingResourceId] = useState(null)
 
     // 删除资源 mutation
     const { mutate: deleteMutate, isLoading: isDeleting } = useMutation({
@@ -177,16 +176,7 @@ function ResourceManagement() {
         },
     })
 
-    // 统计数据
-    const [stats, setStats] = useState({
-        total: 0,
-        documents: 0,
-        videos: 0,
-        exercises: 0,
-        others: 0,
-    })
-
-    // 获取当前页码
+    // 当前页码
     const currentPage = parseInt(searchParams.get('page') || 1)
 
     // 获取资源数据
@@ -202,28 +192,7 @@ function ResourceManagement() {
 
                 setResources(result.resources)
                 setPagination(result.pagination)
-
-                // 计算统计数据
-                const documents = result.resources.filter(
-                    (r) => r.type === '308'
-                ).length
-                const videos = result.resources.filter(
-                    (r) => r.type === '310'
-                ).length
-                const exercises = result.resources.filter(
-                    (r) => r.type === '311'
-                ).length
-                const others = result.resources.filter(
-                    (r) => r.type === '312'
-                ).length
-
-                setStats({
-                    total: result.pagination.total,
-                    documents,
-                    videos,
-                    exercises,
-                    others,
-                })
+                setStats(result.stats)
 
                 // 重置选择状态
                 setSelectedResources([])
@@ -310,19 +279,6 @@ function ResourceManagement() {
         // 实现批量导出逻辑
     }
 
-    // 打开编辑资源Modal
-    const handleOpenEditModal = (resourceId) => {
-        console.log(resourceId, 'resourceId')
-
-        setEditingResourceId(resourceId)
-        console.log(editingResource, 'editingResource')
-    }
-
-    // 关闭编辑资源Modal
-    const handleCloseEditModal = () => {
-        setEditingResourceId(null)
-    }
-
     // 打开删除资源Modal
     const handleOpenDeleteModal = (resourceId) => {
         setDeletingResourceId(resourceId)
@@ -352,6 +308,7 @@ function ResourceManagement() {
 
             setResources(result.resources)
             setPagination(result.pagination)
+            setStats(result.stats)
         } catch (err) {
             console.error('刷新资源列表失败', err)
         } finally {
@@ -375,9 +332,9 @@ function ResourceManagement() {
 
             <Modal>
                 <StyledResourceManagement>
-                    <StatsRow>
+                    {/* <StatsRow>
                         <StatCard>
-                            <h3>{stats.total}</h3>
+                            <h3>{stats?.length}</h3>
                             <p>总资源数</p>
                         </StatCard>
                         <StatCard>
@@ -392,7 +349,7 @@ function ResourceManagement() {
                             <h3>{stats.exercises}</h3>
                             <p>练习题库</p>
                         </StatCard>
-                    </StatsRow>
+                    </StatsRow> */}
                     {/* 
                 <FilterSection>
                     <ResourceFilter onFilterChange={handleFilterChange} />
@@ -509,20 +466,18 @@ function ResourceManagement() {
                                                         >
                                                             查看
                                                         </Menus.Button>
-                                                        <Modal.Open opens="edit-resource">
-                                                            <Menus.Button
-                                                                icon={
-                                                                    <HiOutlinePencil />
-                                                                }
-                                                                onClick={() =>
-                                                                    handleOpenEditModal(
-                                                                        resource._id
-                                                                    )
-                                                                }
-                                                            >
-                                                                编辑
-                                                            </Menus.Button>
-                                                        </Modal.Open>
+                                                        <Menus.Button
+                                                            icon={
+                                                                <HiOutlinePencil />
+                                                            }
+                                                            onClick={() =>
+                                                                navigate(
+                                                                    `/resources/edit/${resource._id}`
+                                                                )
+                                                            }
+                                                        >
+                                                            编辑
+                                                        </Menus.Button>
                                                         <Modal.Open opens="delete-resource">
                                                             <Menus.Button
                                                                 icon={
@@ -551,25 +506,6 @@ function ResourceManagement() {
                         </Table>
                     )}
                 </StyledResourceManagement>
-
-                {/* <Modal> */}
-                {/* 编辑资源Modal */}
-                <Modal.Window name="edit-resource">
-                    <StyledModal>
-                        <Heading as="h2">编辑资源</Heading>
-                        {isLoadingResource ? (
-                            <Spinner />
-                        ) : (
-                            editingResource && (
-                                <EditResourceForm
-                                    resource={editingResource}
-                                    onCloseModal={handleCloseEditModal}
-                                    onSuccess={handleRefreshResources}
-                                />
-                            )
-                        )}
-                    </StyledModal>
-                </Modal.Window>
 
                 {/* 删除资源Modal */}
                 <Modal.Window name="delete-resource">

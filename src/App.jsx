@@ -12,12 +12,12 @@ import Settings from './pages/Settings'
 import Users from './pages/Users'
 import Resources from './pages/Resources'
 import ResourceManagement from './pages/admin/ResourceManagement'
-import ResourceEdit from './pages/admin/ResourceEdit'
 import Profile from './pages/Profile'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Search from './pages/Search'
 import Upload from './pages/Upload'
+import EditResource from './pages/EditResource'
 import GlobalStyles from './styles/GlobalStyles'
 import AppLayout from './ui/AppLayout'
 import { Toaster } from 'react-hot-toast'
@@ -83,7 +83,7 @@ function App() {
                                     />
                                     <Route
                                         path="resources/edit/:id"
-                                        element={<ResourceEdit />}
+                                        element={<EditResource />}
                                     />
                                     <Route
                                         path="profile"

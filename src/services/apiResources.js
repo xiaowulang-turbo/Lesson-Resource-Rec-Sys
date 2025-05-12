@@ -41,6 +41,12 @@ export async function getAllResources(filters = {}) {
 // 获取单个资源
 export async function getResourceById(id) {
     try {
+        console.log('getResourceById: 获取资源详情，ID:', id)
+
+        if (!id || id === 'null' || id === 'undefined') {
+            throw new Error('无效的资源ID，无法获取详情')
+        }
+
         const res = await fetch(`${BASE_URL}${ENDPOINTS.RESOURCES.BASE}/${id}`)
         const data = await res.json()
 
@@ -346,32 +352,92 @@ export async function updateResource(formData) {
             throw new Error('您尚未登录，请先登录')
         }
 
+        // 尝试从formData中获取ID
         const id = formData.get('id')
+        console.log('updateResource: 正在更新资源，ID:', id)
 
-        const res = await fetch(
-            `${BASE_URL}${ENDPOINTS.RESOURCES.BASE}/${id}`,
-            {
-                method: 'PATCH',
-                body: formData,
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        )
-
-        const data = await res.json()
-
-        if (!res.ok) {
-            console.error('API Error Response:', data)
-            throw new Error(data.message || '更新资源失败')
+        if (!id || id === 'null' || id === 'undefined') {
+            throw new Error('无效的资源ID，无法更新')
         }
 
-        // 检查返回的数据结构
-        if (data.status === 'success' && data.data && data.data.resource) {
-            return data.data.resource // 返回更新后的资源对象
+        // 由于后端无法处理FormData，将数据转换为JSON对象
+        const jsonData = {}
+        for (const [key, value] of formData.entries()) {
+            if (key !== 'id' && key !== 'resourceFile') {
+                // 处理标签等数组类型
+                if (key === 'tags') {
+                    // 如果键已存在且为数组，添加到数组中
+                    if (jsonData[key] && Array.isArray(jsonData[key])) {
+                        jsonData[key].push(value)
+                    }
+                    // 否则创建新数组
+                    else {
+                        jsonData[key] = [value]
+                    }
+                } else {
+                    // 常规字段
+                    jsonData[key] = value
+                }
+            }
+        }
+
+        console.log('转换为JSON发送:', JSON.stringify(jsonData))
+
+        // 处理文件上传 - 如果有文件，需要使用FormData
+        if (formData.get('resourceFile')) {
+            console.log('检测到文件上传，使用FormData')
+            // 保持原有FormData处理方式
+            const cleanFormData = new FormData()
+            for (const [key, value] of formData.entries()) {
+                if (key !== 'id') {
+                    cleanFormData.append(key, value)
+                }
+            }
+
+            const res = await fetch(
+                `${BASE_URL}${ENDPOINTS.RESOURCES.BASE}/${id}`,
+                {
+                    method: 'PATCH',
+                    body: cleanFormData,
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
+            const data = await res.json()
+            if (!res.ok) {
+                console.error('API Error Response:', data)
+                throw new Error(data.message || '更新资源失败')
+            }
+            return data.data.resource
         } else {
-            console.error('Unexpected API response structure on update:', data)
-            throw new Error('更新资源成功，但返回数据格式不正确')
+            // 对于没有文件的请求，使用JSON格式
+            const res = await fetch(
+                `${BASE_URL}${ENDPOINTS.RESOURCES.BASE}/${id}`,
+                {
+                    method: 'PATCH',
+                    body: JSON.stringify(jsonData),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
+            const data = await res.json()
+            if (!res.ok) {
+                console.error('API Error Response:', data)
+                throw new Error(data.message || '更新资源失败')
+            }
+            // 检查返回的数据结构
+            if (data.status === 'success' && data.data && data.data.resource) {
+                return data.data.resource // 返回更新后的资源对象
+            } else {
+                console.error(
+                    'Unexpected API response structure on update:',
+                    data
+                )
+                throw new Error('更新资源成功，但返回数据格式不正确')
+            }
         }
     } catch (error) {
         console.error('更新资源失败:', error)

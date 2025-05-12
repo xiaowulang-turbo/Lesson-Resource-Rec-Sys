@@ -12,7 +12,7 @@ export const getAllResources = async (req, res) => {
         const filters = req.query
         const result = await dataService.getAllResources(filters)
 
-        console.log('获取资源列表成功:', result)
+        // console.log('获取资源列表成功:', result)
 
         res.status(200).json({
             status: 'success',
@@ -174,6 +174,12 @@ export const createResource = async (req, res) => {
 
 export const updateResource = async (req, res) => {
     try {
+        console.log(
+            'updateResource: 更新资源，资源ID:',
+            req.params.id,
+            req.body
+        )
+
         const resource = await dataService.updateResource(
             req.params.id,
             req.body

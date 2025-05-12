@@ -39,7 +39,7 @@ export const getUser = async (req, res) => {
         console.log(req.params.id, 'req.params.id')
         const user = await dataService.getUserById(req.params.id)
 
-        console.log(user, 'user')
+        // console.log(user, 'user')
 
         if (!user) {
             return res.status(404).json({

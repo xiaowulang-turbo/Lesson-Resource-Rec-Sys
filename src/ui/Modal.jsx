@@ -65,15 +65,19 @@ function Modal({ children }) {
 
     return (
         <ModalContext.Provider value={{ openName, close, open }}>
-            <div>{children}</div>
+            {children}
         </ModalContext.Provider>
     )
 }
 
 function Open({ children, opens: opensWindowName }) {
-    console.log(ModalContext, 'ModalContext')
+    const context = useContext(ModalContext)
 
-    const { open } = useContext(ModalContext)
+    if (!context) {
+        throw new Error('Modal.Open 组件必须在 Modal 组件内部使用')
+    }
+
+    const { open } = context
 
     return (
         <>{cloneElement(children, { onClick: () => open(opensWindowName) })}</>
@@ -81,7 +85,13 @@ function Open({ children, opens: opensWindowName }) {
 }
 
 function Window({ children, name }) {
-    const { openName, close } = useContext(ModalContext)
+    const context = useContext(ModalContext)
+
+    if (!context) {
+        throw new Error('Modal.Window 组件必须在 Modal 组件内部使用')
+    }
+
+    const { openName, close } = context
 
     // custom hook
     const ref = useOutsideClick(close, true)
