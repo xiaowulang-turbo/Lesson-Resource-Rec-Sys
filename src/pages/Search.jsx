@@ -6,11 +6,15 @@ import Spinner from '../ui/Spinner'
 import ResourceList from '../components/ResourceList'
 import Empty from '../ui/Empty'
 // import Filter from '../ui/Filter';
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { searchResources } from '../services/apiSearch'
-import { searchMoocCoursesDirectly } from '../services/apiMooc'
+import {
+    searchMoocCoursesDirectly,
+    saveMoocResources,
+} from '../services/apiMooc'
 import { useState, useEffect, useCallback } from 'react'
 import { debounce } from '../utils/debounce'
+import toast from 'react-hot-toast'
 
 const SearchPageLayout = styled.div`
     padding: 3.2rem 4.8rem;
@@ -48,6 +52,9 @@ function Search() {
     const [resources, setResources] = useState([]) // 资源列表状态
     const [isLoading, setIsLoading] = useState(false) // 加载状态
     const [error, setError] = useState(null) // 错误状态
+    const [isSaving, setIsSaving] = useState(false) // 保存状态
+
+    const queryClient = useQueryClient() // 获取 query client 实例
 
     // 本地搜索使用React Query
     const {
@@ -74,20 +81,30 @@ function Search() {
                 const moocResults = await searchMoocCoursesDirectly(searchQuery)
                 console.log('获取到MOOC资源数量:', moocResults?.length || 0)
 
+                console.log('MOOC资源:', moocResults)
+
                 // 确保每个资源都有id字段和必要属性
                 const validResources = (moocResults || []).filter(
                     (resource) => {
-                        // 必须有ID
-                        if (!resource.id) return false
+                        // console.log('resource', resource)
+                        // 必须有ID 或者能自动生成ID
+                        const hasId = resource._id || resource.id
+
+                        // resource.title =
+                        //     resource.mocTextbookVo?.name || '未知课程'
+                        // resource.organization =
+                        //     resource.highlightUniversity || '中国大学MOOC'
+                        // resource.description =
+                        //     resource.mocTextbookVo?.description || '无描述'
 
                         // 处理各字段
-                        if (!resource.title) resource.title = '未知课程'
-                        if (!resource.organization)
-                            resource.organization = '中国大学MOOC'
-                        if (!resource.description)
-                            resource.description = '无描述'
+                        // if (!resource.title) resource.title = '未知课程'
+                        // if (!resource.organization)
+                        //     resource.organization = '中国大学MOOC'
+                        // if (!resource.description)
+                        //     resource.description = '无描述'
 
-                        return true
+                        return true // 允许所有资源，MongoDB会自动生成ID
                     }
                 )
 
@@ -97,7 +114,34 @@ function Search() {
                     console.warn('存在没有ID的资源，这些资源将被过滤掉')
                 }
 
-                setResources(validResources)
+                // 将获取的MOOC资源保存到数据库
+                setIsSaving(true)
+                try {
+                    const savedResults = await saveMoocResources(validResources)
+                    console.log('保存的资源数量:', savedResults?.results || 0)
+
+                    // 保存成功后，刷新本地资源缓存
+                    queryClient.invalidateQueries(['resources'])
+                    toast.success(
+                        `已成功保存 ${
+                            savedResults?.results || 0
+                        } 个资源到数据库`
+                    )
+
+                    // 保存后切换到本地搜索展示保存的资源
+                    setSearchType('local')
+                    setSearchParams({
+                        q: query,
+                        type: 'local',
+                    })
+                } catch (err) {
+                    console.error('保存MOOC资源失败:', err)
+                    toast.error(`保存资源失败: ${err.message || '未知错误'}`)
+                    // 保存失败仍然显示搜索结果
+                    setResources(validResources)
+                } finally {
+                    setIsSaving(false)
+                }
             } catch (err) {
                 console.error('搜索MOOC失败:', err)
                 setError(err.message || '搜索MOOC资源失败')
@@ -105,7 +149,7 @@ function Search() {
                 setIsLoading(false)
             }
         }, 500),
-        [searchType]
+        [searchType, queryClient, setSearchParams]
     )
 
     // MOOC搜索使用普通fetch
@@ -129,6 +173,7 @@ function Search() {
 
     // 切换搜索类型
     const handleSearchTypeChange = (type) => {
+        if (type === searchType) return // 如果类型相同，无需切换
         debouncedSetSearchType(type)
     }
 
@@ -142,7 +187,7 @@ function Search() {
     console.log('当前资源数量:', currentResources?.length || 0)
 
     if (currentResources && currentResources.length > 0) {
-        console.log('第一个资源示例:', currentResources[0])
+        // console.log('第一个资源示例:', currentResources[0])
         // 确认资源是否有必要的字段
         const firstResource = currentResources[0]
         const missingFields = []
@@ -188,7 +233,7 @@ function Search() {
             </SearchType>
 
             {/* --- 根据状态显示内容 --- */}
-            {currentIsLoading && <Spinner />}
+            {(currentIsLoading || isSaving) && <Spinner />}
             {currentError && (
                 <Empty
                     resource={`搜索 "${query}" 时出错: ${
@@ -197,6 +242,7 @@ function Search() {
                 />
             )}
             {!currentIsLoading &&
+                !isSaving &&
                 !currentError &&
                 query &&
                 currentResources &&
@@ -204,6 +250,7 @@ function Search() {
                     <ResourceList resources={currentResources} />
                 )}
             {!currentIsLoading &&
+                !isSaving &&
                 !currentError &&
                 query &&
                 (!currentResources || currentResources.length === 0) && (
@@ -213,7 +260,7 @@ function Search() {
                         }资源`}
                     />
                 )}
-            {!currentIsLoading && !currentError && !query && (
+            {!currentIsLoading && !isSaving && !currentError && !query && (
                 <Empty resource="请输入关键词开始搜索资源" />
             )}
         </SearchPageLayout>

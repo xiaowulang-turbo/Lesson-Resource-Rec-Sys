@@ -3,6 +3,10 @@ import mongoose from 'mongoose'
 const resourceSchema = new mongoose.Schema(
     {
         // 基本信息
+        originalId: {
+            type: String,
+            default: '',
+        },
         title: {
             type: String,
             required: [true, '请提供资源标题'],

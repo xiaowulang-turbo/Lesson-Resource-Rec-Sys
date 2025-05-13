@@ -9,6 +9,8 @@ import fetch from 'node-fetch' // 确保安装: npm install node-fetch
 function convertMocCourseToResource(mocCourse) {
     if (!mocCourse) return null
 
+    console.log('mocCourse', mocCourse)
+
     // 难度等级映射
     const difficultyMap = {
         入门: 1,

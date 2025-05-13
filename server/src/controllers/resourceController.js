@@ -364,3 +364,85 @@ export const downloadResourceFile = async (req, res) => {
         })
     }
 }
+
+// 保存MOOC资源到数据库
+export const saveMoocResources = async (req, res) => {
+    try {
+        const { resources } = req.body
+
+        if (!resources || !Array.isArray(resources) || resources.length === 0) {
+            return res.status(400).json({
+                status: 'fail',
+                message: '无效的资源数据',
+            })
+        }
+
+        // 获取用户ID，如果用户未登录，则使用系统默认ID
+        const userId =
+            req.user?.id ||
+            new mongoose.Types.ObjectId('000000000000000000000001')
+
+        // 处理每个资源，将其格式化为符合我们数据库模型的格式
+        const formattedResources = resources.map((resource) => {
+            // 确保每个资源都有必要的字段
+            return {
+                title: resource.title || '未知标题',
+                description: resource.description || '无描述',
+                contentType: resource.contentType || 'course',
+                pedagogicalType: resource.pedagogicalType || 'courseware',
+                format: resource.format || 'url',
+                subject: resource.subject || '未分类',
+                grade: resource.grade || '高等教育',
+                difficulty: resource.difficulty || 3,
+                url: resource.url || '',
+                cover: resource.cover || '',
+                price: resource.price || 0,
+                originalPrice: resource.originalPrice || 0,
+                authors: resource.authors || '',
+                publisher: resource.publisher || '',
+                organization: resource.organization || '',
+                school: resource.school || {
+                    id: null,
+                    name: '',
+                    shortName: '',
+                    imgUrl: '',
+                    supportMooc: false,
+                    supportSpoc: false,
+                    bgPhoto: '',
+                },
+                enrollCount: resource.enrollCount || 0,
+                studyAvatars: resource.studyAvatars || [],
+                tags: resource.tags || [],
+                highlightContent: resource.highlightContent || '',
+                metadata: resource.metadata || {},
+                // 添加必要的创建者字段
+                createdBy: userId,
+                access: {
+                    isPublic: true,
+                    allowedUsers: [],
+                    allowedRoles: ['user', 'teacher', 'admin'],
+                },
+            }
+        })
+
+        // 使用insertMany批量插入资源
+        const savedResources = await Resource.insertMany(formattedResources, {
+            // 忽略重复项，以URL作为唯一标识
+            ordered: false,
+        })
+
+        res.status(201).json({
+            status: 'success',
+            results: savedResources.length,
+            data: {
+                resources: savedResources,
+            },
+        })
+    } catch (err) {
+        console.error('保存MOOC资源失败:', err)
+        res.status(400).json({
+            status: 'fail',
+            message: err.message || '保存MOOC资源失败',
+        })
+    }
+}

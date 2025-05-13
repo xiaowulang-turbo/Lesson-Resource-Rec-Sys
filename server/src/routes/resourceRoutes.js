@@ -1,15 +1,14 @@
 import express from 'express'
 import {
+    createResource,
     getAllResources,
     getResource,
-    createResource,
     updateResource,
     deleteResource,
-    addRating,
     getResourceFile,
-    downloadResourceFile,
+    saveMoocResources,
 } from '../controllers/resourceController.js'
-import { protect, restrictTo } from '../middlewares/authMiddleware.js'
+import { protect } from '../middlewares/authMiddleware.js'
 import {
     resourceUpload,
     handleUploadErrors,
@@ -17,24 +16,16 @@ import {
 
 const router = express.Router()
 
-// 公开路由
+// 公开资源相关路由
 router.get('/', getAllResources)
 router.get('/:id', getResource)
-
-// 文件访问路由 - 可以公开访问，但会在控制器中检查权限
 router.get('/:id/file', getResourceFile)
-router.get('/:id/download', downloadResourceFile)
 
-// 保护后续所有路由
+// 保存MOOC资源到数据库的路由 - 不需要认证
+router.post('/mooc', saveMoocResources)
+
+// 以下路由需要登录
 router.use(protect)
-
-// 评分路由
-router.post('/:id/ratings', addRating)
-
-// 限制创建、更新、删除资源的权限
-router.use(restrictTo('admin', 'teacher'))
-
-// 使用新的文件上传中间件
 router.post('/', resourceUpload, handleUploadErrors, createResource)
 router.patch('/:id', updateResource)
 router.delete('/:id', deleteResource)

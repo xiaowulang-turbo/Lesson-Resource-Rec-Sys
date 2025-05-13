@@ -1,5 +1,6 @@
 import { BASE_URL } from './apiConfig'
 import { extractAndConvertMocSearchResults } from '../utils/mocDataAdapter'
+import { API_URL } from '../utils/constants'
 
 /**
  * 从MOOC API搜索课程
@@ -83,12 +84,37 @@ export async function searchMoocCoursesDirectly(query, options = {}) {
         // 打印转换后的数据结构
         console.log('转换后的MOOC资源数量:', result.length)
         if (result.length > 0) {
-            console.log('第一个资源示例:', JSON.stringify(result[0], null, 2))
+            // console.log('第一个资源示例:', JSON.stringify(result[0], null, 2))
         }
 
         return result
     } catch (error) {
         console.error('直接搜索MOOC课程出错:', error)
         throw error
+    }
+}
+
+// 保存MOOC资源到数据库
+export async function saveMoocResources(resources) {
+    try {
+        const response = await fetch(`${API_URL}/api/v1/resources/mooc`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ resources }),
+            credentials: 'include',
+        })
+
+        if (!response.ok) {
+            const error = await response.json()
+            throw new Error(error.message || '保存MOOC资源失败')
+        }
+
+        const data = await response.json()
+        return data
+    } catch (err) {
+        console.error('保存MOOC资源失败:', err)
+        throw err
     }
 }
