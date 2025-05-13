@@ -188,11 +188,8 @@ function Profile() {
     const uploads = uploadsData || [] // 如果数据未加载，则为空数组
 
     const handleResourceClick = (resourceId, type) => {
-        // 在实际应用中，这里应该跳转到资源详情页
-        console.log(`查看${type}资源: ${resourceId}`)
-        // 示例跳转 - 实际项目中应替换为真实路由
-        // navigate(`/resources/${resourceId}`);
-        alert(`您点击了ID为${resourceId}的${type}资源`)
+        // 直接跳转到资源详情页
+        navigate(`/resources/${resourceId}`)
     }
 
     // 如果用户信息还在加载，显示 Spinner
@@ -257,12 +254,8 @@ function Profile() {
                         ) : (
                             uploads.map((resource) => (
                                 <ResourceCardLink
-                                    key={resource.id}
-                                    to={`/resources/${resource.id}`}
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        handleResourceClick(resource.id, '上传')
-                                    }}
+                                    key={resource._id}
+                                    to={`/resources/${resource._id}`}
                                 >
                                     <ResourceCard>
                                         <ResourceImage>
@@ -322,12 +315,8 @@ function Profile() {
                     ) : (
                         collections.map((resource) => (
                             <ResourceCardLink
-                                key={resource.id}
-                                to={`/resources/${resource.id}`}
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    handleResourceClick(resource.id, '收藏')
-                                }}
+                                key={resource._id}
+                                to={`/resources/${resource._id}`}
                             >
                                 <ResourceCard>
                                     <ResourceImage>
