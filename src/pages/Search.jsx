@@ -53,6 +53,7 @@ function Search() {
     const [isLoading, setIsLoading] = useState(false) // 加载状态
     const [error, setError] = useState(null) // 错误状态
     const [isSaving, setIsSaving] = useState(false) // 保存状态
+    const [saveError, setSaveError] = useState(null) // 保存错误状态
 
     const queryClient = useQueryClient() // 获取 query client 实例
 
@@ -75,11 +76,17 @@ function Search() {
 
             setIsLoading(true)
             setError(null)
+            setSaveError(null)
 
             try {
                 console.log('开始搜索MOOC资源:', searchQuery)
                 const moocResults = await searchMoocCoursesDirectly(searchQuery)
                 console.log('获取到MOOC资源数量:', moocResults?.length || 0)
+
+                if (!moocResults || moocResults.length === 0) {
+                    setIsLoading(false)
+                    return // 如果没有搜索结果，直接返回
+                }
 
                 console.log('MOOC资源:', moocResults)
 
@@ -90,25 +97,17 @@ function Search() {
                         // 必须有ID 或者能自动生成ID
                         const hasId = resource._id || resource.id
 
-                        // resource.title =
-                        //     resource.mocTextbookVo?.name || '未知课程'
-                        // resource.organization =
-                        //     resource.highlightUniversity || '中国大学MOOC'
-                        // resource.description =
-                        //     resource.mocTextbookVo?.description || '无描述'
-
-                        // 处理各字段
-                        // if (!resource.title) resource.title = '未知课程'
-                        // if (!resource.organization)
-                        //     resource.organization = '中国大学MOOC'
-                        // if (!resource.description)
-                        //     resource.description = '无描述'
-
                         return true // 允许所有资源，MongoDB会自动生成ID
                     }
                 )
 
                 console.log('有效的MOOC资源数量:', validResources.length)
+
+                if (validResources.length === 0) {
+                    setIsLoading(false)
+                    setError('没有找到有效的资源')
+                    return
+                }
 
                 if (validResources.length !== (moocResults || []).length) {
                     console.warn('存在没有ID的资源，这些资源将被过滤掉')
@@ -119,6 +118,12 @@ function Search() {
                 try {
                     const savedResults = await saveMoocResources(validResources)
                     console.log('保存的资源数量:', savedResults?.results || 0)
+
+                    if (!savedResults || savedResults.results === 0) {
+                        setSaveError('没有资源被成功保存到数据库')
+                        setIsSaving(false)
+                        return
+                    }
 
                     // 保存成功后，刷新本地资源缓存
                     queryClient.invalidateQueries(['resources'])
@@ -136,9 +141,8 @@ function Search() {
                     })
                 } catch (err) {
                     console.error('保存MOOC资源失败:', err)
+                    setSaveError(`保存资源失败: ${err.message || '未知错误'}`)
                     toast.error(`保存资源失败: ${err.message || '未知错误'}`)
-                    // 保存失败仍然显示搜索结果
-                    setResources(validResources)
                 } finally {
                     setIsSaving(false)
                 }
@@ -149,7 +153,7 @@ function Search() {
                 setIsLoading(false)
             }
         }, 500),
-        [searchType, queryClient, setSearchParams]
+        [searchType, queryClient, setSearchParams, query]
     )
 
     // MOOC搜索使用普通fetch
@@ -163,6 +167,7 @@ function Search() {
     const debouncedSetSearchType = useCallback(
         debounce((type) => {
             setSearchType(type)
+            setSaveError(null) // 清除保存错误
             setSearchParams({
                 q: query,
                 type,
@@ -234,24 +239,37 @@ function Search() {
 
             {/* --- 根据状态显示内容 --- */}
             {(currentIsLoading || isSaving) && <Spinner />}
-            {currentError && (
+
+            {/* 显示错误信息 */}
+            {currentError && !currentIsLoading && !isSaving && (
                 <Empty
                     resource={`搜索 "${query}" 时出错: ${
                         currentError.message || currentError
                     }`}
                 />
             )}
+
+            {/* 显示保存错误信息 */}
+            {saveError && !currentIsLoading && !isSaving && (
+                <Empty resource={saveError} />
+            )}
+
+            {/* 显示资源列表 */}
             {!currentIsLoading &&
                 !isSaving &&
                 !currentError &&
+                !saveError &&
                 query &&
                 currentResources &&
                 currentResources.length > 0 && (
                     <ResourceList resources={currentResources} />
                 )}
+
+            {/* 没有找到资源 */}
             {!currentIsLoading &&
                 !isSaving &&
                 !currentError &&
+                !saveError &&
                 query &&
                 (!currentResources || currentResources.length === 0) && (
                     <Empty
@@ -260,9 +278,13 @@ function Search() {
                         }资源`}
                     />
                 )}
-            {!currentIsLoading && !isSaving && !currentError && !query && (
-                <Empty resource="请输入关键词开始搜索资源" />
-            )}
+
+            {/* 初始状态 */}
+            {!currentIsLoading &&
+                !isSaving &&
+                !currentError &&
+                !saveError &&
+                !query && <Empty resource="请输入关键词开始搜索资源" />}
         </SearchPageLayout>
     )
 }

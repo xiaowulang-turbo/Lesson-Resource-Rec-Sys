@@ -80,7 +80,7 @@ app.use(
         optionsSuccessStatus: 204,
     })
 )
-app.use(express.json({ limit: '10kb' }))
+app.use(express.json({ limit: '100kb' }))
 app.use(morgan('dev'))
 
 // 添加静态文件服务中间件，用于访问上传的文件
