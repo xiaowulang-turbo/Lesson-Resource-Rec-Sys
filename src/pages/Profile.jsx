@@ -22,6 +22,8 @@ const PLACEHOLDER_IMAGE = '../public/default-resource.jpg'
 
 const StyledProfile = styled.div`
     max-width: 1200px;
+    min-width: 800px;
+    min-height: 50vh;
     margin: 0 auto;
 `
 
@@ -32,6 +34,7 @@ const ProfileSection = styled.div`
     padding: 2.4rem;
     margin-bottom: 2.4rem;
     box-shadow: var(--shadow-sm);
+    min-height: 50vh;
 `
 
 const SectionHeader = styled.div`
