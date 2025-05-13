@@ -1,13 +1,10 @@
 /* eslint-disable no-unused-vars */
 import {
-    HiOutlineCog6Tooth,
     HiOutlineHome,
     HiOutlineUsers,
-    HiOutlineAcademicCap,
     HiOutlineBookOpen,
     HiOutlineUserCircle,
 } from 'react-icons/hi2'
-import { HiOutlineBeaker } from 'react-icons/hi'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { useAuth } from '../context/AuthContext'
@@ -89,12 +86,6 @@ function MainNav({ isHorizontal = false }) {
     return (
         <nav>
             <NavList>
-                {/* <li>
-                    <StyledNavLink to="/courses" isHorizontal={isHorizontal}>
-                        <HiOutlineAcademicCap />
-                        课程
-                    </StyledNavLink>
-                </li> */}
                 {isAdmin ? (
                     <>
                         <li>
@@ -118,7 +109,6 @@ function MainNav({ isHorizontal = false }) {
                     </>
                 ) : (
                     <>
-                        {' '}
                         <li>
                             <StyledNavLink
                                 to="/home"
@@ -148,12 +138,6 @@ function MainNav({ isHorizontal = false }) {
                         </li>
                     </>
                 )}
-                {/* <li>
-                    <StyledNavLink to="/api-test" isHorizontal={isHorizontal}>
-                        <HiOutlineBeaker />
-                        API测试
-                    </StyledNavLink>
-                </li> */}
             </NavList>
         </nav>
     )
