@@ -36,6 +36,7 @@ const resourceSchema = new mongoose.Schema(
             type: String,
             required: [true, '请提供资源的格式'],
             enum: [
+                'file',
                 'pdf',
                 'docx',
                 'pptx',

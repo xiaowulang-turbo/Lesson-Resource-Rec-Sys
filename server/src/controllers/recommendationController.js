@@ -695,7 +695,7 @@ const contentBasedSimilarityFiltering = async (
 
     // 计算所有资源的相似性分数
     const scoredResources = allResources
-        .filter((resource) => {
+        ?.filter((resource) => {
             // 确保资源有_id字段
             if (!resource._id) {
                 console.log(

@@ -308,6 +308,8 @@ export function convertMocTextbookToResource(mocItem) {
         },
     }
 
+    console.log('resource', resource)
+
     return resource
 }
 

@@ -387,11 +387,12 @@ export const saveMoocResources = async (req, res) => {
         const formattedResources = resources.map((resource) => {
             // 确保每个资源都有必要的字段
             return {
+                originalId: resource.originalId || '',
                 title: resource.title || '未知标题',
                 description: resource.description || '无描述',
                 contentType: resource.contentType || 'course',
                 pedagogicalType: resource.pedagogicalType || 'courseware',
-                format: resource.format || 'url',
+                format: resource.format || 'file',
                 subject: resource.subject || '未分类',
                 grade: resource.grade || '高等教育',
                 difficulty: resource.difficulty || 3,
