@@ -182,7 +182,7 @@ function Resources() {
 
             <StyledResources>
                 <Description>
-                    在这里查找和浏览各类教学资源。您可以通过筛选和搜索找到所需的备课材料。
+                    在这里查找和浏览各类教学资源。您可以通过筛选和搜索找到所需的备课资源。
                 </Description>
 
                 <FilterSection>

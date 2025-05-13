@@ -16,6 +16,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { debounce } from '../utils/debounce'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
+import Input from '../ui/Input'
+import Button from '../ui/Button'
 
 const SearchPageLayout = styled.div`
     padding: 3.2rem 4.8rem;
@@ -44,12 +47,41 @@ const SearchTypeButton = styled.button`
     }
 `
 
+// 添加搜索框样式
+const SearchContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 1.6rem;
+    background-color: var(--color-grey-50);
+    border-radius: var(--border-radius-md);
+    margin-bottom: 2rem;
+`
+
+const SearchOptionsRow = styled.div`
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 0.8rem;
+`
+
+const SearchInputRow = styled.div`
+    display: flex;
+    gap: 1.2rem;
+    width: 100%;
+
+    input {
+        flex-grow: 1;
+    }
+`
+
 function Search() {
+    const navigate = useNavigate()
     const [searchParams, setSearchParams] = useSearchParams()
     const query = searchParams.get('q') || ''
     const type = searchParams.get('type') || 'local' // 默认为本地搜索
 
     const [searchType, setSearchType] = useState(type) // 搜索类型状态
+    const [searchQuery, setSearchQuery] = useState(query) // 新增：搜索输入框状态
     const [resources, setResources] = useState([]) // 资源列表状态
     const [isLoading, setIsLoading] = useState(false) // 加载状态
     const [error, setError] = useState(null) // 错误状态
@@ -70,6 +102,21 @@ function Search() {
         // 只有当需要本地搜索且query不为空时执行查询
         enabled: !!query && searchType === 'local',
     })
+
+    // 新增：处理搜索提交
+    const handleSearchSubmit = (e) => {
+        e.preventDefault()
+        if (!searchQuery.trim()) return
+
+        // 根据搜索类型导航到不同的搜索页面
+        if (searchType === 'local') {
+            navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+        } else {
+            navigate(
+                `/search?q=${encodeURIComponent(searchQuery.trim())}&type=mooc`
+            )
+        }
+    }
 
     // 防抖处理MOOC搜索
     const debouncedFetchMooc = useCallback(
@@ -187,6 +234,12 @@ function Search() {
         debouncedSetSearchType(type)
     }
 
+    // 同步URL查询参数到搜索框状态
+    useEffect(() => {
+        setSearchQuery(query)
+        setSearchType(type)
+    }, [query, type])
+
     // 根据当前搜索类型决定显示的资源和状态
     const currentResources =
         searchType === 'local' ? localResources || [] : resources
@@ -227,20 +280,35 @@ function Search() {
                 </Heading>
             </Row>
 
-            <SearchType>
-                <SearchTypeButton
-                    active={searchType === 'local'}
-                    onClick={() => handleSearchTypeChange('local')}
-                >
-                    搜本地
-                </SearchTypeButton>
-                <SearchTypeButton
-                    active={searchType === 'mooc'}
-                    onClick={() => handleSearchTypeChange('mooc')}
-                >
-                    搜全网
-                </SearchTypeButton>
-            </SearchType>
+            {/* 新增：搜索框组件 */}
+            <SearchContainer as="form" onSubmit={handleSearchSubmit}>
+                <SearchOptionsRow>
+                    <SearchTypeButton
+                        type="button"
+                        active={searchType === 'local'}
+                        onClick={() => handleSearchTypeChange('local')}
+                    >
+                        搜本地
+                    </SearchTypeButton>
+                    <SearchTypeButton
+                        type="button"
+                        active={searchType === 'mooc'}
+                        onClick={() => handleSearchTypeChange('mooc')}
+                    >
+                        搜全网
+                    </SearchTypeButton>
+                </SearchOptionsRow>
+                <SearchInputRow>
+                    <Input
+                        type="search"
+                        placeholder="快速搜索资源..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        id="search-input"
+                    />
+                    <Button type="submit">搜索</Button>
+                </SearchInputRow>
+            </SearchContainer>
 
             {/* --- 根据状态显示内容 --- */}
             {(currentIsLoading || isSaving) && <Spinner />}

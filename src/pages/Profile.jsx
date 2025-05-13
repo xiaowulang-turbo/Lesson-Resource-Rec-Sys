@@ -70,7 +70,7 @@ const ResourceCardLink = styled(Link)`
 
 const ResourceCard = styled.div`
     background-color: var(--color-grey-0);
-    border-radius: var(--border-radius-md);
+    /* border-radius: var(--border-radius-md); */
     overflow: hidden;
     box-shadow: var(--shadow-sm);
     transition: all 0.3s;
@@ -87,6 +87,7 @@ const ResourceCard = styled.div`
 const ResourceImage = styled.div`
     overflow: hidden;
     background-color: var(--color-grey-100);
+    border-radius: var(--border-radius-md);
     flex: 0 0 240px;
     width: 240px;
     height: auto;
@@ -158,7 +159,7 @@ const Label = styled.span`
 function Profile() {
     const navigate = useNavigate()
     // 示例数据，实际应该从API获取
-    const [activeTab, setActiveTab] = useState('uploads')
+    const [activeTab, setActiveTab] = useState('collections')
     const { user, isLoading: isLoadingUser } = useUser()
 
     // 使用 React Query 获取用户上传的资源
