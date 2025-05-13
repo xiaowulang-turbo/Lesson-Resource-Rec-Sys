@@ -572,9 +572,15 @@ export const getSimilarResources = catchAsync(async (req, res, next) => {
 
         // 如果没有找到预定义的关系数据，回退到基于内容的相似度计算
         // 添加forSimilarResources标志，确保获取所有资源
-        const allResources = await dataService.getAllResources({
+        const resourcesData = await dataService.getAllResources({
             forSimilarResources: true,
         })
+
+        // 确保我们有一个有效的资源数组
+        const allResources =
+            resourcesData && resourcesData.resources
+                ? resourcesData.resources
+                : []
 
         console.log(`为相似度计算获取了 ${allResources.length} 个资源`)
 
