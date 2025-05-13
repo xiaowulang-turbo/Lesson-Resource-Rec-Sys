@@ -23,7 +23,7 @@ const ResourceCardLink = styled(Link)`
 
 const ResourceCard = styled.div`
     background-color: var(--color-grey-0);
-    border-radius: var(--border-radius-md);
+    /* border-radius: var(--border-radius-md); */
     overflow: hidden;
     box-shadow: var(--shadow-sm);
     transition: all 0.3s;
@@ -39,6 +39,7 @@ const ResourceCard = styled.div`
 const ResourceImage = styled.div`
     overflow: hidden;
     background-color: var(--color-grey-100); // Background for placeholder
+    border-radius: var(--border-radius-md);
     flex: 0 0 240px;
     width: 240px;
     height: auto;
