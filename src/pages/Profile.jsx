@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import Heading from '../ui/Heading'
 import Row from '../ui/Row'
 import styled from 'styled-components'
@@ -11,6 +12,10 @@ import {
     HiOutlineUpload,
     HiOutlineEye,
 } from 'react-icons/hi'
+import { getResourcesByUser } from '../services/apiResources'
+import useUser from '../features/authentication/useUser'
+import Spinner from '../ui/Spinner'
+import Empty from '../ui/Empty'
 
 // 使用本地默认资源图片替代在线服务
 const PLACEHOLDER_IMAGE = '../public/default-resource.jpg'
@@ -68,6 +73,7 @@ const ResourceCard = styled.div`
     transition: all 0.3s;
     display: flex;
     align-items: stretch;
+    height: 320px;
 
     ${ResourceCardLink}:hover & {
         transform: translateY(-2px);
@@ -78,8 +84,8 @@ const ResourceCard = styled.div`
 const ResourceImage = styled.div`
     overflow: hidden;
     background-color: var(--color-grey-100);
-    flex: 0 0 160px;
-    width: 160px;
+    flex: 0 0 240px;
+    width: 240px;
     height: auto;
 
     img {
@@ -98,6 +104,19 @@ const ResourceContent = styled.div`
     padding: 1.6rem 2rem;
     flex: 1;
     overflow: hidden;
+
+    p {
+        font-size: 1.4rem;
+        color: var(--color-grey-600);
+        margin-top: 0.8rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.5;
+        height: calc(1.5em * 2);
+    }
 `
 
 const ResourceTitle = styled.h3`
@@ -137,95 +156,24 @@ function Profile() {
     const navigate = useNavigate()
     // 示例数据，实际应该从API获取
     const [activeTab, setActiveTab] = useState('uploads')
+    const { user, isLoading: isLoadingUser } = useUser()
 
-    const mockUploads = [
-        {
-            id: 101,
-            title: '二次函数教学设计',
-            type: '教案',
-            views: 156,
-            likes: 42,
-            cover: PLACEHOLDER_IMAGE,
-            description:
-                '针对高一学生的二次函数教学设计，包括课程目标、教学重点难点、教学过程和课后作业。',
-            createdAt: '2023-05-15',
-        },
-        {
-            id: 102,
-            title: '几何证明教学课件',
-            type: '课件',
-            views: 234,
-            likes: 78,
-            cover: PLACEHOLDER_IMAGE,
-            description:
-                '高中几何证明方法总结，包括直接证明、反证法、待定系数法等多种证明方法的案例。',
-            createdAt: '2023-06-20',
-        },
-        {
-            id: 103,
-            title: '数学思维训练题集',
-            type: '试题',
-            views: 198,
-            likes: 45,
-            cover: PLACEHOLDER_IMAGE,
-            description:
-                '精选高中数学思维训练题，培养学生的逻辑思维和解题能力。',
-            createdAt: '2023-07-05',
-        },
-        {
-            id: 104,
-            title: '概率初步教学案例',
-            type: '教案',
-            views: 178,
-            likes: 39,
-            cover: PLACEHOLDER_IMAGE,
-            description:
-                '高二概率统计单元教学案例，包含丰富的生活实例和互动环节。',
-            createdAt: '2023-08-12',
-        },
-    ]
+    // 获取上传的资源 (这里可以稍后同样用 useQuery 替换 mockUploads)
+    const mockUploads = [] // 暂时清空，之后再处理
 
-    const mockCollections = [
-        {
-            id: 201,
-            title: '高考数学重点题型',
-            type: '试题',
-            author: '高考研究中心',
-            rating: 4.8,
-            cover: PLACEHOLDER_IMAGE,
-            description:
-                '精选近五年高考数学真题中的重点题型，包含详细解析和解题技巧。',
-        },
-        {
-            id: 202,
-            title: '数学竞赛题解析',
-            type: '教学资源',
-            author: '奥数研究所',
-            rating: 4.9,
-            cover: PLACEHOLDER_IMAGE,
-            description:
-                '各类数学竞赛题目的详细解析，适合培养学生的数学思维和竞赛能力。',
-        },
-        {
-            id: 203,
-            title: '数学思维导图集',
-            type: '课件',
-            author: '思维教育研究所',
-            rating: 4.7,
-            cover: PLACEHOLDER_IMAGE,
-            description: '高中数学各章节知识点思维导图，帮助学生构建知识体系。',
-        },
-        {
-            id: 204,
-            title: '趣味数学案例',
-            type: '教案',
-            author: '数学教育专家组',
-            rating: 4.6,
-            cover: PLACEHOLDER_IMAGE,
-            description:
-                '将数学知识与生活实际相结合的趣味教学案例，提高学生学习兴趣。',
-        },
-    ]
+    // 使用 React Query 获取收藏的资源
+    const {
+        data: collectionsData,
+        isLoading: isLoadingCollections,
+        error: collectionsError,
+    } = useQuery({
+        // 当用户信息加载完成且用户存在时才执行查询
+        queryKey: ['userCollections', user?.id],
+        queryFn: () => getResourcesByUser(user.id, 'collections'),
+        enabled: !!user && !isLoadingUser, // 只有在 user 存在时才启用查询
+    })
+
+    const collections = collectionsData || [] // 如果数据未加载，则为空数组
 
     const handleResourceClick = (resourceId, type) => {
         // 在实际应用中，这里应该跳转到资源详情页
@@ -234,6 +182,9 @@ function Profile() {
         // navigate(`/resources/${resourceId}`);
         alert(`您点击了ID为${resourceId}的${type}资源`)
     }
+
+    // 如果用户信息还在加载，显示 Spinner
+    if (isLoadingUser) return <Spinner />
 
     return (
         <>
@@ -262,17 +213,6 @@ function Profile() {
                             <Button
                                 size="small"
                                 variation={
-                                    activeTab === 'uploads'
-                                        ? 'primary'
-                                        : 'secondary'
-                                }
-                                onClick={() => setActiveTab('uploads')}
-                            >
-                                <HiOutlineUpload /> 上传
-                            </Button>
-                            <Button
-                                size="small"
-                                variation={
                                     activeTab === 'collections'
                                         ? 'primary'
                                         : 'secondary'
@@ -281,95 +221,110 @@ function Profile() {
                             >
                                 <HiOutlineBookmark /> 收藏
                             </Button>
+                            <Button
+                                size="small"
+                                variation={
+                                    activeTab === 'uploads'
+                                        ? 'primary'
+                                        : 'secondary'
+                                }
+                                onClick={() => setActiveTab('uploads')}
+                            >
+                                <HiOutlineUpload /> 上传
+                            </Button>
                         </div>
                     </SectionHeader>
 
-                    {activeTab === 'uploads'
-                        ? mockUploads.map((resource) => (
-                              <ResourceCardLink
-                                  key={resource.id}
-                                  to={`/resources/${resource.id}`}
-                                  onClick={(e) => {
-                                      e.preventDefault()
-                                      handleResourceClick(resource.id, '上传')
-                                  }}
-                              >
-                                  <ResourceCard>
-                                      <ResourceImage>
-                                          <img
-                                              src={resource.cover}
-                                              alt={resource.title}
-                                              onError={(e) => {
-                                                  e.target.src =
-                                                      PLACEHOLDER_IMAGE
-                                              }}
-                                          />
-                                      </ResourceImage>
-                                      <ResourceContent>
-                                          <ResourceTitle>
-                                              {resource.title}
-                                          </ResourceTitle>
-                                          <ResourceInfo>
-                                              <Label>{resource.type}</Label>
-                                              <Label>
-                                                  <HiOutlineEye />
-                                                  {resource.views} 次浏览
-                                              </Label>
-                                              <Label>
-                                                  <HiOutlineHeart />
-                                                  {resource.likes} 获赞
-                                              </Label>
-                                          </ResourceInfo>
-                                          <p>{resource.description}</p>
-                                          <ResourceInfo>
-                                              <span>
-                                                  上传时间: {resource.createdAt}
-                                              </span>
-                                          </ResourceInfo>
-                                      </ResourceContent>
-                                  </ResourceCard>
-                              </ResourceCardLink>
-                          ))
-                        : mockCollections.map((resource) => (
-                              <ResourceCardLink
-                                  key={resource.id}
-                                  to={`/resources/${resource.id}`}
-                                  onClick={(e) => {
-                                      e.preventDefault()
-                                      handleResourceClick(resource.id, '收藏')
-                                  }}
-                              >
-                                  <ResourceCard>
-                                      <ResourceImage>
-                                          <img
-                                              src={resource.cover}
-                                              alt={resource.title}
-                                              onError={(e) => {
-                                                  e.target.src =
-                                                      PLACEHOLDER_IMAGE
-                                              }}
-                                          />
-                                      </ResourceImage>
-                                      <ResourceContent>
-                                          <ResourceTitle>
-                                              {resource.title}
-                                          </ResourceTitle>
-                                          <ResourceInfo>
-                                              <Label>{resource.type}</Label>
-                                              <Label>
-                                                  评分: {resource.rating}
-                                              </Label>
-                                          </ResourceInfo>
-                                          <p>{resource.description}</p>
-                                          <ResourceInfo>
-                                              <span>
-                                                  作者: {resource.author}
-                                              </span>
-                                          </ResourceInfo>
-                                      </ResourceContent>
-                                  </ResourceCard>
-                              </ResourceCardLink>
-                          ))}
+                    {activeTab === 'uploads' ? (
+                        mockUploads.map((resource) => (
+                            <ResourceCardLink
+                                key={resource.id}
+                                to={`/resources/${resource.id}`}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    handleResourceClick(resource.id, '上传')
+                                }}
+                            >
+                                <ResourceCard>
+                                    <ResourceImage>
+                                        <img
+                                            src={resource.cover}
+                                            alt={resource.title}
+                                            onError={(e) => {
+                                                e.target.src = PLACEHOLDER_IMAGE
+                                            }}
+                                        />
+                                    </ResourceImage>
+                                    <ResourceContent>
+                                        <ResourceTitle>
+                                            {resource.title}
+                                        </ResourceTitle>
+                                        <ResourceInfo>
+                                            <Label>{resource.type}</Label>
+                                            <Label>
+                                                <HiOutlineEye />
+                                                {resource.views} 次浏览
+                                            </Label>
+                                            <Label>
+                                                <HiOutlineHeart />
+                                                {resource.likes} 获赞
+                                            </Label>
+                                        </ResourceInfo>
+                                        <p>{resource.description}</p>
+                                        <ResourceInfo>
+                                            <span>
+                                                上传时间: {resource.createdAt}
+                                            </span>
+                                        </ResourceInfo>
+                                    </ResourceContent>
+                                </ResourceCard>
+                            </ResourceCardLink>
+                        ))
+                    ) : isLoadingCollections ? (
+                        <Spinner />
+                    ) : collectionsError ? (
+                        <p>加载收藏资源失败: {collectionsError.message}</p>
+                    ) : collections.length > 0 ? (
+                        collections.map((resource) => (
+                            <ResourceCardLink
+                                key={resource.id}
+                                to={`/resources/${resource.id}`}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    handleResourceClick(resource.id, '收藏')
+                                }}
+                            >
+                                <ResourceCard>
+                                    <ResourceImage>
+                                        <img
+                                            src={resource.cover}
+                                            alt={resource.title}
+                                            onError={(e) => {
+                                                e.target.src = PLACEHOLDER_IMAGE
+                                            }}
+                                        />
+                                    </ResourceImage>
+                                    <ResourceContent>
+                                        <ResourceTitle>
+                                            {resource.title}
+                                        </ResourceTitle>
+                                        <ResourceInfo>
+                                            <Label>{resource.type}</Label>
+                                            <Label>
+                                                评分: {resource.rating}
+                                            </Label>
+                                        </ResourceInfo>
+                                        <p>{resource.description}</p>
+                                        <ResourceInfo>
+                                            <span>作者: {resource.author}</span>
+                                        </ResourceInfo>
+                                    </ResourceContent>
+                                </ResourceCard>
+                            </ResourceCardLink>
+                        ))
+                    ) : (
+                        <Empty resourceName="收藏资源" />
+                    )}
                 </ProfileSection>
             </StyledProfile>
         </>
