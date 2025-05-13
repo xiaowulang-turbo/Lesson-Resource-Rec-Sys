@@ -95,14 +95,17 @@ export async function searchMoocCoursesDirectly(query, options = {}) {
 }
 
 // 保存MOOC资源到数据库
-export async function saveMoocResources(resources) {
+export async function saveMoocResources(resources, userId = null) {
     try {
         const response = await fetch(`${API_URL}/api/v1/resources/mooc`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ resources }),
+            body: JSON.stringify({
+                resources,
+                userId,
+            }),
             credentials: 'include',
         })
 

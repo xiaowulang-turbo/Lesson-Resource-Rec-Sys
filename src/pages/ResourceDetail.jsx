@@ -238,7 +238,7 @@ function ResourceDetail() {
                     </p>
                     <p>
                         <strong>上传者：</strong>{' '}
-                        {resource.createdBy ? resource.createdBy : '未知用户'}
+                        {resource.createdBy || '未知用户'}
                     </p>
                     <p>
                         <strong>上传时间：</strong> {formattedDate}

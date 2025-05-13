@@ -368,7 +368,7 @@ export const downloadResourceFile = async (req, res) => {
 // 保存MOOC资源到数据库
 export const saveMoocResources = async (req, res) => {
     try {
-        const { resources } = req.body
+        const { resources, userId } = req.body
 
         if (!resources || !Array.isArray(resources) || resources.length === 0) {
             return res.status(400).json({
@@ -377,8 +377,9 @@ export const saveMoocResources = async (req, res) => {
             })
         }
 
-        // 获取用户ID，如果用户未登录，则使用系统默认ID
-        const userId =
+        // 获取用户ID，优先使用传递的userId，然后是req.user?.id，最后使用默认ID
+        const creatorId =
+            userId ||
             req.user?.id ||
             new mongoose.Types.ObjectId('000000000000000000000001')
 
@@ -415,8 +416,8 @@ export const saveMoocResources = async (req, res) => {
                 tags: resource.tags || [],
                 highlightContent: resource.highlightContent || '',
                 metadata: resource.metadata || {},
-                // 添加必要的创建者字段
-                createdBy: userId,
+                // 使用传递的用户ID作为创建者
+                createdBy: creatorId,
                 access: {
                     isPublic: true,
                     allowedUsers: [],

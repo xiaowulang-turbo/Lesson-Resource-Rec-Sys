@@ -15,6 +15,7 @@ import {
 import { useState, useEffect, useCallback } from 'react'
 import { debounce } from '../utils/debounce'
 import toast from 'react-hot-toast'
+import { useAuth } from '../context/AuthContext'
 
 const SearchPageLayout = styled.div`
     padding: 3.2rem 4.8rem;
@@ -56,6 +57,7 @@ function Search() {
     const [saveError, setSaveError] = useState(null) // 保存错误状态
 
     const queryClient = useQueryClient() // 获取 query client 实例
+    const { user } = useAuth() // 获取当前用户信息
 
     // 本地搜索使用React Query
     const {
@@ -116,7 +118,10 @@ function Search() {
                 // 将获取的MOOC资源保存到数据库
                 setIsSaving(true)
                 try {
-                    const savedResults = await saveMoocResources(validResources)
+                    const savedResults = await saveMoocResources(
+                        validResources,
+                        user?._id || user?.id // 传递用户ID
+                    )
                     console.log('保存的资源数量:', savedResults?.results || 0)
 
                     if (!savedResults || savedResults.results === 0) {
@@ -153,7 +158,7 @@ function Search() {
                 setIsLoading(false)
             }
         }, 500),
-        [searchType, queryClient, setSearchParams, query]
+        [searchType, queryClient, setSearchParams, query, user]
     )
 
     // MOOC搜索使用普通fetch
