@@ -88,7 +88,7 @@ function Search() {
                     return // 如果没有搜索结果，直接返回
                 }
 
-                console.log('MOOC资源:', moocResults)
+                // console.log('MOOC资源:', moocResults)
 
                 // 确保每个资源都有id字段和必要属性
                 const validResources = (moocResults || []).filter(
