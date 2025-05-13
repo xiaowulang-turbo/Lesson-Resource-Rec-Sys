@@ -193,6 +193,8 @@ export async function addFavorite(userId, resourceId) {
         throw new Error(data.message || '添加收藏失败')
     }
 
+    // console.log('添加收藏成功', data)
+
     return data.data // 返回更新后的收藏列表等信息
 }
 

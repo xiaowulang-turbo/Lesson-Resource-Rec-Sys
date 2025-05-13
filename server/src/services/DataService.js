@@ -9,6 +9,7 @@ export class DataService {
     // 用户相关方法
     async createUser(userData) {
         const user = await User.create(userData)
+
         return {
             id: user._id,
             name: user.name,
@@ -18,6 +19,7 @@ export class DataService {
             interests: user.interests || [],
             course_interactions: user.course_interactions || [],
             accountId: user.accountId,
+            favoriteResources: user.favoriteResources,
         }
     }
 
@@ -55,6 +57,7 @@ export class DataService {
                 // 仍然保留原始字段，以便其他地方使用
                 preferences: user.preferences,
                 accountId: user.accountId,
+                favoriteResources: user.favoriteResources,
             }
         } catch (error) {
             console.error('获取用户失败:', error)
@@ -135,6 +138,35 @@ export class DataService {
 
     async updateUser(id, userData) {
         try {
+            // 如果包含MongoDB操作符，直接透传
+            if (Object.keys(userData).some((key) => key.startsWith('$'))) {
+                const user = await User.findByIdAndUpdate(id, userData, {
+                    new: true,
+                    runValidators: true,
+                }).populate('account')
+                if (!user) return null
+                const account = user.account || {}
+                return {
+                    id: user._id,
+                    name: user.name || account.name,
+                    email: account.email || '',
+                    phone: user.phone || '',
+                    avatar: user.avatar || null,
+                    subject: user.preferences?.preferredSubjects?.[0] || '',
+                    grade: user.preferences?.preferredGrades?.[0] || '',
+                    experience: user.experience || '',
+                    bio: user.bio || '',
+                    preferred_subjects: user.preferred_subjects || [],
+                    preferred_difficulty: user.preferred_difficulty,
+                    preferred_resource_types:
+                        user.preferred_resource_types || [],
+                    interests: user.interests || [],
+                    course_interactions: user.course_interactions || [],
+                    preferences: user.preferences,
+                    accountId: user.accountId,
+                    favoriteResources: user.favoriteResources,
+                }
+            }
             // 过滤掉不需要的字段，防止用户更新敏感信息
             const allowedFields = [
                 'name',
@@ -147,6 +179,7 @@ export class DataService {
                 'preferences',
                 'avatar',
                 'interests',
+                'favoriteResources',
             ]
 
             const filteredData = {}
@@ -176,7 +209,7 @@ export class DataService {
                 filteredData.interests = [userData.interests]
             }
 
-            console.log('更新用户前的数据:', filteredData)
+            // console.log('更新用户前的数据:', filteredData)
 
             const user = await User.findByIdAndUpdate(id, filteredData, {
                 new: true,
@@ -205,6 +238,7 @@ export class DataService {
                 course_interactions: user.course_interactions || [],
                 preferences: user.preferences,
                 accountId: user.accountId,
+                favoriteResources: user.favoriteResources,
             }
         } catch (error) {
             console.error('更新用户失败:', error)

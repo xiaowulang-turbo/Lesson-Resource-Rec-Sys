@@ -211,7 +211,7 @@ export const addFavoriteResource = async (req, res) => {
         const userId = req.user.id
         const resourceId = req.params.resourceId
 
-        console.log(userId, resourceId, 'userId, resourceId')
+        // console.log(userId, resourceId, 'userId, resourceId')
 
         if (!mongoose.Types.ObjectId.isValid(resourceId)) {
             return res
@@ -229,6 +229,8 @@ export const addFavoriteResource = async (req, res) => {
                 .status(404)
                 .json({ status: 'error', message: '未找到用户' })
         }
+
+        console.log(user, 'user')
 
         // 可选：更新资源的收藏计数
         await dataService.incrementResourceStat(resourceId, 'favorites', 1)
@@ -287,6 +289,43 @@ export const removeFavoriteResource = async (req, res) => {
         res.status(500).json({
             status: 'error',
             message: err.message || '移除收藏失败',
+        })
+    }
+}
+
+// 获取用户收藏资源列表
+export const getFavoriteResources = async (req, res) => {
+    try {
+        const userId = req.params.userId
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res
+                .status(400)
+                .json({ status: 'error', message: '无效的用户ID' })
+        }
+        // 查询用户并填充收藏资源
+        const user = await dataService.getUserById(userId)
+        if (!user) {
+            return res
+                .status(404)
+                .json({ status: 'error', message: '未找到用户' })
+        }
+        // 直接查找 User 模型，填充 favoriteResources 字段
+        const mongooseUser = await mongoose
+            .model('User')
+            .findById(userId)
+            .populate('favoriteResources')
+        res.status(200).json({
+            status: 'success',
+            message: '获取收藏资源成功',
+            data: {
+                resources: mongooseUser.favoriteResources || [],
+            },
+        })
+    } catch (err) {
+        console.error('获取收藏资源失败:', err)
+        res.status(500).json({
+            status: 'error',
+            message: err.message || '获取收藏资源失败',
         })
     }
 }

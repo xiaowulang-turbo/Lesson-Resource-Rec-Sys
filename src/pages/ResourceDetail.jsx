@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import styled from 'styled-components'
@@ -114,10 +114,16 @@ function ResourceDetail() {
         retry: false,
     })
 
-    const [isFavorited, setIsFavorited] = useState(() => {
-        if (!isAuthenticated || !currentUser?.favoriteResources) return false
-        return currentUser.favoriteResources.includes(resourceId)
-    })
+    const [isFavorited, setIsFavorited] = useState(false)
+
+    // Effect to update isFavorited when user or resourceId changes
+    useEffect(() => {
+        if (!isAuthenticated || !currentUser?.favoriteResources) {
+            setIsFavorited(false)
+        } else {
+            setIsFavorited(currentUser.favoriteResources.includes(resourceId))
+        }
+    }, [currentUser, isAuthenticated, resourceId])
 
     const { mutate: addFavMutate, isLoading: isAddingFavorite } = useMutation({
         mutationFn: () => addFavorite(currentUser.id, resourceId),
@@ -280,9 +286,6 @@ function ResourceDetail() {
 
                 {/* 交互按钮区域 */}
                 <ActionsContainer>
-                    <Button variation="secondary" size="small">
-                        👍 点赞 ({resource.upvotes || 0})
-                    </Button>
                     <Button
                         variation={isFavorited ? 'primary' : 'secondary'}
                         size="small"
@@ -291,9 +294,6 @@ function ResourceDetail() {
                     >
                         {isFavorited ? '★ 已收藏' : '⭐ 收藏'} (
                         {resource.stats?.favorites || 0})
-                    </Button>
-                    <Button variation="danger" size="small">
-                        举报
                     </Button>
                 </ActionsContainer>
             </MainContent>
