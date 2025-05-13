@@ -503,6 +503,77 @@ export class DataService {
         }
     }
 
+    // 获取用户上传的资源
+    async getUserUploadedResources(userId, options = {}) {
+        try {
+            console.log(
+                `正在获取用户(ID: ${userId})上传的资源，选项:`,
+                JSON.stringify(options)
+            )
+
+            // 验证ID格式是否有效
+            if (!mongoose.Types.ObjectId.isValid(userId)) {
+                console.error(`无效的用户ID格式: ${userId}`)
+                return { resources: [], total: 0 }
+            }
+
+            // 构建查询条件
+            const query = { createdBy: userId }
+
+            // 添加可选过滤条件
+            if (options.type) {
+                query.type = options.type
+            }
+            if (options.subject) {
+                query.subject = options.subject
+            }
+            if (options.format) {
+                query.format = options.format
+            }
+
+            // 构建排序选项
+            let sortOption = {}
+            if (options.sortBy) {
+                if (options.sortBy === 'newest') {
+                    sortOption = { createdAt: -1 }
+                } else if (options.sortBy === 'oldest') {
+                    sortOption = { createdAt: 1 }
+                } else if (options.sortBy === 'popularity') {
+                    sortOption = { 'stats.views': -1 }
+                } else if (options.sortBy === 'title') {
+                    sortOption = { title: 1 }
+                }
+            } else {
+                // 默认按最新创建时间排序
+                sortOption = { createdAt: -1 }
+            }
+
+            // 设置分页
+            const page = parseInt(options.page) || 1
+            const limit = parseInt(options.limit) || 10
+            const skip = (page - 1) * limit
+
+            // 执行查询
+            const resources = await Resource.find(query)
+                .sort(sortOption)
+                .skip(skip)
+                .limit(limit)
+                .lean()
+
+            // 获取总数
+            const total = await Resource.countDocuments(query)
+
+            console.log(
+                `查询到用户(ID: ${userId})上传的 ${resources.length} 个资源，总共有 ${total} 个匹配资源`
+            )
+
+            return { resources, total }
+        } catch (error) {
+            console.error(`获取用户(ID: ${userId})上传的资源失败:`, error)
+            return { resources: [], total: 0 }
+        }
+    }
+
     async getAllResources(filters = {}) {
         try {
             console.log('正在获取所有资源，过滤条件:', JSON.stringify(filters))

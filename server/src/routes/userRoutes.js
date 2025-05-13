@@ -11,6 +11,7 @@ import {
     addFavoriteResource,
     removeFavoriteResource,
     getFavoriteResources,
+    getUserUploadedResources,
 } from '../controllers/userController.js'
 import { protect, restrictTo } from '../middlewares/authMiddleware.js'
 
@@ -30,6 +31,9 @@ router.delete('/:userId/favorites/:resourceId', removeFavoriteResource)
 
 // 新增：获取用户收藏资源列表
 router.get('/:userId/collections', getFavoriteResources)
+
+// 新增：获取用户上传的资源列表
+router.get('/:userId/uploads', getUserUploadedResources)
 
 // 限制以下路由仅管理员可访问
 router.use(restrictTo('admin'))

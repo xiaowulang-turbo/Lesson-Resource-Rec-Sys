@@ -329,3 +329,53 @@ export const getFavoriteResources = async (req, res) => {
         })
     }
 }
+
+// 获取用户上传的资源
+export const getUserUploadedResources = async (req, res) => {
+    try {
+        const userId = req.params.userId
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                status: 'error',
+                message: '无效的用户ID',
+            })
+        }
+
+        // 从查询参数获取过滤和分页选项
+        const options = {
+            type: req.query.type,
+            subject: req.query.subject,
+            format: req.query.format,
+            sortBy: req.query.sortBy,
+            page: req.query.page,
+            limit: req.query.limit,
+        }
+
+        // 调用数据服务获取用户上传的资源
+        const { resources, total } = await dataService.getUserUploadedResources(
+            userId,
+            options
+        )
+
+        res.status(200).json({
+            status: 'success',
+            message: '获取用户上传资源成功',
+            results: resources.length,
+            pagination: {
+                page: parseInt(options.page) || 1,
+                limit: parseInt(options.limit) || 10,
+                total,
+            },
+            data: {
+                resources,
+            },
+        })
+    } catch (err) {
+        console.error('获取用户上传资源失败:', err)
+        res.status(500).json({
+            status: 'error',
+            message: err.message || '获取用户上传资源失败',
+        })
+    }
+}

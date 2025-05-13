@@ -161,8 +161,16 @@ function Profile() {
     const [activeTab, setActiveTab] = useState('uploads')
     const { user, isLoading: isLoadingUser } = useUser()
 
-    // 获取上传的资源 (这里可以稍后同样用 useQuery 替换 mockUploads)
-    const mockUploads = [] // 暂时清空，之后再处理
+    // 使用 React Query 获取用户上传的资源
+    const {
+        data: uploadsData,
+        isLoading: isLoadingUploads,
+        error: uploadsError,
+    } = useQuery({
+        queryKey: ['userUploads', user?.id],
+        queryFn: () => getResourcesByUser(user.id, 'uploads'),
+        enabled: !!user && !isLoadingUser, // 只有在 user 存在时才启用查询
+    })
 
     // 使用 React Query 获取收藏的资源
     const {
@@ -177,6 +185,7 @@ function Profile() {
     })
 
     const collections = collectionsData || [] // 如果数据未加载，则为空数组
+    const uploads = uploadsData || [] // 如果数据未加载，则为空数组
 
     const handleResourceClick = (resourceId, type) => {
         // 在实际应用中，这里应该跳转到资源详情页
@@ -239,55 +248,78 @@ function Profile() {
                     </SectionHeader>
 
                     {activeTab === 'uploads' ? (
-                        mockUploads.map((resource) => (
-                            <ResourceCardLink
-                                key={resource.id}
-                                to={`/resources/${resource.id}`}
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    handleResourceClick(resource.id, '上传')
-                                }}
-                            >
-                                <ResourceCard>
-                                    <ResourceImage>
-                                        <img
-                                            src={resource.cover}
-                                            alt={resource.title}
-                                            onError={(e) => {
-                                                e.target.src = PLACEHOLDER_IMAGE
-                                            }}
-                                        />
-                                    </ResourceImage>
-                                    <ResourceContent>
-                                        <ResourceTitle>
-                                            {resource.title}
-                                        </ResourceTitle>
-                                        <ResourceInfo>
-                                            <Label>{resource.type}</Label>
-                                            <Label>
-                                                <HiOutlineEye />
-                                                {resource.views} 次浏览
-                                            </Label>
-                                            <Label>
-                                                <HiOutlineHeart />
-                                                {resource.likes} 获赞
-                                            </Label>
-                                        </ResourceInfo>
-                                        <p>{resource.description}</p>
-                                        <ResourceInfo>
-                                            <span>
-                                                上传时间: {resource.createdAt}
-                                            </span>
-                                        </ResourceInfo>
-                                    </ResourceContent>
-                                </ResourceCard>
-                            </ResourceCardLink>
-                        ))
+                        isLoadingUploads ? (
+                            <Spinner />
+                        ) : uploadsError ? (
+                            <p>加载上传资源失败: {uploadsError.message}</p>
+                        ) : uploads.length === 0 ? (
+                            <Empty resourceName="上传资源" />
+                        ) : (
+                            uploads.map((resource) => (
+                                <ResourceCardLink
+                                    key={resource.id}
+                                    to={`/resources/${resource.id}`}
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        handleResourceClick(resource.id, '上传')
+                                    }}
+                                >
+                                    <ResourceCard>
+                                        <ResourceImage>
+                                            <img
+                                                src={resource.cover}
+                                                alt={resource.title}
+                                                onError={(e) => {
+                                                    e.target.src =
+                                                        PLACEHOLDER_IMAGE
+                                                }}
+                                            />
+                                        </ResourceImage>
+                                        <ResourceContent>
+                                            <ResourceTitle>
+                                                {resource.title}
+                                            </ResourceTitle>
+                                            <ResourceInfo>
+                                                <Label>
+                                                    {resource.format ||
+                                                        resource.type}
+                                                </Label>
+                                                <Label>
+                                                    <HiOutlineEye />
+                                                    {resource.stats?.views ||
+                                                        0}{' '}
+                                                    次浏览
+                                                </Label>
+                                                <Label>
+                                                    <HiOutlineHeart />
+                                                    {resource.stats
+                                                        ?.favorites || 0}{' '}
+                                                    收藏
+                                                </Label>
+                                            </ResourceInfo>
+                                            <p>{resource.description}</p>
+                                            <ResourceInfo>
+                                                <span>
+                                                    上传时间:{' '}
+                                                    {new Date(
+                                                        resource.createdAt
+                                                    ).toLocaleDateString(
+                                                        'zh-CN'
+                                                    )}
+                                                </span>
+                                            </ResourceInfo>
+                                        </ResourceContent>
+                                    </ResourceCard>
+                                </ResourceCardLink>
+                            ))
+                        )
                     ) : isLoadingCollections ? (
                         <Spinner />
                     ) : collectionsError ? (
                         <p>加载收藏资源失败: {collectionsError.message}</p>
-                    ) : collections.length > 0 ? (
+                    ) : collections.length === 0 ? (
+                        <Empty resourceName="收藏资源" />
+                    ) : (
                         collections.map((resource) => (
                             <ResourceCardLink
                                 key={resource.id}
@@ -312,21 +344,26 @@ function Profile() {
                                             {resource.title}
                                         </ResourceTitle>
                                         <ResourceInfo>
-                                            <Label>{resource.type}</Label>
                                             <Label>
-                                                评分: {resource.rating}
+                                                {resource.format ||
+                                                    resource.type}
+                                            </Label>
+                                            <Label>
+                                                评分:{' '}
+                                                {resource.averageRating || 0}
                                             </Label>
                                         </ResourceInfo>
                                         <p>{resource.description}</p>
                                         <ResourceInfo>
-                                            <span>作者: {resource.author}</span>
+                                            <span>
+                                                作者:{' '}
+                                                {resource.author || '未知'}
+                                            </span>
                                         </ResourceInfo>
                                     </ResourceContent>
                                 </ResourceCard>
                             </ResourceCardLink>
                         ))
-                    ) : (
-                        <Empty resourceName="收藏资源" />
                     )}
                 </ProfileSection>
             </StyledProfile>

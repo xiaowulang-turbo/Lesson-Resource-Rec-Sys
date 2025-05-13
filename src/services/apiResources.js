@@ -213,7 +213,7 @@ export async function getResourcesByUser(userId, type = 'uploads') {
                 break
             case 'uploads':
             default:
-                endpoint = `/users/${userId}/resources`
+                endpoint = `/users/${userId}/uploads`
                 break
         }
 
