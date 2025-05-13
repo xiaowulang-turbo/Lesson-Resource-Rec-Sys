@@ -3,6 +3,7 @@ import useUser from './useUser'
 import { useNavigate } from 'react-router-dom'
 import { BASE_URL } from '../../services/apiConfig'
 import { HiOutlineUserCircle } from 'react-icons/hi2'
+import defaultUserAvatar from '../../public/default-user.jpg'
 
 const StyledUserAvatar = styled.div`
     display: flex;
@@ -65,7 +66,13 @@ export default function UserAvatar() {
     return (
         <StyledUserAvatar onClick={handleAvatarClick}>
             {avatarUrl ? (
-                <Avatar src={avatarUrl} alt={`Avatar of ${displayName}`} />
+                <Avatar
+                    src={avatarUrl}
+                    alt={`Avatar of ${displayName}`}
+                    onError={(e) => {
+                        e.target.src = defaultUserAvatar
+                    }}
+                />
             ) : (
                 <DefaultAvatar>
                     <HiOutlineUserCircle />

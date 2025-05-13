@@ -4,7 +4,7 @@ import FileInput from '../../ui/FileInput'
 import { HiOutlineUserCircle } from 'react-icons/hi2'
 import { useState, useEffect } from 'react'
 import { BASE_URL } from '../../services/apiConfig'
-
+import defaultUserAvatar from '../../public/default-user.jpg'
 const AccountSection = styled.div`
     background-color: var(--color-grey-0);
     border: 1px solid var(--color-grey-100);
@@ -80,7 +80,7 @@ function AvatarSection({ user, onUpdate }) {
                 ? user.avatar
                 : `${BASE_URL.replace('/api/v1', '')}${user.avatar}`
 
-            console.log('头像URL:', avatarUrl)
+            // console.log('头像URL:', avatarUrl)
             setAvatarPreview(avatarUrl)
         }
     }, [user.avatar])
@@ -114,7 +114,13 @@ function AvatarSection({ user, onUpdate }) {
             <AvatarContainer>
                 <AvatarPreview>
                     {avatarPreview ? (
-                        <img src={avatarPreview} alt="用户头像" />
+                        <img
+                            src={avatarPreview}
+                            alt="用户头像"
+                            onError={(e) => {
+                                e.target.src = defaultUserAvatar
+                            }}
+                        />
                     ) : (
                         <HiOutlineUserCircle />
                     )}
