@@ -87,6 +87,68 @@ const ActionsContainer = styled.section`
     border-top: 1px solid var(--color-grey-100);
 `
 
+// 修改封面图片布局为并排布局
+const ResourceHeader = styled.div`
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2.4rem;
+    padding-bottom: 2.4rem;
+    border-bottom: 1px solid var(--color-grey-100);
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+`
+
+const TitleContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    h1 {
+        margin-bottom: 1.5rem;
+    }
+
+    .resource-subtitle {
+        color: var(--color-grey-500);
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+    }
+
+    .resource-price {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--color-brand-600);
+        margin-bottom: 1.5rem;
+    }
+`
+
+// 修改封面图片容器样式
+const CoverImageContainer = styled.div`
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: var(--color-grey-100);
+    height: 340px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    order: 2;
+
+    @media (max-width: 768px) {
+        order: 1;
+        height: 280px;
+        margin-bottom: 1.6rem;
+    }
+`
+
+const CoverImage = styled.img`
+    max-width: 100%;
+    max-height: 340px;
+    object-fit: contain;
+`
+
 // 添加链接样式
 const AuthorLink = styled(Link)`
     color: var(--color-brand-600);
@@ -165,6 +227,18 @@ function ResourceDetail() {
             },
         })
 
+    // 根据资源类型获取默认封面图片
+    const getDefaultCoverImage = (type) => {
+        const typeMap = {
+            1: '/images/covers/document.png',
+            2: '/images/covers/video.png',
+            3: '/images/covers/audio.png',
+            4: '/images/covers/image.png',
+            5: '/images/covers/other.png',
+        }
+        return typeMap[type] || '/images/covers/default.png'
+    }
+
     const handleToggleFavorite = () => {
         if (!isAuthenticated) {
             toast.error('请先登录才能收藏资源')
@@ -202,12 +276,62 @@ function ResourceDetail() {
         5: '专家',
     }
 
+    // 获取封面图片 URL (优先使用资源的coverImage字段，如果没有则使用默认图片)
+    const coverImageUrl = resource.cover || getDefaultCoverImage(resource.type)
+
     return (
         <DetailLayout>
             <MainContent>
-                <Heading as="h1" style={{ marginBottom: '2.4rem' }}>
-                    {resource.title}
-                </Heading>
+                {/* 修改为标题和图片并排布局 */}
+                <ResourceHeader>
+                    <TitleContainer>
+                        <Heading as="h1">{resource.title}</Heading>
+                        <div className="resource-subtitle">
+                            {resourceTypeMap[resource.type] || '未知'} |{' '}
+                            {resource.subject} |{' '}
+                            {difficultyMap[resource.difficulty] || '未知'}
+                        </div>
+                        <div className="resource-price">
+                            {resource.price > 0
+                                ? `¥${resource.price.toFixed(2)}`
+                                : '免费'}
+                        </div>
+                        <div
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                marginBottom: '1rem',
+                            }}
+                        >
+                            <Button
+                                variation={
+                                    isFavorited ? 'primary' : 'secondary'
+                                }
+                                size="small"
+                                onClick={handleToggleFavorite}
+                                disabled={
+                                    isAddingFavorite || isRemovingFavorite
+                                }
+                            >
+                                {isFavorited ? '★ 已收藏' : '⭐ 收藏'} (
+                                {resource.stats?.favorites || 0})
+                            </Button>
+                        </div>
+                    </TitleContainer>
+
+                    {/* 封面图片 */}
+                    <CoverImageContainer>
+                        <CoverImage
+                            src={coverImageUrl}
+                            alt={`${resource.title}的封面图片`}
+                            onError={(e) => {
+                                e.target.src = getDefaultCoverImage(
+                                    resource.type
+                                )
+                            }}
+                        />
+                    </CoverImageContainer>
+                </ResourceHeader>
 
                 <ResourceInfo>
                     <Heading as="h3" style={{ marginBottom: '1.6rem' }}>
@@ -215,26 +339,6 @@ function ResourceDetail() {
                     </Heading>
                     <p>
                         <strong>描述：</strong> {resource.description}
-                    </p>
-                    <p>
-                        <strong>类型：</strong>{' '}
-                        {resourceTypeMap[resource.type] || '未知'}
-                    </p>
-                    <p>
-                        <strong>学科：</strong> {resource.subject}
-                    </p>
-                    <p>
-                        <strong>年级：</strong> {resource.grade}
-                    </p>
-                    <p>
-                        <strong>难度：</strong>{' '}
-                        {difficultyMap[resource.difficulty] || '未知'}
-                    </p>
-                    <p>
-                        <strong>价格：</strong>{' '}
-                        {resource.price > 0
-                            ? `¥${resource.price.toFixed(2)}`
-                            : '免费'}
                     </p>
                     <p>
                         <strong>上传者：</strong>{' '}
@@ -283,19 +387,6 @@ function ResourceDetail() {
                         <p>无可用文件或链接。</p>
                     )}
                 </ResourceInfo>
-
-                {/* 交互按钮区域 */}
-                <ActionsContainer>
-                    <Button
-                        variation={isFavorited ? 'primary' : 'secondary'}
-                        size="small"
-                        onClick={handleToggleFavorite}
-                        disabled={isAddingFavorite || isRemovingFavorite}
-                    >
-                        {isFavorited ? '★ 已收藏' : '⭐ 收藏'} (
-                        {resource.stats?.favorites || 0})
-                    </Button>
-                </ActionsContainer>
             </MainContent>
 
             <Sidebar>
