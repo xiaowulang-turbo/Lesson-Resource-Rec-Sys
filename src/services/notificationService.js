@@ -66,11 +66,15 @@ export const getUnreadNotifications = async () => {
  * @returns {Promise} - 操作结果
  */
 export const markAsRead = async (id) => {
+    const auth = getStoredAuth()
+    if (!auth?.token) return null
+
     const response = await fetch(`${BASE_URL}/${id}/read`, {
         method: 'PATCH',
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`,
         },
     })
 
@@ -87,11 +91,15 @@ export const markAsRead = async (id) => {
  * @returns {Promise} - 操作结果
  */
 export const markAllAsRead = async () => {
+    const auth = getStoredAuth()
+    if (!auth?.token) return null
+
     const response = await fetch(`${BASE_URL}/read-all`, {
         method: 'PATCH',
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`,
         },
     })
 
@@ -109,11 +117,15 @@ export const markAllAsRead = async () => {
  * @returns {Promise} - 操作结果
  */
 export const deleteUserNotification = async (id) => {
+    const auth = getStoredAuth()
+    if (!auth?.token) return null
+
     const response = await fetch(`${BASE_URL}/user/${id}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`,
         },
     })
 
@@ -133,11 +145,15 @@ export const deleteUserNotification = async (id) => {
  * @returns {Promise} - 创建的通知
  */
 export const createNotification = async (data) => {
+    const auth = getStoredAuth()
+    if (!auth?.token) return null
+
     const response = await fetch(BASE_URL, {
         method: 'POST',
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`,
         },
         body: JSON.stringify(data),
     })
@@ -157,11 +173,15 @@ export const createNotification = async (data) => {
  * @returns {Promise} - 更新后的通知
  */
 export const updateNotification = async (id, data) => {
+    const auth = getStoredAuth()
+    if (!auth?.token) return null
+
     const response = await fetch(`${BASE_URL}/${id}`, {
         method: 'PATCH',
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`,
         },
         body: JSON.stringify(data),
     })
@@ -180,11 +200,15 @@ export const updateNotification = async (id, data) => {
  * @returns {Promise} - 操作结果
  */
 export const deleteNotification = async (id) => {
+    const auth = getStoredAuth()
+    if (!auth?.token) return null
+
     const response = await fetch(`${BASE_URL}/${id}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`,
         },
     })
 
@@ -202,11 +226,15 @@ export const deleteNotification = async (id) => {
  * @returns {Promise} - 操作结果
  */
 export const publishNotification = async (id) => {
+    const auth = getStoredAuth()
+    if (!auth?.token) return null
+
     const response = await fetch(`${BASE_URL}/${id}/publish`, {
         method: 'PATCH',
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`,
         },
     })
 
@@ -224,11 +252,15 @@ export const publishNotification = async (id) => {
  * @returns {Promise} - 操作结果
  */
 export const archiveNotification = async (id) => {
+    const auth = getStoredAuth()
+    if (!auth?.token) return null
+
     const response = await fetch(`${BASE_URL}/${id}/archive`, {
         method: 'PATCH',
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`,
         },
     })
 
