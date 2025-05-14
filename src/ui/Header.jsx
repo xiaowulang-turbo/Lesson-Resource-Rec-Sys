@@ -14,6 +14,7 @@ import Logo from './Logo'
 import { useState, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { debounce } from '../utils/debounce'
+import NotificationIcon from '../components/NotificationIcon'
 
 const StyleHeader = styled.div`
     background-color: var(--color-grey-0);
@@ -172,6 +173,7 @@ function Header({ showNavInHeader = false }) {
                     />
                 </SearchContainer>
 
+                <NotificationIcon />
                 <UserAvatar />
                 <HeaderMenu />
             </RightContainer>

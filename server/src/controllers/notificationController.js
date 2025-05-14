@@ -159,6 +159,8 @@ export const getUserNotifications = async (req, res, next) => {
             isDeleted: false,
         })
 
+        console.log(userNotifications, 'userNotifications')
+
         const result = {
             status: 'success',
             results: userNotifications.length,
@@ -178,6 +180,8 @@ export const getUserNotifications = async (req, res, next) => {
 
         res.status(200).json(result)
     } catch (err) {
+        console.log(err)
+
         next(err)
     }
 }

@@ -7,6 +7,14 @@ const router = express.Router()
 // 保护所有通知路由
 router.use(protect)
 
+// 用户路由
+router.get('/', notificationController.getUserNotifications)
+router.get('/unread', notificationController.getUnreadNotifications)
+router.patch('/:id/read', notificationController.markAsRead)
+router.patch('/:id/unread', notificationController.markAsUnread)
+router.delete('/user/:id', notificationController.deleteUserNotification)
+router.patch('/read-all', notificationController.markAllAsRead)
+
 // 管理员路由
 router.post('/', restrictTo('admin'), notificationController.createNotification)
 router.patch(
@@ -29,13 +37,5 @@ router.patch(
     restrictTo('admin'),
     notificationController.archiveNotification
 )
-
-// 用户路由
-router.get('/', notificationController.getUserNotifications)
-router.get('/unread', notificationController.getUnreadNotifications)
-router.patch('/:id/read', notificationController.markAsRead)
-router.patch('/:id/unread', notificationController.markAsUnread)
-router.delete('/user/:id', notificationController.deleteUserNotification)
-router.patch('/read-all', notificationController.markAllAsRead)
 
 export default router

@@ -4,6 +4,7 @@ import {
     HiOutlineUsers,
     HiOutlineBookOpen,
     HiOutlineUserCircle,
+    HiOutlineBell,
 } from 'react-icons/hi2'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
@@ -104,6 +105,15 @@ function MainNav({ isHorizontal = false }) {
                             >
                                 <HiOutlineUsers />
                                 用户管理
+                            </StyledNavLink>
+                        </li>
+                        <li>
+                            <StyledNavLink
+                                to="/admin/notification-management"
+                                isHorizontal={isHorizontal}
+                            >
+                                <HiOutlineBell />
+                                消息管理
                             </StyledNavLink>
                         </li>
                     </>

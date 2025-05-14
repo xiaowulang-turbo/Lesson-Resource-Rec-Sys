@@ -3,6 +3,7 @@ import Table from '../../ui/Table'
 import Menus from '../../ui/Menus'
 import Empty from '../../ui/Empty'
 import { useUsers } from './useUsers'
+import defaultUser from '../../public/default-user.jpg'
 
 function UserTable() {
     const { isLoading, users, error } = useUsers()
@@ -43,8 +44,11 @@ function UserRow({ user }) {
                         ? photo
                         : photo
                         ? `http://127.0.0.1:8000/img/users/${photo}`
-                        : '/default-user.jpg'
+                        : defaultUser
                 }
+                onError={(e) => {
+                    e.target.src = defaultUser
+                }}
                 alt={`Avatar of ${name}`}
                 style={{
                     display: 'block',
