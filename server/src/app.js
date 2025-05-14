@@ -11,6 +11,7 @@ import recommendationRoutes from './routes/recommendationRoutes.js'
 import moocRoutes from './routes/moocRoutes.js'
 import tagRoutes from './routes/tagRoutes.js'
 import searchRoutes from './routes/searchRoutes.js'
+import notificationRoutes from './routes/notificationRoutes.js'
 import rateLimit from 'express-rate-limit'
 import cookieParser from 'cookie-parser'
 import globalErrorHandler from './middlewares/errorMiddleware.js'
@@ -150,6 +151,7 @@ app.use('/api/v1/recommendations', recommendationRoutes)
 app.use('/api/v1/mooc', moocRoutes)
 app.use('/api/v1/tags', tagRoutes)
 app.use('/api/v1/search', searchRoutes)
+app.use('/api/v1/notifications', notificationRoutes)
 
 // 添加中国大学慕课的API代理路由
 app.post('/api/course/search', async (req, res) => {
