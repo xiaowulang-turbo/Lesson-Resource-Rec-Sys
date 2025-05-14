@@ -273,7 +273,7 @@ const NotificationManagePage = () => {
             ) : notifications.length === 0 ? (
                 <EmptyState>
                     <EmptyText>
-                        暂无通知，点击“创建新通知”添加第一条通知
+                        暂无通知，点击"创建新通知"添加第一条通知
                     </EmptyText>
                 </EmptyState>
             ) : (
@@ -338,16 +338,6 @@ const NotificationManagePage = () => {
                                                         }
                                                     >
                                                         编辑
-                                                    </ActionButton>
-                                                    <ActionButton
-                                                        className="publish"
-                                                        onClick={() =>
-                                                            handlePublish(
-                                                                notification._id
-                                                            )
-                                                        }
-                                                    >
-                                                        发布
                                                     </ActionButton>
                                                 </>
                                             )}
@@ -612,15 +602,6 @@ const ActionButton = styled.button`
 
         &:hover {
             background-color: #bae6fd;
-        }
-    }
-
-    &.publish {
-        background-color: #d1fae5;
-        color: #059669;
-
-        &:hover {
-            background-color: #a7f3d0;
         }
     }
 

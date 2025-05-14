@@ -224,6 +224,7 @@ export const deleteNotification = async (id) => {
  * 发布通知
  * @param {string} id - 通知ID
  * @returns {Promise} - 操作结果
+ * @deprecated 新通知已在创建时自动发布，此函数保留用于向后兼容或特殊情况
  */
 export const publishNotification = async (id) => {
     const auth = getStoredAuth()

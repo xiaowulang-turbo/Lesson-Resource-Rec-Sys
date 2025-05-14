@@ -27,6 +27,7 @@ router.delete(
     restrictTo('admin'),
     notificationController.deleteNotification
 )
+// 保留API用于向后兼容，但新通知已在创建时自动发布
 router.patch(
     '/:id/publish',
     restrictTo('admin'),

@@ -14,7 +14,9 @@ export default function useLogin() {
 
         onSuccess: (data) => {
             // data is the full authData object { status, token, data: { user } }
-            toast.success('登录成功')
+            toast.success('登录成功', {
+                duration: 1500,
+            })
 
             // 1. Update AuthContext state
             authContextLogin(data)

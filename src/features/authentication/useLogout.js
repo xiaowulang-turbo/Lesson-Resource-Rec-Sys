@@ -17,7 +17,9 @@ export default function useLogout() {
 
             // queryClient.removeQueries(["user"]); // Context state change should be sufficient
             // navigate("/login", { replace: true }); // Handled by authContextLogout
-            toast.success('Logout successful')
+            toast.success('Logout successful', {
+                duration: 1500,
+            })
         },
 
         onError: (error) => {

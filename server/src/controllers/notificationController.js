@@ -11,13 +11,49 @@ export const createNotification = async (req, res, next) => {
         // 添加创建者ID
         req.body.createdBy = req.user.id
 
+        // 直接设置状态为已发布，跳过草稿状态
+        req.body.status = 'published'
+
         // 创建通知
         const notification = await Notification.create(req.body)
+
+        // 发布通知给目标用户 - 直接集成发布逻辑
+        // 查找目标用户
+        let userQuery = {}
+
+        // 根据目标受众过滤用户
+        if (notification.targetAudience !== 'all') {
+            const accounts = await Account.find({
+                role: notification.targetAudience.slice(0, -1),
+            }) // 去掉末尾的's'
+            const accountIds = accounts.map((account) => account._id)
+            userQuery = { accountId: { $in: accountIds } }
+        }
+
+        const users = await User.find(userQuery)
+
+        // 为每个用户创建通知状态记录
+        const userNotifications = users.map((user) => ({
+            userId: user._id,
+            notificationId: notification._id,
+        }))
+
+        // 批量插入用户通知
+        if (userNotifications.length > 0) {
+            await UserNotification.insertMany(userNotifications, {
+                ordered: false,
+            })
+        }
+
+        // 清除相关缓存
+        const cacheKey = `${cacheService.prefix}notifications_`
+        await cacheService.clear(cacheKey)
 
         res.status(201).json({
             status: 'success',
             data: {
                 notification,
+                recipientCount: userNotifications.length,
             },
         })
     } catch (err) {
