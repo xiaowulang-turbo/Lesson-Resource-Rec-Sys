@@ -129,7 +129,7 @@ export const getHomepageRecommendations = catchAsync(async (req, res, next) => {
 
     // 创建缓存键
     const cacheParams = {
-        userId: currentUser?.user_id || 'guest',
+        userId: currentUser?.id || 'guest',
         algorithm: algorithmPreference,
         limit,
         contentWeight,

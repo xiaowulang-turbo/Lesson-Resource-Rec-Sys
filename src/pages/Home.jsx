@@ -84,7 +84,10 @@ function Home() {
                 setIsLoading(true)
                 setError(null)
                 console.log('Fetching recommendations...')
-                const recommendations = await fetchHomepageRecommendations(8)
+                const recommendations = await fetchHomepageRecommendations(
+                    8,
+                    true
+                )
                 console.log('Recommendations received:', recommendations)
                 setRecommendedResources(recommendations)
             } catch (err) {
@@ -96,7 +99,7 @@ function Home() {
         }
 
         loadRecommendations()
-    }, [isAuthenticated])
+    }, [isAuthenticated, user?.id])
 
     const handleSearchSubmit = (e) => {
         e.preventDefault()

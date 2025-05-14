@@ -10,9 +10,14 @@ import {
  * Fetches homepage recommendations from the backend.
  * Handles both guest and logged-in users.
  */
-export const fetchHomepageRecommendations = async (limit = 8) => {
+export const fetchHomepageRecommendations = async (
+    limit = 8,
+    skipCache = false
+) => {
     try {
-        const url = `${API_URL}/recommendations/homepage?limit=${limit}`
+        const url = `${API_URL}/recommendations/homepage?limit=${limit}${
+            skipCache ? '&skipCache=true' : ''
+        }`
 
         // 修正获取token的方式，从auth对象中获取，而不是直接获取jwt
         let token = null
