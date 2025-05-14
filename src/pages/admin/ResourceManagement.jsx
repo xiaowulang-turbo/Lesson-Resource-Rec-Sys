@@ -29,9 +29,7 @@ import {
     HiCheck,
     // HiOutlineRefresh,
 } from 'react-icons/hi2'
-import { HiOutlineDownload } from 'react-icons/hi'
 import ResourceFilter from '../../components/ResourceFilter'
-import Checkbox from '../../ui/Checkbox'
 import ConfirmDelete from '../../components/ConfirmDelete'
 
 const StyledResourceManagement = styled.div`
@@ -115,12 +113,6 @@ const Difficulty = styled.span`
     }
 `
 
-const BatchActions = styled.div`
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.6rem;
-`
-
 const StyledModal = styled.div`
     width: 80rem;
     max-width: 90vw;
@@ -145,8 +137,6 @@ function ResourceManagement() {
         difficulty: 'all',
         sort: 'newest',
     })
-    const [selectedResources, setSelectedResources] = useState([])
-    const [selectAll, setSelectAll] = useState(false)
     const [stats, setStats] = useState({
         total: 0,
         documents: 0,
@@ -163,9 +153,9 @@ function ResourceManagement() {
         mutationFn: deleteResource,
         onSuccess: () => {
             toast.success('资源已成功删除')
-            queryClient.invalidateQueries({ queryKey: ['resources'] })
 
-            // 重新获取资源列表
+            // 刷新资源列表
+            queryClient.invalidateQueries({ queryKey: ['resources'] })
             handleRefreshResources()
         },
         onError: (err) => {
@@ -193,10 +183,6 @@ function ResourceManagement() {
                 setResources(result.resources)
                 setPagination(result.pagination)
                 setStats(result.stats)
-
-                // 重置选择状态
-                setSelectedResources([])
-                setSelectAll(false)
             } catch (err) {
                 console.error('获取资源列表失败', err)
             } finally {
@@ -206,20 +192,6 @@ function ResourceManagement() {
 
         fetchResources()
     }, [currentPage, filters.sort])
-
-    // 处理筛选变化
-    // const handleFilterChange = (filterChange) => {
-    //     setFilters((prevFilters) => ({
-    //         ...prevFilters,
-    //         [filterChange.type]: filterChange.value,
-    //     }))
-
-    //     // 重置到第一页
-    //     if (currentPage !== 1) {
-    //         searchParams.set('page', 1)
-    //         setSearchParams(searchParams)
-    //     }
-    // }
 
     // 资源类型映射
     const resourceTypeMap = {
@@ -246,42 +218,10 @@ function ResourceManagement() {
         5: '专家级',
     }
 
-    // 处理资源选择
-    const handleSelectResource = (resourceId) => {
-        setSelectedResources((prev) => {
-            if (prev.includes(resourceId)) {
-                return prev.filter((id) => id !== resourceId)
-            } else {
-                return [...prev, resourceId]
-            }
-        })
-    }
-
-    // 处理全选
-    const handleSelectAll = () => {
-        if (selectAll) {
-            setSelectedResources([])
-        } else {
-            setSelectedResources(resources.map((r) => r.id))
-        }
-        setSelectAll(!selectAll)
-    }
-
-    // 批量删除选中的资源
-    const handleBatchDelete = () => {
-        console.log('批量删除:', selectedResources)
-        // 实现批量删除逻辑
-    }
-
-    // 批量导出选中的资源
-    const handleBatchExport = () => {
-        console.log('批量导出:', selectedResources)
-        // 实现批量导出逻辑
-    }
-
     // 打开删除资源Modal
     const handleOpenDeleteModal = (resourceId) => {
         setDeletingResourceId(resourceId)
+        console.log(`正在删除资源，ID: ${resourceId}`)
     }
 
     // 关闭删除资源Modal
@@ -291,7 +231,10 @@ function ResourceManagement() {
 
     // 确认删除资源
     const handleConfirmDelete = () => {
+        console.log('确认删除:', deletingResourceId)
         if (deletingResourceId) {
+            // 单个资源删除
+            console.log(`执行资源删除，ID: ${deletingResourceId}`)
             deleteMutate(deletingResourceId)
         }
     }
@@ -355,44 +298,13 @@ function ResourceManagement() {
                     <ResourceFilter onFilterChange={handleFilterChange} />
                 </FilterSection> */}
 
-                    {selectedResources.length > 0 && (
-                        <BatchActions>
-                            <Button
-                                size="small"
-                                variation="danger"
-                                onClick={handleBatchDelete}
-                            >
-                                <HiOutlineTrash />
-                                <span>
-                                    批量删除 ({selectedResources.length})
-                                </span>
-                            </Button>
-                            <Button
-                                size="small"
-                                variation="secondary"
-                                onClick={handleBatchExport}
-                            >
-                                <HiOutlineDownload />
-                                <span>
-                                    批量导出 ({selectedResources.length})
-                                </span>
-                            </Button>
-                        </BatchActions>
-                    )}
-
                     {isLoading ? (
                         <Spinner />
                     ) : resources.length === 0 ? (
                         <Empty resource="资源" />
                     ) : (
-                        <Table columns="0.3fr 2fr 0.8fr 0.8fr 1fr 0.8fr 1fr">
+                        <Table columns="2fr 0.8fr 0.8fr 1fr 0.8fr 1fr">
                             <Table.Header>
-                                <div>
-                                    <Checkbox
-                                        checked={selectAll}
-                                        onChange={handleSelectAll}
-                                    />
-                                </div>
                                 <div>标题</div>
                                 <div>类型</div>
                                 <div>难度</div>
@@ -405,18 +317,6 @@ function ResourceManagement() {
                                 data={resources}
                                 render={(resource) => (
                                     <Table.Row key={resource._id}>
-                                        <div>
-                                            <Checkbox
-                                                checked={selectedResources.includes(
-                                                    resource._id
-                                                )}
-                                                onChange={() =>
-                                                    handleSelectResource(
-                                                        resource._id
-                                                    )
-                                                }
-                                            />
-                                        </div>
                                         <div>{resource.title}</div>
                                         <div>
                                             <ResourceType>
