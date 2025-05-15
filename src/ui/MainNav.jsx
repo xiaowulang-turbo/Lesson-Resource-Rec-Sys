@@ -143,7 +143,7 @@ function MainNav({ isHorizontal = false }) {
                                 isHorizontal={isHorizontal}
                             >
                                 <HiOutlineUserCircle />
-                                个人中心
+                                我的资源
                             </StyledNavLink>
                         </li>
                     </>
