@@ -126,7 +126,7 @@ function Home() {
             </Row>
 
             <SearchContainer as="form" onSubmit={handleSearchSubmit}>
-                <SearchOptionsRow>
+                {/* <SearchOptionsRow>
                     <SearchOptionButton
                         type="button"
                         active={searchType === 'local'}
@@ -141,7 +141,7 @@ function Home() {
                     >
                         搜全网
                     </SearchOptionButton>
-                </SearchOptionsRow>
+                </SearchOptionsRow> */}
                 <SearchInputRow>
                     <Input
                         type="search"
