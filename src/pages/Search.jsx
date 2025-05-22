@@ -282,7 +282,7 @@ function Search() {
 
             {/* 新增：搜索框组件 */}
             <SearchContainer as="form" onSubmit={handleSearchSubmit}>
-                <SearchOptionsRow>
+                {/* <SearchOptionsRow>
                     <SearchTypeButton
                         type="button"
                         active={searchType === 'local'}
@@ -297,7 +297,7 @@ function Search() {
                     >
                         搜全网
                     </SearchTypeButton>
-                </SearchOptionsRow>
+                </SearchOptionsRow> */}
                 <SearchInputRow>
                     <Input
                         type="search"
