@@ -13,6 +13,7 @@ import Button from '../ui/Button'
 import Empty from '../ui/Empty'
 import SimilarResourceList from '../ui/SimilarResourceList'
 import toast from 'react-hot-toast'
+const defaultCoverImage = '../public/default-resource.jpg'
 
 // --- 样式化组件 ---
 const DetailLayout = styled.div`
@@ -228,7 +229,9 @@ function ResourceDetail() {
         })
 
     // 根据资源类型获取默认封面图片
+    // 根据文件类型获取默认封面图片
     const getDefaultCoverImage = (type) => {
+        // 定义文件类型与封面图片的映射关系
         const typeMap = {
             1: '/images/covers/document.png',
             2: '/images/covers/video.png',
@@ -236,6 +239,7 @@ function ResourceDetail() {
             4: '/images/covers/image.png',
             5: '/images/covers/other.png',
         }
+        // 返回对应类型的封面图片，如果没有对应类型则返回默认封面图片
         return typeMap[type] || '/images/covers/default.png'
     }
 
@@ -277,7 +281,10 @@ function ResourceDetail() {
     }
 
     // 获取封面图片 URL (优先使用资源的coverImage字段，如果没有则使用默认图片)
-    const coverImageUrl = resource.cover || getDefaultCoverImage(resource.type)
+    const coverImageUrl =
+        resource.cover ||
+        defaultCoverImage ||
+        getDefaultCoverImage(resource.type)
 
     return (
         <DetailLayout>
