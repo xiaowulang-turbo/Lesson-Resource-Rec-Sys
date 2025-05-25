@@ -146,9 +146,9 @@ const CoverImageContainer = styled.div`
 `
 
 const CoverImage = styled.img`
-    max-width: 100%;
-    max-height: 340px;
-    object-fit: contain;
+    min-width: 85%;
+    border-radius: var(--border-radius-md);
+    object-fit: fill;
 `
 
 // 添加链接样式
