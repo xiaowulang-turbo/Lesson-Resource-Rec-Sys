@@ -125,7 +125,24 @@ const PreviewUnavailableIcon = () => (
 // API基础URL
 const API_BASE_URL = 'http://localhost:3000'
 
+// 根据文件扩展名判断资源类型
+const getResourceType = (extension) => {
+    const videoExtensions = ['mp4', 'webm', 'ogg', 'mov']
+    const audioExtensions = ['mp3', 'wav', 'ogg', 'm4a', 'aac']
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']
+    const documentExtensions = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt']
+
+    extension = extension.toLowerCase()
+
+    if (videoExtensions.includes(extension)) return 'video'
+    if (audioExtensions.includes(extension)) return 'audio'
+    if (imageExtensions.includes(extension)) return 'image'
+    if (documentExtensions.includes(extension)) return 'document'
+    return 'other'
+}
+
 function ResourcePreview({ resource }) {
+    console.log(resource, 'resource')
     if (!resource || !resource.url) {
         return (
             <PreviewUnavailable>
@@ -149,15 +166,17 @@ function ResourcePreview({ resource }) {
         // 去除URL参数
         const cleanUrl = url.split('?')[0]
         // 获取最后一个点号之后的部分
+        console.log(cleanUrl, 'cleanUrl')
         return cleanUrl.split('.').pop().toLowerCase()
     }
 
     const fileExtension = getFileExtension(url)
 
-    // 根据不同的资源类型提供不同的预览
-    switch (type) {
-        // 视频类型
-        case 2:
+    // 根据文件扩展名判断资源类型并提供不同的预览
+    const resourceType = getResourceType(fileExtension)
+
+    switch (resourceType) {
+        case 'video':
             return (
                 <VideoPlayer
                     src={fullUrl}
@@ -166,8 +185,7 @@ function ResourcePreview({ resource }) {
                 />
             )
 
-        // 音频类型
-        case 3:
+        case 'audio':
             return (
                 <AudioPlayer
                     src={fullUrl}
@@ -176,16 +194,14 @@ function ResourcePreview({ resource }) {
                 />
             )
 
-        // 图片类型
-        case 4:
+        case 'image':
             return (
                 <PreviewContainer>
                     <ImagePreview src={fullUrl} alt={title || '图片预览'} />
                 </PreviewContainer>
             )
 
-        // 文档类型
-        case 1:
+        case 'document':
             // 对于PDF可以使用iframe预览
             if (fileExtension === 'pdf') {
                 return (
@@ -213,7 +229,6 @@ function ResourcePreview({ resource }) {
                 )
             }
 
-        // 其他类型
         default:
             return (
                 <PreviewUnavailable>
