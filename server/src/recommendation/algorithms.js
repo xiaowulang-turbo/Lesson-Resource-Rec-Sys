@@ -90,18 +90,18 @@ export const contentBasedRecommendation = async (user, limit = 10) => {
         }
     }
 
-    console.log('[contentBased] 用户数据:', user)
+    // console.log('[contentBased] 用户数据:', user)
 
     // 获取用户偏好，确保不会有undefined
     const preferredSubjects = user.preferred_subjects || []
     const interests = user.interests || []
     const preferredDifficulty = user.preferred_difficulty || 3 // 默认中级难度
 
-    console.log('[contentBased] 处理后的用户偏好:', {
-        preferredSubjects,
-        interests,
-        preferredDifficulty,
-    })
+    // console.log('[contentBased] 处理后的用户偏好:', {
+    //     preferredSubjects,
+    //     interests,
+    //     preferredDifficulty,
+    // })
 
     // 加载资源数据
     const resources = await loadResourcesData()

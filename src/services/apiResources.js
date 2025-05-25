@@ -206,14 +206,14 @@ export async function getResourcesByUser(userId, type = 'uploads') {
         let endpoint = ''
         switch (type) {
             case 'collections':
-                endpoint = `/users/${userId}/collections`
+                endpoint = `/users/${userId}/collections?limit=1000`
                 break
             case 'liked':
-                endpoint = `/users/${userId}/likes`
+                endpoint = `/users/${userId}/likes?limit=1000`
                 break
             case 'uploads':
             default:
-                endpoint = `/users/${userId}/uploads`
+                endpoint = `/users/${userId}/uploads?limit=1000`
                 break
         }
 

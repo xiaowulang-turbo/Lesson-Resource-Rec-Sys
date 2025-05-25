@@ -4,21 +4,19 @@ import Heading from '../ui/Heading'
 import Row from '../ui/Row'
 import styled from 'styled-components'
 import Button from '../ui/Button'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
     HiOutlineBookmark,
     HiOutlineClipboardList,
-    HiOutlineHeart,
     HiOutlineUpload,
-    HiOutlineEye,
+    HiOutlineViewGrid,
+    HiOutlineViewList,
 } from 'react-icons/hi'
 import { getResourcesByUser } from '../services/apiResources'
 import useUser from '../features/authentication/useUser'
 import Spinner from '../ui/Spinner'
 import Empty from '../ui/Empty'
-
-// 使用本地默认资源图片替代在线服务
-const PLACEHOLDER_IMAGE = '../public/default-resource.jpg'
+import ResourceTreeView from '../ui/ResourceTreeView'
 
 const StyledProfile = styled.div`
     max-width: 1200px;
@@ -61,22 +59,60 @@ const SectionIcon = styled.div`
     }
 `
 
-const ResourceCardLink = styled(Link)`
+const TabGroup = styled.div`
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+`
+
+const ViewToggle = styled.div`
+    display: flex;
+    gap: 0.5rem;
+    margin-left: 1rem;
+    align-items: center;
+`
+
+const ViewButton = styled.button`
+    background: ${(props) =>
+        props.active ? 'var(--color-brand-600)' : 'var(--color-grey-200)'};
+    color: ${(props) =>
+        props.active ? 'var(--color-grey-0)' : 'var(--color-grey-600)'};
+    border: none;
+    border-radius: var(--border-radius-sm);
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: ${(props) =>
+            props.active ? 'var(--color-brand-700)' : 'var(--color-grey-300)'};
+    }
+
+    svg {
+        width: 1.6rem;
+        height: 1.6rem;
+    }
+`
+
+// 原来的卡片视图样式
+const ResourceCardLink = styled.a`
     text-decoration: none;
     color: inherit;
     display: block;
     margin-bottom: 1.6rem;
+    cursor: pointer;
 `
 
 const ResourceCard = styled.div`
     background-color: var(--color-grey-0);
-    /* border-radius: var(--border-radius-md); */
     overflow: hidden;
     box-shadow: var(--shadow-sm);
     transition: all 0.3s;
     display: flex;
     align-items: stretch;
     height: 320px;
+    border: 1px solid var(--color-grey-100);
+    border-radius: var(--border-radius-md);
 
     ${ResourceCardLink}:hover & {
         transform: translateY(-2px);
@@ -156,10 +192,61 @@ const Label = styled.span`
     gap: 0.4rem;
 `
 
+// 卡片视图组件
+const CardView = ({ resources, navigate }) => {
+    const PLACEHOLDER_IMAGE = '../public/default-resource.jpg'
+
+    return (
+        <div>
+            {resources.map((resource) => (
+                <ResourceCardLink
+                    key={resource._id}
+                    onClick={() => navigate(`/resources/${resource._id}`)}
+                >
+                    <ResourceCard>
+                        <ResourceImage>
+                            <img
+                                src={resource.cover}
+                                alt={resource.title}
+                                onError={(e) => {
+                                    e.target.src = PLACEHOLDER_IMAGE
+                                }}
+                            />
+                        </ResourceImage>
+                        <ResourceContent>
+                            <ResourceTitle>{resource.title}</ResourceTitle>
+                            <ResourceInfo>
+                                <Label>
+                                    {resource.format || resource.type}
+                                </Label>
+                                <Label>
+                                    {resource.stats?.views || 0} 次浏览
+                                </Label>
+                                <Label>
+                                    {resource.stats?.favorites || 0} 收藏
+                                </Label>
+                            </ResourceInfo>
+                            <p>{resource.description}</p>
+                            <ResourceInfo>
+                                <span>
+                                    上传时间:{' '}
+                                    {new Date(
+                                        resource.createdAt
+                                    ).toLocaleDateString('zh-CN')}
+                                </span>
+                            </ResourceInfo>
+                        </ResourceContent>
+                    </ResourceCard>
+                </ResourceCardLink>
+            ))}
+        </div>
+    )
+}
+
 function Profile() {
     const navigate = useNavigate()
-    // 示例数据，实际应该从API获取
-    const [activeTab, setActiveTab] = useState('collections')
+    const [activeTab, setActiveTab] = useState('uploads')
+    const [viewMode, setViewMode] = useState('tree') // 'tree' 或 'card'
     const { user, isLoading: isLoadingUser } = useUser()
 
     // 使用 React Query 获取用户上传的资源
@@ -188,13 +275,25 @@ function Profile() {
     const collections = collectionsData || [] // 如果数据未加载，则为空数组
     const uploads = uploadsData || [] // 如果数据未加载，则为空数组
 
-    const handleResourceClick = (resourceId, type) => {
-        // 直接跳转到资源详情页
-        navigate(`/resources/${resourceId}`)
-    }
-
     // 如果用户信息还在加载，显示 Spinner
     if (isLoadingUser) return <Spinner />
+
+    const renderContent = (resources, isLoading, error, resourceType) => {
+        if (isLoading) return <Spinner />
+        if (error)
+            return (
+                <p>
+                    加载{resourceType}失败: {error.message}
+                </p>
+            )
+        if (resources.length === 0) return <Empty resourceName={resourceType} />
+
+        return viewMode === 'tree' ? (
+            <ResourceTreeView resources={resources} />
+        ) : (
+            <CardView resources={resources} navigate={navigate} />
+        )
+    }
 
     return (
         <>
@@ -219,18 +318,7 @@ function Profile() {
                             <HiOutlineClipboardList />
                             <h2>我的资源列表</h2>
                         </SectionIcon>
-                        <div>
-                            <Button
-                                size="small"
-                                variation={
-                                    activeTab === 'collections'
-                                        ? 'primary'
-                                        : 'secondary'
-                                }
-                                onClick={() => setActiveTab('collections')}
-                            >
-                                <HiOutlineBookmark /> 收藏
-                            </Button>
+                        <TabGroup>
                             <Button
                                 size="small"
                                 variation={
@@ -240,121 +328,51 @@ function Profile() {
                                 }
                                 onClick={() => setActiveTab('uploads')}
                             >
-                                <HiOutlineUpload /> 上传
+                                <HiOutlineUpload /> 上传资源
                             </Button>
-                        </div>
+                            <Button
+                                size="small"
+                                variation={
+                                    activeTab === 'collections'
+                                        ? 'primary'
+                                        : 'secondary'
+                                }
+                                onClick={() => setActiveTab('collections')}
+                            >
+                                <HiOutlineBookmark /> 收藏资源
+                            </Button>
+                            <ViewToggle>
+                                <ViewButton
+                                    active={viewMode === 'tree'}
+                                    onClick={() => setViewMode('tree')}
+                                    title="树形视图"
+                                >
+                                    <HiOutlineViewList />
+                                </ViewButton>
+                                <ViewButton
+                                    active={viewMode === 'card'}
+                                    onClick={() => setViewMode('card')}
+                                    title="卡片视图"
+                                >
+                                    <HiOutlineViewGrid />
+                                </ViewButton>
+                            </ViewToggle>
+                        </TabGroup>
                     </SectionHeader>
 
-                    {activeTab === 'uploads' ? (
-                        isLoadingUploads ? (
-                            <Spinner />
-                        ) : uploadsError ? (
-                            <p>加载上传资源失败: {uploadsError.message}</p>
-                        ) : uploads.length === 0 ? (
-                            <Empty resourceName="上传资源" />
-                        ) : (
-                            uploads.map((resource) => (
-                                <ResourceCardLink
-                                    key={resource._id}
-                                    to={`/resources/${resource._id}`}
-                                >
-                                    <ResourceCard>
-                                        <ResourceImage>
-                                            <img
-                                                src={resource.cover}
-                                                alt={resource.title}
-                                                onError={(e) => {
-                                                    e.target.src =
-                                                        PLACEHOLDER_IMAGE
-                                                }}
-                                            />
-                                        </ResourceImage>
-                                        <ResourceContent>
-                                            <ResourceTitle>
-                                                {resource.title}
-                                            </ResourceTitle>
-                                            <ResourceInfo>
-                                                <Label>
-                                                    {resource.format ||
-                                                        resource.type}
-                                                </Label>
-                                                <Label>
-                                                    <HiOutlineEye />
-                                                    {resource.stats?.views ||
-                                                        0}{' '}
-                                                    次浏览
-                                                </Label>
-                                                <Label>
-                                                    <HiOutlineHeart />
-                                                    {resource.stats
-                                                        ?.favorites || 0}{' '}
-                                                    收藏
-                                                </Label>
-                                            </ResourceInfo>
-                                            <p>{resource.description}</p>
-                                            <ResourceInfo>
-                                                <span>
-                                                    上传时间:{' '}
-                                                    {new Date(
-                                                        resource.createdAt
-                                                    ).toLocaleDateString(
-                                                        'zh-CN'
-                                                    )}
-                                                </span>
-                                            </ResourceInfo>
-                                        </ResourceContent>
-                                    </ResourceCard>
-                                </ResourceCardLink>
-                            ))
-                        )
-                    ) : isLoadingCollections ? (
-                        <Spinner />
-                    ) : collectionsError ? (
-                        <p>加载收藏资源失败: {collectionsError.message}</p>
-                    ) : collections.length === 0 ? (
-                        <Empty resourceName="收藏资源" />
-                    ) : (
-                        collections.map((resource) => (
-                            <ResourceCardLink
-                                key={resource._id}
-                                to={`/resources/${resource._id}`}
-                            >
-                                <ResourceCard>
-                                    <ResourceImage>
-                                        <img
-                                            src={resource.cover}
-                                            alt={resource.title}
-                                            onError={(e) => {
-                                                e.target.src = PLACEHOLDER_IMAGE
-                                            }}
-                                        />
-                                    </ResourceImage>
-                                    <ResourceContent>
-                                        <ResourceTitle>
-                                            {resource.title}
-                                        </ResourceTitle>
-                                        <ResourceInfo>
-                                            <Label>
-                                                {resource.format ||
-                                                    resource.type}
-                                            </Label>
-                                            <Label>
-                                                评分:{' '}
-                                                {resource.averageRating || 0}
-                                            </Label>
-                                        </ResourceInfo>
-                                        <p>{resource.description}</p>
-                                        <ResourceInfo>
-                                            <span>
-                                                作者:{' '}
-                                                {resource.author || '未知'}
-                                            </span>
-                                        </ResourceInfo>
-                                    </ResourceContent>
-                                </ResourceCard>
-                            </ResourceCardLink>
-                        ))
-                    )}
+                    {activeTab === 'uploads'
+                        ? renderContent(
+                              uploads,
+                              isLoadingUploads,
+                              uploadsError,
+                              '上传资源'
+                          )
+                        : renderContent(
+                              collections,
+                              isLoadingCollections,
+                              collectionsError,
+                              '收藏资源'
+                          )}
                 </ProfileSection>
             </StyledProfile>
         </>

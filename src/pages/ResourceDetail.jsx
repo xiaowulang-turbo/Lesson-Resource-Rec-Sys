@@ -13,6 +13,7 @@ import Button from '../ui/Button'
 import Empty from '../ui/Empty'
 import SimilarResourceList from '../ui/SimilarResourceList'
 import toast from 'react-hot-toast'
+import defaultCover from '../public/default-resource.jpg'
 
 // --- 样式化组件 ---
 const DetailLayout = styled.div`
@@ -325,9 +326,9 @@ function ResourceDetail() {
                             src={coverImageUrl}
                             alt={`${resource.title}的封面图片`}
                             onError={(e) => {
-                                e.target.src = getDefaultCoverImage(
-                                    resource.type
-                                )
+                                e.target.src =
+                                    defaultCover ||
+                                    getDefaultCoverImage(resource.type)
                             }}
                         />
                     </CoverImageContainer>

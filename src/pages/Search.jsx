@@ -11,6 +11,8 @@ import { searchResources } from '../services/apiSearch'
 import {
     searchMoocCoursesDirectly,
     saveMoocResources,
+    searchMoocCourses,
+    saveMoocCourses,
 } from '../services/apiMooc'
 import { useState, useEffect, useCallback } from 'react'
 import { debounce } from '../utils/debounce'
@@ -111,14 +113,20 @@ function Search() {
         // 根据搜索类型导航到不同的搜索页面
         if (searchType === 'local') {
             navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
-        } else {
+        } else if (searchType === 'mooc') {
             navigate(
                 `/search?q=${encodeURIComponent(searchQuery.trim())}&type=mooc`
+            )
+        } else if (searchType === 'course') {
+            navigate(
+                `/search?q=${encodeURIComponent(
+                    searchQuery.trim()
+                )}&type=course`
             )
         }
     }
 
-    // 防抖处理MOOC搜索
+    // 防抖处理MOOC搜索（教材）
     const debouncedFetchMooc = useCallback(
         debounce(async (searchQuery) => {
             if (!searchQuery || searchType !== 'mooc') return
@@ -137,15 +145,9 @@ function Search() {
                     return // 如果没有搜索结果，直接返回
                 }
 
-                // console.log('MOOC资源:', moocResults)
-
                 // 确保每个资源都有id字段和必要属性
                 const validResources = (moocResults || []).filter(
                     (resource) => {
-                        // console.log('resource', resource)
-                        // 必须有ID 或者能自动生成ID
-                        const hasId = resource._id || resource.id
-
                         return true // 允许所有资源，MongoDB会自动生成ID
                     }
                 )
@@ -156,10 +158,6 @@ function Search() {
                     setIsLoading(false)
                     setError('没有找到有效的资源')
                     return
-                }
-
-                if (validResources.length !== (moocResults || []).length) {
-                    console.warn('存在没有ID的资源，这些资源将被过滤掉')
                 }
 
                 // 将获取的MOOC资源保存到数据库
@@ -208,12 +206,108 @@ function Search() {
         [searchType, queryClient, setSearchParams, query, user]
     )
 
+    // 新增：防抖处理课程搜索
+    const debouncedFetchCourses = useCallback(
+        debounce(async (searchQuery) => {
+            if (!searchQuery || searchType !== 'course') return
+
+            setIsLoading(true)
+            setError(null)
+            setSaveError(null)
+
+            try {
+                console.log('开始搜索课程资源:', searchQuery)
+                const courseResults = await searchMoocCourses(searchQuery)
+                console.log('获取到课程资源数量:', courseResults?.length || 0)
+
+                if (!courseResults || courseResults.length === 0) {
+                    setIsLoading(false)
+                    return
+                }
+
+                // 确保每个资源都有id字段和必要属性
+                const validResources = (courseResults || []).filter(
+                    (resource) => {
+                        return true // 允许所有资源，MongoDB会自动生成ID
+                    }
+                )
+
+                console.log('有效的课程资源数量:', validResources.length)
+
+                if (validResources.length === 0) {
+                    setIsLoading(false)
+                    setError('没有找到有效的课程资源')
+                    return
+                }
+
+                console.log('有效的课程资源:', validResources)
+
+                // 将获取的课程资源保存到数据库
+                setIsSaving(true)
+                try {
+                    const savedResults = await saveMoocCourses(
+                        validResources,
+                        user?._id || user?.id
+                    )
+                    console.log(
+                        '保存的课程资源数量:',
+                        savedResults?.results || 0
+                    )
+
+                    if (!savedResults || savedResults.results === 0) {
+                        setSaveError('没有课程资源被成功保存到数据库')
+                        setIsSaving(false)
+                        return
+                    }
+
+                    // 保存成功后，刷新本地资源缓存
+                    queryClient.invalidateQueries(['resources'])
+                    toast.success(
+                        `已成功保存 ${
+                            savedResults?.results || 0
+                        } 个课程资源到数据库`
+                    )
+
+                    // 保存后切换到本地搜索展示保存的资源
+                    setSearchType('local')
+                    setSearchParams({
+                        q: query,
+                        type: 'local',
+                    })
+                } catch (err) {
+                    console.error('保存课程资源失败:', err)
+                    setSaveError(
+                        `保存课程资源失败: ${err.message || '未知错误'}`
+                    )
+                    toast.error(
+                        `保存课程资源失败: ${err.message || '未知错误'}`
+                    )
+                } finally {
+                    setIsSaving(false)
+                }
+            } catch (err) {
+                console.error('搜索课程失败:', err)
+                setError(err.message || '搜索课程资源失败')
+            } finally {
+                setIsLoading(false)
+            }
+        }, 500),
+        [searchType, queryClient, setSearchParams, query, user]
+    )
+
     // MOOC搜索使用普通fetch
     useEffect(() => {
         if (query && searchType === 'mooc') {
             debouncedFetchMooc(query)
         }
     }, [query, searchType, debouncedFetchMooc])
+
+    // 新增：课程搜索使用普通fetch
+    useEffect(() => {
+        if (query && searchType === 'course') {
+            debouncedFetchCourses(query)
+        }
+    }, [query, searchType, debouncedFetchCourses])
 
     // 切换搜索类型 - 防抖处理
     const debouncedSetSearchType = useCallback(
@@ -250,7 +344,6 @@ function Search() {
     console.log('当前资源数量:', currentResources?.length || 0)
 
     if (currentResources && currentResources.length > 0) {
-        // console.log('第一个资源示例:', currentResources[0])
         // 确认资源是否有必要的字段
         const firstResource = currentResources[0]
         const missingFields = []
@@ -282,7 +375,7 @@ function Search() {
 
             {/* 新增：搜索框组件 */}
             <SearchContainer as="form" onSubmit={handleSearchSubmit}>
-                {/* <SearchOptionsRow>
+                <SearchOptionsRow>
                     <SearchTypeButton
                         type="button"
                         active={searchType === 'local'}
@@ -295,9 +388,16 @@ function Search() {
                         active={searchType === 'mooc'}
                         onClick={() => handleSearchTypeChange('mooc')}
                     >
-                        搜全网
+                        搜教材
                     </SearchTypeButton>
-                </SearchOptionsRow> */}
+                    <SearchTypeButton
+                        type="button"
+                        active={searchType === 'course'}
+                        onClick={() => handleSearchTypeChange('course')}
+                    >
+                        搜课程
+                    </SearchTypeButton>
+                </SearchOptionsRow>
                 <SearchInputRow>
                     <Input
                         type="search"
@@ -347,7 +447,11 @@ function Search() {
                 (!currentResources || currentResources.length === 0) && (
                     <Empty
                         resource={`没有找到与 "${query}" 相关的${
-                            searchType === 'local' ? '本地' : 'MOOC'
+                            searchType === 'local'
+                                ? '本地'
+                                : searchType === 'mooc'
+                                ? 'MOOC'
+                                : '课程'
                         }资源`}
                     />
                 )}
