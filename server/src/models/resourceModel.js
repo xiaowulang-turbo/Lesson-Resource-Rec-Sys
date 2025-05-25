@@ -44,7 +44,7 @@ const resourceSchema = new mongoose.Schema(
                 'audio',
                 'image',
                 'zip',
-                'url',
+                'url', // 课程
                 'interactive', // H5P, SCORM 等
                 'software', // 需要安装的软件
                 'other', // 其他格式
