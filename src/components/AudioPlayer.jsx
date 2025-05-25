@@ -120,7 +120,7 @@ const Button = styled.button`
 
 const PlayButton = styled(Button)`
     background-color: var(--color-primary-600);
-    color: white;
+    color: var(--color-grey-900);
     width: 50px;
     height: 50px;
 
@@ -328,7 +328,9 @@ function AudioPlayer({ src, title, artist }) {
                 </CoverArt>
                 <TrackInfo>
                     <TrackTitle>{title || '未知音频'}</TrackTitle>
-                    <TrackDetails>{artist || '未知艺术家'}</TrackDetails>
+                    <TrackDetails>
+                        {'artist' || artist || '未知艺术家'}
+                    </TrackDetails>
                 </TrackInfo>
             </PlayerHeader>
 
