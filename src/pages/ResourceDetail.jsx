@@ -374,7 +374,7 @@ function ResourceDetail() {
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            查看链接
+                            跳转资源
                         </Button>
                     ) : resource.url ? (
                         <Button
