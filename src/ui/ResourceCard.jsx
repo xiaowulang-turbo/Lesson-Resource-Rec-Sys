@@ -100,6 +100,27 @@ const TypeIcon = styled.span`
     font-size: 1.6rem;
 `
 
+// 父课程信息样式
+const ParentCourseInfo = styled(Link)`
+    font-size: 1.2rem;
+    color: var(--color-grey-500);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    transition: all 0.2s;
+
+    &:hover {
+        color: var(--color-primary-700);
+    }
+
+    &:before {
+        content: '📚';
+        font-size: 1.4rem;
+    }
+`
+
 // 帮助函数：获取资源类型图标
 function getTypeIcon(type) {
     const icons = {
@@ -128,10 +149,13 @@ function ResourceCard({ resource }) {
     // 检查是否有资源数据
     if (!resource) return null
 
-    const { _id, title, type, subject, tags, cover } = resource
+    const { _id, title, type, subject, tags, cover, courseStructure } = resource
 
     // 如果标签是数组，只取前两个标签
     const displayTags = Array.isArray(tags) ? tags.slice(0, 2) : []
+
+    // 获取父课程信息
+    const parentCourse = courseStructure?.parentCourse
 
     return (
         <Card to={`/resources/${_id}`}>
@@ -145,6 +169,15 @@ function ResourceCard({ resource }) {
 
             <CardBody>
                 <Title>{title}</Title>
+
+                {parentCourse && (
+                    <ParentCourseInfo
+                        to={`/resources/${parentCourse._id}`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {parentCourse.title || '未知课程'}
+                    </ParentCourseInfo>
+                )}
 
                 <ResourceInfo>
                     <TypeIcon>{getTypeIcon(type)}</TypeIcon>

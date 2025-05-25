@@ -650,7 +650,13 @@ export class DataService {
             const skip = (page - 1) * limit
 
             // 执行查询
-            let resourcesQuery = Resource.find(query).sort(sortOption)
+            let resourcesQuery = Resource.find(query)
+                .sort(sortOption)
+                .populate({
+                    path: 'courseStructure.parentCourse',
+                    select: 'title _id',
+                    model: 'Resource',
+                })
 
             // 只在需要分页时应用skip和limit
             if (limit > 0) {
