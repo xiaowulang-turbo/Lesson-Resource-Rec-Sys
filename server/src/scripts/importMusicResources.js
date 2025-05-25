@@ -197,7 +197,7 @@ const convertMusicToResource = (music, defaultUserId) => {
 }
 
 // 在线导入音乐数据到数据库
-const importMusicToDatabase = async (onlineMode = true) => {
+const importMusicToDatabase = async (onlineMode = false) => {
     let mongoConnection = null
 
     try {
@@ -369,7 +369,7 @@ const importMusicToDatabase = async (onlineMode = true) => {
             console.log('📝 离线模式：生成JSON导入文件...')
 
             // 模拟一个用户ID用于离线文件
-            const mockUserId = '5ffdf41a1a2b10a2a99fffff'
+            const mockUserId = '680b41f38a1c4e8a07501a86'
 
             // 转换所有音乐数据为资源格式
             const resources = musicResults.map((music) =>
