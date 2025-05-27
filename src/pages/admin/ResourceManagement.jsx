@@ -29,7 +29,7 @@ import {
     HiCheck,
     // HiOutlineRefresh,
 } from 'react-icons/hi2'
-import ResourceFilter from '../../components/ResourceFilter'
+// import ResourceFilter from '../../components/ResourceFilter'
 import ConfirmDelete from '../../components/ConfirmDelete'
 
 const StyledResourceManagement = styled.div`

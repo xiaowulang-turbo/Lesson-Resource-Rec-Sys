@@ -371,11 +371,7 @@ function ResourceList({ resources: initialResources }) {
                     return (
                         <ResourceCardLink
                             key={resourceId}
-                            to={
-                                isMoocResource
-                                    ? resource.url
-                                    : `/resources/${resourceId}`
-                            }
+                            to={`/resources/${resourceId}`}
                             target={isMoocResource ? '_blank' : undefined}
                             rel={
                                 isMoocResource

@@ -108,9 +108,15 @@ function Home() {
         // 根据搜索类型导航到不同的搜索页面
         if (searchType === 'local') {
             navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
-        } else {
+        } else if (searchType === 'mooc') {
             navigate(
                 `/search?q=${encodeURIComponent(searchQuery.trim())}&type=mooc`
+            )
+        } else if (searchType === 'course') {
+            navigate(
+                `/search?q=${encodeURIComponent(
+                    searchQuery.trim()
+                )}&type=course`
             )
         }
     }
@@ -139,7 +145,14 @@ function Home() {
                         active={searchType === 'mooc'}
                         onClick={() => setSearchType('mooc')}
                     >
-                        搜全网
+                        搜教材
+                    </SearchOptionButton>
+                    <SearchOptionButton
+                        type="button"
+                        active={searchType === 'course'}
+                        onClick={() => setSearchType('course')}
+                    >
+                        搜课程
                     </SearchOptionButton>
                 </SearchOptionsRow> */}
                 <SearchInputRow>

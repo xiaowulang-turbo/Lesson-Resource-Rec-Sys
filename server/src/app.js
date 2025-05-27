@@ -81,7 +81,7 @@ app.use(
         optionsSuccessStatus: 204,
     })
 )
-app.use(express.json({ limit: '100kb' }))
+app.use(express.json({ limit: '200kb' }))
 app.use(morgan('dev'))
 
 // 添加静态文件服务中间件，用于访问上传的文件
@@ -156,12 +156,24 @@ app.use('/api/v1/notifications', notificationRoutes)
 // 添加中国大学慕课的API代理路由
 app.post('/api/course/search', async (req, res) => {
     try {
-        // 重定向到mooc代理处理程序
+        // 重定向到mooc代理处理程序（教材）
         req.url = '/api/v1/mooc/proxy'
         app._router.handle(req, res)
     } catch (error) {
         console.error('代理请求失败:', error)
         res.status(500).json({ error: '代理请求失败' })
+    }
+})
+
+// 添加课程搜索代理路由
+app.post('/api/course/search-courses', async (req, res) => {
+    try {
+        // 重定向到mooc课程代理处理程序
+        req.url = '/api/v1/mooc/proxy-courses'
+        app._router.handle(req, res)
+    } catch (error) {
+        console.error('课程代理请求失败:', error)
+        res.status(500).json({ error: '课程代理请求失败' })
     }
 })
 

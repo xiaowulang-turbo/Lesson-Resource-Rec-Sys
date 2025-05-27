@@ -550,7 +550,7 @@ export class DataService {
 
             // 设置分页
             const page = parseInt(options.page) || 1
-            const limit = parseInt(options.limit) || 10
+            const limit = parseInt(options.limit) || 20
             const skip = (page - 1) * limit
 
             // 执行查询
@@ -650,7 +650,13 @@ export class DataService {
             const skip = (page - 1) * limit
 
             // 执行查询
-            let resourcesQuery = Resource.find(query).sort(sortOption)
+            let resourcesQuery = Resource.find(query)
+                .sort(sortOption)
+                .populate({
+                    path: 'courseStructure.parentCourse',
+                    select: 'title _id',
+                    model: 'Resource',
+                })
 
             // 只在需要分页时应用skip和limit
             if (limit > 0) {
@@ -840,11 +846,11 @@ export class DataService {
             const decoded = jwt.verify(token, JWT_SECRET)
 
             // 验证通过，打印解码后的信息(去除敏感数据)
-            console.log('令牌解码成功:', {
-                id: decoded.id,
-                iat: decoded.iat,
-                exp: decoded.exp,
-            })
+            // console.log('令牌解码成功:', {
+            //     id: decoded.id,
+            //     iat: decoded.iat,
+            //     exp: decoded.exp,
+            // })
 
             // 检查令牌是否过期
             const now = Math.floor(Date.now() / 1000)

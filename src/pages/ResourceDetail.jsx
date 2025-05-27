@@ -12,8 +12,9 @@ import Tag from '../ui/Tag'
 import Button from '../ui/Button'
 import Empty from '../ui/Empty'
 import SimilarResourceList from '../ui/SimilarResourceList'
+import ResourcePreview from '../components/ResourcePreview'
 import toast from 'react-hot-toast'
-const defaultCoverImage = '../public/default-resource.jpg'
+import defaultCover from '../public/default-resource.jpg'
 
 // --- 样式化组件 ---
 const DetailLayout = styled.div`
@@ -145,9 +146,9 @@ const CoverImageContainer = styled.div`
 `
 
 const CoverImage = styled.img`
-    max-width: 100%;
-    max-height: 340px;
-    object-fit: contain;
+    min-width: 85%;
+    border-radius: var(--border-radius-md);
+    object-fit: fill;
 `
 
 // 添加链接样式
@@ -162,10 +163,55 @@ const AuthorLink = styled(Link)`
     }
 `
 
+// 为预览和资源访问添加新的部分
+const ResourcePreviewSection = styled.section`
+    margin-bottom: 2.4rem;
+    padding-bottom: 2.4rem;
+    border-bottom: 1px solid var(--color-grey-100);
+`
+
+const ResourceAccessSection = styled.section`
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+`
+
+// 添加选项卡控件
+const TabsContainer = styled.div`
+    display: flex;
+    border-bottom: 1px solid var(--color-grey-200);
+    margin-bottom: 2rem;
+`
+
+const Tab = styled.button`
+    padding: 1rem 2rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid
+        ${(props) =>
+            props.active ? 'var(--color-primary-600)' : 'transparent'};
+    color: ${(props) =>
+        props.active ? 'var(--color-primary-700)' : 'var(--color-grey-500)'};
+    font-weight: ${(props) => (props.active ? '600' : '400')};
+    font-size: 1.6rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        color: ${(props) =>
+            props.active
+                ? 'var(--color-primary-700)'
+                : 'var(--color-grey-700)'};
+    }
+`
+
 function ResourceDetail() {
     const { id: resourceId } = useParams()
     const queryClient = useQueryClient()
     const { user: currentUser, isAuthenticated } = useContext(AuthContext)
+    // 添加选项卡状态
+    const [activeTab, setActiveTab] = useState('info')
 
     const {
         data: resource,
@@ -332,68 +378,121 @@ function ResourceDetail() {
                             src={coverImageUrl}
                             alt={`${resource.title}的封面图片`}
                             onError={(e) => {
-                                e.target.src = getDefaultCoverImage(
-                                    resource.type
-                                )
+                                e.target.src =
+                                    defaultCover ||
+                                    getDefaultCoverImage(resource.type)
                             }}
                         />
                     </CoverImageContainer>
                 </ResourceHeader>
 
-                <ResourceInfo>
-                    <Heading as="h3" style={{ marginBottom: '1.6rem' }}>
-                        基本信息
-                    </Heading>
-                    <p>
-                        <strong>描述：</strong> {resource.description}
-                    </p>
-                    <p>
-                        <strong>上传者：</strong>{' '}
-                        {resource.createdBy || '未知用户'}
-                    </p>
-                    <p>
-                        <strong>上传时间：</strong> {formattedDate}
-                    </p>
-                    {resource.tags && resource.tags.length > 0 && (
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <strong>标签：</strong>
-                            <TagsContainer>
-                                {resource.tags.map((tag, index) => (
-                                    <Tag key={index} type="blue">
-                                        {tag}
-                                    </Tag>
-                                ))}
-                            </TagsContainer>
-                        </div>
-                    )}
-                </ResourceInfo>
+                {/* 添加选项卡 */}
+                <TabsContainer>
+                    <Tab
+                        active={activeTab === 'info'}
+                        onClick={() => setActiveTab('info')}
+                    >
+                        详细信息
+                    </Tab>
+                    <Tab
+                        active={activeTab === 'preview'}
+                        onClick={() => setActiveTab('preview')}
+                    >
+                        预览
+                    </Tab>
+                </TabsContainer>
 
-                {/* 文件/链接部分 */}
-                <ResourceInfo>
-                    <Heading as="h3" style={{ marginBottom: '1.6rem' }}>
-                        资源内容
-                    </Heading>
-                    {resource.url && resource.url.startsWith('http') ? (
-                        <Button
-                            as="a"
-                            href={resource.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            查看链接
-                        </Button>
-                    ) : resource.url ? (
-                        <Button
-                            as="a"
-                            href={`http://localhost:3000/${resource.url}`}
-                            download
-                        >
-                            下载文件
-                        </Button>
-                    ) : (
-                        <p>无可用文件或链接。</p>
-                    )}
-                </ResourceInfo>
+                {/* 根据选项卡状态显示不同内容 */}
+                {activeTab === 'preview' ? (
+                    <ResourcePreviewSection>
+                        <ResourcePreview resource={resource} />
+
+                        <ResourceAccessSection>
+                            {resource.url && resource.url.startsWith('http') ? (
+                                <Button
+                                    as="a"
+                                    href={resource.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    size="large"
+                                >
+                                    访问完整资源 ↗
+                                </Button>
+                            ) : resource.url ? (
+                                <Button
+                                    as="a"
+                                    href={`http://localhost:3000/${resource.url}`}
+                                    download
+                                    size="large"
+                                >
+                                    下载完整资源 ↓
+                                </Button>
+                            ) : (
+                                <p>无可用文件或链接。</p>
+                            )}
+                        </ResourceAccessSection>
+                    </ResourcePreviewSection>
+                ) : (
+                    <ResourceInfo>
+                        <Heading as="h3" style={{ marginBottom: '1.6rem' }}>
+                            基本信息
+                        </Heading>
+                        <p>
+                            <strong>描述：</strong> {resource.description}
+                        </p>
+                        <p>
+                            <strong>上传者：</strong>{' '}
+                            {resource.createdBy || '未知用户'}
+                        </p>
+                        <p>
+                            <strong>上传时间：</strong> {formattedDate}
+                        </p>
+                        {resource.tags && resource.tags.length > 0 && (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <strong>标签：</strong>
+                                <TagsContainer>
+                                    {resource.tags.map((tag, index) => (
+                                        <Tag key={index} type="blue">
+                                            {tag}
+                                        </Tag>
+                                    ))}
+                                </TagsContainer>
+                            </div>
+                        )}
+
+                        {/* 文件/链接部分 */}
+                        <div style={{ marginTop: '2rem' }}>
+                            <Heading as="h3" style={{ marginBottom: '1.6rem' }}>
+                                资源内容
+                            </Heading>
+                            {resource.url && resource.url.startsWith('http') ? (
+                                <Button
+                                    as="a"
+                                    href={resource.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    访问资源 ↗
+                                </Button>
+                            ) : resource.url ? (
+                                <Button
+                                    as="a"
+                                    href={`http://localhost:3000/${resource.url}`}
+                                    download
+                                >
+                                    下载文件 ↓
+                                </Button>
+                            ) : (
+                                <p>无可用文件或链接。</p>
+                            )}
+                        </div>
+                    </ResourceInfo>
+                )}
             </MainContent>
 
             <Sidebar>
