@@ -328,9 +328,7 @@ function ResourceDetail() {
 
     // 获取封面图片 URL (优先使用资源的coverImage字段，如果没有则使用默认图片)
     const coverImageUrl =
-        resource.cover ||
-        defaultCoverImage ||
-        getDefaultCoverImage(resource.type)
+        resource.cover || defaultCover || getDefaultCoverImage(resource.type)
 
     return (
         <DetailLayout>
