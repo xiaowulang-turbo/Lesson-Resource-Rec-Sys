@@ -32,8 +32,6 @@ const NotificationManagePage = () => {
         expiresAt: '',
     })
 
-    const navigate = useNavigate()
-
     // 加载通知列表
     const loadNotifications = async (page = 1) => {
         try {
@@ -507,13 +505,12 @@ const Header = styled.div`
 `
 
 const Title = styled.h1`
-    font-size: 1.5rem;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--color-grey-900);
 `
 
 const CreateButton = styled.button`
-    background-color: #4f46e5;
+    background-color: var(--color-primary);
     color: white;
     border: none;
     padding: 0.625rem 1.25rem;
@@ -523,43 +520,42 @@ const CreateButton = styled.button`
     transition: background-color 0.2s;
 
     &:hover {
-        background-color: #4338ca;
+        background-color: var(--color-primary-dark);
     }
 `
 
 const Table = styled.table`
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.875rem;
 `
 
 const TableHead = styled.thead`
-    background-color: #f9fafb;
+    background-color: var(--color-grey-50);
 
     th {
         padding: 0.75rem 1rem;
         text-align: left;
         font-weight: 500;
-        color: #4b5563;
-        border-bottom: 1px solid #e5e7eb;
+        color: var(--color-grey-700);
+        border-bottom: 1px solid var(--color-grey-200);
     }
 `
 
 const TableBody = styled.tbody`
     td {
         padding: 0.75rem 1rem;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid var(--color-grey-200);
     }
 
     td.title {
         font-weight: 500;
-        color: #1f2937;
+        color: var(--color-grey-900);
     }
 `
 
 const TableRow = styled.tr`
     &:hover {
-        background-color: #f9fafb;
+        background-color: var(--color-grey-50);
     }
 `
 
@@ -569,7 +565,7 @@ const StatusBadge = styled.span`
     color: white;
     padding: 0.25rem 0.5rem;
     border-radius: 0.25rem;
-    font-size: 0.75rem;
+    /* font-size: 0.75rem; */
     font-weight: 500;
 `
 
@@ -592,34 +588,34 @@ const ActionButton = styled.button`
     padding: 0.25rem 0.5rem;
     border: none;
     border-radius: 0.25rem;
-    font-size: 0.75rem;
+    /* font-size: 0.75rem; */
     font-weight: 500;
     cursor: pointer;
 
     &.edit {
-        background-color: #e0f2fe;
-        color: #0284c7;
+        background-color: var(--color-primary-light);
+        color: var(--color-primary);
 
         &:hover {
-            background-color: #bae6fd;
+            background-color: var(--color-primary-light);
         }
     }
 
     &.archive {
-        background-color: #f3f4f6;
-        color: #4b5563;
+        background-color: var(--color-grey-50);
+        color: var(--color-grey-700);
 
         &:hover {
-            background-color: #e5e7eb;
+            background-color: var(--color-grey-50);
         }
     }
 
     &.delete {
-        background-color: #fee2e2;
-        color: #b91c1c;
+        background-color: var(--color-red-50);
+        color: var(--color-red-700);
 
         &:hover {
-            background-color: #fecaca;
+            background-color: var(--color-red-50);
         }
     }
 `
@@ -633,10 +629,10 @@ const LoadingContainer = styled.div`
 
 const ErrorMessage = styled.div`
     padding: 1rem;
-    background-color: #fee2e2;
-    color: #b91c1c;
+    background-color: var(--color-red-50);
+    color: var(--color-red-700);
     border-radius: 0.375rem;
-    font-size: 0.9375rem;
+    /* font-size: 0.9375rem; */
     margin: 1rem 0;
 `
 
@@ -645,14 +641,14 @@ const EmptyState = styled.div`
     justify-content: center;
     align-items: center;
     padding: 4rem 0;
-    background-color: #f9fafb;
+    background-color: var(--color-grey-50);
     border-radius: 0.5rem;
-    border: 1px dashed #d1d5db;
+    border: 1px dashed var(--color-grey-200);
 `
 
 const EmptyText = styled.p`
-    color: #6b7280;
-    font-size: 0.9375rem;
+    color: var(--color-grey-600);
+    /* font-size: 0.9375rem; */
 `
 
 const PaginationContainer = styled.div`
@@ -683,22 +679,22 @@ const FormRow = styled.div`
 
 const Label = styled.label`
     display: block;
-    font-size: 0.875rem;
+    /* font-size: 0.875rem; */
     font-weight: 500;
-    color: #4b5563;
+    color: var(--color-grey-700);
     margin-bottom: 0.5rem;
 `
 
 const Input = styled.input`
     width: 100%;
     padding: 0.625rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--color-grey-200);
     border-radius: 0.375rem;
-    font-size: 0.9375rem;
+    /* font-size: 0.9375rem; */
 
     &:focus {
         outline: none;
-        border-color: #6366f1;
+        border-color: var(--color-primary);
         box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
     }
 `
@@ -706,15 +702,15 @@ const Input = styled.input`
 const TextArea = styled.textarea`
     width: 100%;
     padding: 0.625rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--color-grey-200);
     border-radius: 0.375rem;
-    font-size: 0.9375rem;
+    /* font-size: 0.9375rem; */
     font-family: inherit;
     resize: vertical;
 
     &:focus {
         outline: none;
-        border-color: #6366f1;
+        border-color: var(--color-primary);
         box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
     }
 `
@@ -722,14 +718,14 @@ const TextArea = styled.textarea`
 const Select = styled.select`
     width: 100%;
     padding: 0.625rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--color-grey-200);
     border-radius: 0.375rem;
-    font-size: 0.9375rem;
+    /* font-size: 0.9375rem; */
     background-color: white;
 
     &:focus {
         outline: none;
-        border-color: #6366f1;
+        border-color: var(--color-primary);
         box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
     }
 `
@@ -751,21 +747,21 @@ const Button = styled.button`
 
 const CancelButton = styled(Button)`
     background-color: white;
-    color: #4b5563;
-    border: 1px solid #d1d5db;
+    color: var(--color-grey-700);
+    border: 1px solid var(--color-grey-200);
 
     &:hover {
-        background-color: #f9fafb;
+        background-color: var(--color-grey-50);
     }
 `
 
 const SubmitButton = styled(Button)`
-    background-color: #4f46e5;
+    background-color: var(--color-primary);
     color: white;
     border: none;
 
     &:hover {
-        background-color: #4338ca;
+        background-color: var(--color-primary-dark);
     }
 `
 
