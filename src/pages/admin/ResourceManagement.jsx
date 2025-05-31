@@ -303,7 +303,7 @@ function ResourceManagement() {
                     ) : resources.length === 0 ? (
                         <Empty resource="资源" />
                     ) : (
-                        <Table columns="2fr 0.8fr 0.8fr 1fr 0.8fr 1fr">
+                        <Table columns="2fr 0.8fr 0.8fr 1fr 1fr 0.5fr">
                             <Table.Header>
                                 <div>标题</div>
                                 <div>类型</div>
@@ -322,7 +322,9 @@ function ResourceManagement() {
                                             <ResourceType>
                                                 {resourceTypeMap[
                                                     resource.type
-                                                ] || resource.type}
+                                                ] ||
+                                                    resource.type ||
+                                                    '课程'}
                                             </ResourceType>
                                         </div>
                                         <div>
@@ -339,8 +341,7 @@ function ResourceManagement() {
                                             </Difficulty>
                                         </div>
                                         <div>
-                                            {resource.creator?.name ||
-                                                '未知用户'}
+                                            {resource.creator?.name || 'xiaowu'}
                                         </div>
                                         <div>
                                             {formatDate(resource.createdAt)}
