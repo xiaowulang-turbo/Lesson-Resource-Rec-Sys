@@ -41,9 +41,7 @@ const NotificationManagePage = () => {
             setError(null)
             // 这里使用与普通用户相同的接口，后续可以考虑添加管理员专用接口
             const result = await getUserNotifications({ page, limit: 10 })
-            setNotifications(
-                result.data.notifications.map((n) => n.notificationId)
-            )
+            setNotifications(result.data.notifications)
             setTotalPages(result.data.pagination.pages)
             setCurrentPage(page)
         } catch (err) {
@@ -295,19 +293,21 @@ const NotificationManagePage = () => {
                             {notifications.map((notification) => (
                                 <TableRow key={notification._id}>
                                     <td className="title">
-                                        {notification.title}
+                                        {notification?.title}
                                     </td>
                                     <td>
-                                        {renderStatusBadge(notification.status)}
+                                        {renderStatusBadge(
+                                            notification?.status
+                                        )}
                                     </td>
-                                    <td>{notification.type}</td>
+                                    <td>{notification?.type}</td>
                                     <td>
                                         <PriorityCell
-                                            priority={notification.priority}
+                                            priority={notification?.priority}
                                         >
-                                            {notification.priority === 'high'
+                                            {notification?.priority === 'high'
                                                 ? '高'
-                                                : notification.priority ===
+                                                : notification?.priority ===
                                                   'medium'
                                                 ? '中'
                                                 : '低'}
@@ -315,18 +315,18 @@ const NotificationManagePage = () => {
                                     </td>
                                     <td>
                                         {renderAudience(
-                                            notification.targetAudience
+                                            notification?.targetAudience
                                         )}
                                     </td>
                                     <td>
-                                        {formatDate(notification.createdAt)}
+                                        {formatDate(notification?.createdAt)}
                                     </td>
                                     <td>
-                                        {formatDate(notification.expiresAt)}
+                                        {formatDate(notification?.expiresAt)}
                                     </td>
                                     <td>
                                         <ActionButtons>
-                                            {notification.status ===
+                                            {notification?.status ===
                                                 'draft' && (
                                                 <>
                                                     <ActionButton
@@ -341,13 +341,13 @@ const NotificationManagePage = () => {
                                                     </ActionButton>
                                                 </>
                                             )}
-                                            {notification.status ===
+                                            {notification?.status ===
                                                 'published' && (
                                                 <ActionButton
                                                     className="archive"
                                                     onClick={() =>
                                                         handleArchive(
-                                                            notification._id
+                                                            notification?._id
                                                         )
                                                     }
                                                 >
@@ -358,7 +358,7 @@ const NotificationManagePage = () => {
                                                 className="delete"
                                                 onClick={() =>
                                                     handleDelete(
-                                                        notification._id
+                                                        notification?._id
                                                     )
                                                 }
                                             >
