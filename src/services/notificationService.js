@@ -111,11 +111,16 @@ export const deleteNotification = async (id) => {
     })
 
     if (!response.ok) {
-        const error = await response.json()
+        let error
+        try {
+            error = await response.json()
+        } catch {
+            error = { message: '删除通知失败' }
+        }
         throw new Error(error.message || '删除通知失败')
     }
-
-    return response.json()
+    // 204无内容，直接返回true
+    return true
 }
 
 /**
