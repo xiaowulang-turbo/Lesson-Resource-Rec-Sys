@@ -87,8 +87,7 @@ export const getUserNotifications = async (req, res, next) => {
         const page = parseInt(req.query.page) || 1
         const limit = parseInt(req.query.limit) || 10
         const skip = (page - 1) * limit
-        // const now = new Date()
-        // 仅支持教师和管理员
+        const now = new Date()
         let audience = ['all']
         if (req.user.role === 'teacher') {
             audience.push('teachers')
@@ -100,16 +99,20 @@ export const getUserNotifications = async (req, res, next) => {
         if (cachedData) {
             return res.status(200).json(cachedData)
         }
-        // const query = {
-        //     status: 'published',
-        //     expiresAt: { $gt: now },
-        //     targetAudience: { $in: audience },
-        // }
-        const notifications = await Notification.find()
+        // 只返回已发布、未过期、目标受众匹配的通知
+        const query = {
+            status: 'published',
+            $or: [
+                { expiresAt: { $exists: false } },
+                { expiresAt: { $gt: now } },
+            ],
+            targetAudience: { $in: audience },
+        }
+        const notifications = await Notification.find(query)
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
-        const total = await Notification.countDocuments()
+        const total = await Notification.countDocuments(query)
         const result = {
             status: 'success',
             results: notifications.length,
@@ -174,6 +177,39 @@ export const deleteNotification = async (req, res, next) => {
         res.status(204).json({
             status: 'success',
             data: null,
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+// 管理员获取全部通知（不做过滤，支持分页）
+export const getAllNotifications = async (req, res, next) => {
+    try {
+        const page = parseInt(req.query.page) || 1
+        const limit = parseInt(req.query.limit) || 10
+        const skip = (page - 1) * limit
+        // 仅管理员可访问
+        if (!req.user || req.user.role !== 'admin') {
+            return res.status(403).json({ status: 'fail', message: '无权限' })
+        }
+        const notifications = await Notification.find()
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+        const total = await Notification.countDocuments()
+        res.status(200).json({
+            status: 'success',
+            results: notifications.length,
+            data: {
+                notifications,
+                pagination: {
+                    total,
+                    page,
+                    pages: Math.ceil(total / limit),
+                    limit,
+                },
+            },
         })
     } catch (err) {
         next(err)
