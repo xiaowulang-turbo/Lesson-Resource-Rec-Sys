@@ -466,6 +466,11 @@ export async function deleteResource(id) {
             }
         )
 
+        if (res.status === 204) {
+            // 删除成功且无内容，直接返回
+            return { success: true, message: '资源已成功删除' }
+        }
+
         const data = await res.json()
 
         if (!res.ok) {
