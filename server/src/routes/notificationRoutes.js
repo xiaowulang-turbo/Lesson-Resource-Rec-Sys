@@ -34,4 +34,11 @@ router.patch(
     notificationController.archiveNotification
 )
 
+// 管理员获取全部通知（不做过滤，支持分页）
+router.get(
+    '/all',
+    restrictTo('admin'),
+    notificationController.getAllNotifications
+)
+
 export default router
