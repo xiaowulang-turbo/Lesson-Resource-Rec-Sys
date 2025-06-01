@@ -83,38 +83,43 @@ const NotificationsPage = () => {
                 </LoadingContainer>
             ) : error ? (
                 <ErrorMessage>{error}</ErrorMessage>
-            ) : allNotifications.length === 0 ? (
+            ) : allNotifications.filter((item) => item.status === 'published')
+                  .length === 0 ? (
                 <EmptyState>
                     <EmptyText>暂无通知</EmptyText>
                 </EmptyState>
             ) : (
                 <>
                     <NotificationList>
-                        {allNotifications.map((item) => (
-                            <NotificationItem key={item._id}>
-                                <Content>
-                                    <NotificationHeader>
-                                        <NotificationTitle>
-                                            {item.title}
-                                        </NotificationTitle>
-                                        {renderPriorityBadge(item.priority)}
-                                    </NotificationHeader>
-                                    <NotificationMessage>
-                                        {item.content}
-                                    </NotificationMessage>
-                                    <NotificationMeta>
-                                        <MetaItem>类型：{item.type}</MetaItem>
-                                        {/* <MetaItem>
+                        {allNotifications
+                            .filter((item) => item.status === 'published')
+                            .map((item) => (
+                                <NotificationItem key={item._id}>
+                                    <Content>
+                                        <NotificationHeader>
+                                            <NotificationTitle>
+                                                {item.title}
+                                            </NotificationTitle>
+                                            {renderPriorityBadge(item.priority)}
+                                        </NotificationHeader>
+                                        <NotificationMessage>
+                                            {item.content}
+                                        </NotificationMessage>
+                                        <NotificationMeta>
+                                            <MetaItem>
+                                                类型：{item.type}
+                                            </MetaItem>
+                                            {/* <MetaItem>
                                             受众：{item.targetAudience}
                                         </MetaItem> */}
-                                        <MetaItem>
-                                            发布时间：
-                                            {formatDate(item.createdAt)}
-                                        </MetaItem>
-                                    </NotificationMeta>
-                                </Content>
-                            </NotificationItem>
-                        ))}
+                                            <MetaItem>
+                                                发布时间：
+                                                {formatDate(item.createdAt)}
+                                            </MetaItem>
+                                        </NotificationMeta>
+                                    </Content>
+                                </NotificationItem>
+                            ))}
                     </NotificationList>
                     {totalPages > 1 && (
                         <PaginationContainer>
