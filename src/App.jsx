@@ -30,7 +30,8 @@ import { LayoutProvider } from './context/LayoutContext'
 import { NotificationProvider } from './context/NotificationContext'
 import ResourceDetail from './pages/ResourceDetail'
 import PageNotFound from './pages/PageNotFound'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider, AuthContext } from './context/AuthContext'
+import { useContext } from 'react'
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -39,6 +40,67 @@ const queryClient = new QueryClient({
         },
     },
 })
+
+function AppRoutes() {
+    const { user } = useContext(AuthContext)
+    return (
+        <Routes>
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+            <Route
+                element={
+                    <ProtectedRoute>
+                        <AppLayout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route index element={<Navigate replace to="home" />} />
+                <Route
+                    path="home"
+                    element={
+                        user?.role === 'admin' ? (
+                            <Navigate replace to="/admin/resource-management" />
+                        ) : (
+                            <Home />
+                        )
+                    }
+                />
+                <Route path="account" element={<Account />} />
+                <Route path="settings" element={<Settings />} />
+                <Route path="users" element={<Users />} />
+                <Route
+                    path="admin/resource-management"
+                    element={<ResourceManagement />}
+                />
+                <Route
+                    path="admin/user-management"
+                    element={<UserManagement />}
+                />
+                <Route
+                    path="admin/notification-management"
+                    element={<NotificationManagePage />}
+                />
+                <Route
+                    path="resources"
+                    element={
+                        user?.role === 'admin' ? (
+                            <Navigate replace to="/admin/resource-management" />
+                        ) : (
+                            <Resources />
+                        )
+                    }
+                />
+                <Route path="resources/:id" element={<ResourceDetail />} />
+                <Route path="resources/edit/:id" element={<EditResource />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="search" element={<Search />} />
+                <Route path="upload" element={<Upload />} />
+                <Route path="notifications" element={<NotificationsPage />} />
+            </Route>
+            <Route path="*" element={<PageNotFound />} />
+        </Routes>
+    )
+}
 
 function App() {
     return (
@@ -50,86 +112,7 @@ function App() {
                             <QueryClientProvider client={queryClient}>
                                 <ReactQueryDevtools initialIsOpen={false} />
                                 <GlobalStyles />
-                                <Routes>
-                                    <Route path="login" element={<Login />} />
-                                    <Route
-                                        path="register"
-                                        element={<Register />}
-                                    />
-                                    {/* TEMPORARY: Move admin route outside protection */}
-                                    {/* <Route path="admin/resource-management" element={<ResourceManagement />} /> */}
-                                    <Route
-                                        element={
-                                            <ProtectedRoute>
-                                                <AppLayout />
-                                            </ProtectedRoute>
-                                        }
-                                    >
-                                        <Route
-                                            index
-                                            element={
-                                                <Navigate replace to="home" />
-                                            }
-                                        />
-                                        <Route path="home" element={<Home />} />
-                                        <Route
-                                            path="account"
-                                            element={<Account />}
-                                        />
-                                        <Route
-                                            path="settings"
-                                            element={<Settings />}
-                                        />
-                                        <Route
-                                            path="users"
-                                            element={<Users />}
-                                        />
-                                        <Route
-                                            path="admin/resource-management"
-                                            element={<ResourceManagement />}
-                                        />
-                                        <Route
-                                            path="admin/user-management"
-                                            element={<UserManagement />}
-                                        />
-                                        <Route
-                                            path="admin/notification-management"
-                                            element={<NotificationManagePage />}
-                                        />
-                                        <Route
-                                            path="resources"
-                                            element={<Resources />}
-                                        />
-                                        <Route
-                                            path="resources/:id"
-                                            element={<ResourceDetail />}
-                                        />
-                                        <Route
-                                            path="resources/edit/:id"
-                                            element={<EditResource />}
-                                        />
-                                        <Route
-                                            path="profile"
-                                            element={<Profile />}
-                                        />
-                                        <Route
-                                            path="search"
-                                            element={<Search />}
-                                        />
-                                        <Route
-                                            path="upload"
-                                            element={<Upload />}
-                                        />
-                                        <Route
-                                            path="notifications"
-                                            element={<NotificationsPage />}
-                                        />
-                                    </Route>
-                                    <Route
-                                        path="*"
-                                        element={<PageNotFound />}
-                                    />
-                                </Routes>
+                                <AppRoutes />
                                 <Toaster
                                     position="top-center"
                                     gutter={12}
