@@ -7,6 +7,7 @@ import {
     deleteNotification,
     publishNotification,
     archiveNotification,
+    getAllNotifications,
 } from '../../services/notificationService'
 import Spinner from '../../ui/Spinner'
 import toast from 'react-hot-toast'
@@ -37,8 +38,8 @@ const NotificationManagePage = () => {
         try {
             setLoading(true)
             setError(null)
-            // 这里使用与普通用户相同的接口，后续可以考虑添加管理员专用接口
-            const result = await getUserNotifications({ page, limit: 10 })
+            // 管理员专用接口，获取全部通知
+            const result = await getAllNotifications({ page, limit: 10 })
             setNotifications(result.data.notifications)
             setTotalPages(result.data.pagination.pages)
             setCurrentPage(page)
