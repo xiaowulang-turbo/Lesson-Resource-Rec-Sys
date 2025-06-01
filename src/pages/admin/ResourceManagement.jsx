@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import styled from 'styled-components'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
@@ -6,7 +6,7 @@ import Heading from '../../ui/Heading'
 import Row from '../../ui/Row'
 import Button from '../../ui/Button'
 import Table from '../../ui/Table'
-import Modal from '../../ui/Modal'
+import Modal from '../../ui/SimpleModal'
 import Menus from '../../ui/Menus'
 import Spinner from '../../ui/Spinner'
 import Pagination from '../../ui/Pagination'
@@ -147,6 +147,7 @@ function ResourceManagement() {
 
     // 删除资源相关状态
     const [deletingResourceId, setDeletingResourceId] = useState(null)
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
     // 删除资源 mutation
     const { mutate: deleteMutate, isLoading: isDeleting } = useMutation({
@@ -221,21 +222,20 @@ function ResourceManagement() {
     // 打开删除资源Modal
     const handleOpenDeleteModal = (resourceId) => {
         setDeletingResourceId(resourceId)
-        console.log(`正在删除资源，ID: ${resourceId}`)
+        setIsDeleteModalOpen(true)
     }
 
     // 关闭删除资源Modal
     const handleCloseDeleteModal = () => {
         setDeletingResourceId(null)
+        setIsDeleteModalOpen(false)
     }
 
     // 确认删除资源
-    const handleConfirmDelete = () => {
-        console.log('确认删除:', deletingResourceId)
+    const handleConfirmDelete = async () => {
         if (deletingResourceId) {
-            // 单个资源删除
-            console.log(`执行资源删除，ID: ${deletingResourceId}`)
-            deleteMutate(deletingResourceId)
+            await deleteMutate(deletingResourceId)
+            setIsDeleteModalOpen(false)
         }
     }
 
@@ -273,150 +273,163 @@ function ResourceManagement() {
                 </Button>
             </Row>
 
-            <Modal>
-                <StyledResourceManagement>
-                    {/* <StatsRow>
-                        <StatCard>
-                            <h3>{stats?.length}</h3>
-                            <p>总资源数</p>
-                        </StatCard>
-                        <StatCard>
-                            <h3>{stats.documents}</h3>
-                            <p>电子教材</p>
-                        </StatCard>
-                        <StatCard>
-                            <h3>{stats.videos}</h3>
-                            <p>实践项目</p>
-                        </StatCard>
-                        <StatCard>
-                            <h3>{stats.exercises}</h3>
-                            <p>练习题库</p>
-                        </StatCard>
-                    </StatsRow> */}
-                    {/* 
+            <StyledResourceManagement>
+                {/* <StatsRow>
+                    <StatCard>
+                        <h3>{stats?.length}</h3>
+                        <p>总资源数</p>
+                    </StatCard>
+                    <StatCard>
+                        <h3>{stats.documents}</h3>
+                        <p>电子教材</p>
+                    </StatCard>
+                    <StatCard>
+                        <h3>{stats.videos}</h3>
+                        <p>实践项目</p>
+                    </StatCard>
+                    <StatCard>
+                        <h3>{stats.exercises}</h3>
+                        <p>练习题库</p>
+                    </StatCard>
+                </StatsRow> */}
+                {/* 
                 <FilterSection>
                     <ResourceFilter onFilterChange={handleFilterChange} />
                 </FilterSection> */}
 
-                    {isLoading ? (
-                        <Spinner />
-                    ) : resources.length === 0 ? (
-                        <Empty resource="资源" />
-                    ) : (
-                        <Table columns="2fr 0.8fr 0.8fr 1fr 1fr 0.5fr">
-                            <Table.Header>
-                                <div>标题</div>
-                                <div>类型</div>
-                                <div>难度</div>
-                                <div>上传者</div>
-                                <div>上传日期</div>
-                                <div>操作</div>
-                            </Table.Header>
+                {isLoading ? (
+                    <Spinner />
+                ) : resources.length === 0 ? (
+                    <Empty resource="资源" />
+                ) : (
+                    <Table columns="2fr 0.8fr 0.8fr 1fr 1fr 0.5fr">
+                        <Table.Header>
+                            <div>标题</div>
+                            <div>类型</div>
+                            <div>难度</div>
+                            <div>上传者</div>
+                            <div>上传日期</div>
+                            <div>操作</div>
+                        </Table.Header>
 
-                            <Table.Body
-                                data={resources}
-                                render={(resource) => (
-                                    <Table.Row key={resource._id}>
-                                        <div>{resource.title}</div>
-                                        <div>
-                                            <ResourceType>
-                                                {resourceTypeMap[
-                                                    resource.type
-                                                ] ||
-                                                    resource.type ||
-                                                    '课程'}
-                                            </ResourceType>
-                                        </div>
-                                        <div>
-                                            <Difficulty
-                                                className={
-                                                    difficultyClassMap[
-                                                        resource.difficulty
-                                                    ] || 'medium'
-                                                }
-                                            >
-                                                {difficultyTextMap[
+                        <Table.Body
+                            data={resources}
+                            render={(resource) => (
+                                <Table.Row key={resource._id}>
+                                    <div>{resource.title}</div>
+                                    <div>
+                                        <ResourceType>
+                                            {resourceTypeMap[resource.type] ||
+                                                resource.type ||
+                                                '课程'}
+                                        </ResourceType>
+                                    </div>
+                                    <div>
+                                        <Difficulty
+                                            className={
+                                                difficultyClassMap[
                                                     resource.difficulty
-                                                ] || resource.difficulty}
-                                            </Difficulty>
-                                        </div>
-                                        <div>
-                                            {resource.creator?.name || 'xiaowu'}
-                                        </div>
-                                        <div>
-                                            {formatDate(resource.createdAt)}
-                                        </div>
-                                        <div>
-                                            <Menus>
-                                                <Menus.Menu>
-                                                    <Menus.Toggle
-                                                        id={resource._id}
-                                                    />
-                                                    <Menus.List
-                                                        id={resource._id}
+                                                ] || 'medium'
+                                            }
+                                        >
+                                            {difficultyTextMap[
+                                                resource.difficulty
+                                            ] || resource.difficulty}
+                                        </Difficulty>
+                                    </div>
+                                    <div>
+                                        {resource.creator?.name || 'xiaowu'}
+                                    </div>
+                                    <div>{formatDate(resource.createdAt)}</div>
+                                    <div>
+                                        <Menus>
+                                            <Menus.Menu>
+                                                <Menus.Toggle
+                                                    id={resource._id}
+                                                />
+                                                <Menus.List id={resource._id}>
+                                                    <Menus.Button
+                                                        icon={<HiOutlineEye />}
+                                                        onClick={() =>
+                                                            navigate(
+                                                                `/resources/${resource._id}`
+                                                            )
+                                                        }
                                                     >
-                                                        <Menus.Button
-                                                            icon={
-                                                                <HiOutlineEye />
-                                                            }
-                                                            onClick={() =>
-                                                                navigate(
-                                                                    `/resources/${resource._id}`
-                                                                )
-                                                            }
-                                                        >
-                                                            查看
-                                                        </Menus.Button>
-                                                        <Menus.Button
-                                                            icon={
-                                                                <HiOutlinePencil />
-                                                            }
-                                                            onClick={() =>
-                                                                navigate(
-                                                                    `/resources/edit/${resource._id}`
-                                                                )
-                                                            }
-                                                        >
-                                                            编辑
-                                                        </Menus.Button>
-                                                        <Modal.Open opens="delete-resource">
-                                                            <Menus.Button
-                                                                icon={
-                                                                    <HiOutlineTrash />
-                                                                }
-                                                                onClick={() =>
-                                                                    handleOpenDeleteModal(
-                                                                        resource._id
-                                                                    )
-                                                                }
-                                                            >
-                                                                删除
-                                                            </Menus.Button>
-                                                        </Modal.Open>
-                                                    </Menus.List>
-                                                </Menus.Menu>
-                                            </Menus>
-                                        </div>
-                                    </Table.Row>
-                                )}
-                            />
+                                                        查看
+                                                    </Menus.Button>
+                                                    <Menus.Button
+                                                        icon={
+                                                            <HiOutlinePencil />
+                                                        }
+                                                        onClick={() =>
+                                                            navigate(
+                                                                `/resources/edit/${resource._id}`
+                                                            )
+                                                        }
+                                                    >
+                                                        编辑
+                                                    </Menus.Button>
+                                                    <Menus.Button
+                                                        icon={
+                                                            <HiOutlineTrash />
+                                                        }
+                                                        onClick={() =>
+                                                            handleOpenDeleteModal(
+                                                                resource._id
+                                                            )
+                                                        }
+                                                        disabled={isDeleting}
+                                                    >
+                                                        删除
+                                                    </Menus.Button>
+                                                </Menus.List>
+                                            </Menus.Menu>
+                                        </Menus>
+                                    </div>
+                                </Table.Row>
+                            )}
+                        />
 
-                            <Table.Footer>
-                                <Pagination count={pagination.total} />
-                            </Table.Footer>
-                        </Table>
-                    )}
-                </StyledResourceManagement>
+                        <Table.Footer>
+                            <Pagination count={pagination.total} />
+                        </Table.Footer>
+                    </Table>
+                )}
+            </StyledResourceManagement>
 
-                {/* 删除资源Modal */}
-                <Modal.Window name="delete-resource">
-                    <ConfirmDelete
-                        resourceName="资源"
+            {/* 删除资源Modal */}
+            <Modal
+                isOpen={isDeleteModalOpen}
+                onClose={handleCloseDeleteModal}
+                title="确认删除资源"
+                width="400px"
+            >
+                <div style={{ marginBottom: '2rem' }}>
+                    确定要删除该资源吗？此操作不可撤销。
+                </div>
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        gap: '1rem',
+                    }}
+                >
+                    <Button
+                        variation="secondary"
+                        onClick={handleCloseDeleteModal}
                         disabled={isDeleting}
-                        onConfirm={handleConfirmDelete}
-                        onCloseModal={handleCloseDeleteModal}
-                    />
-                </Modal.Window>
+                    >
+                        取消
+                    </Button>
+                    <Button
+                        variation="danger"
+                        onClick={handleConfirmDelete}
+                        disabled={isDeleting}
+                    >
+                        {isDeleting ? '删除中...' : '确认删除'}
+                    </Button>
+                </div>
             </Modal>
         </>
     )
