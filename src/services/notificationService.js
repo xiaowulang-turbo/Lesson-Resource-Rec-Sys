@@ -175,3 +175,33 @@ export const archiveNotification = async (id) => {
 
     return response.json()
 }
+
+/**
+ * 管理员获取全部通知（不做过滤，支持分页）
+ * @param {Object} params - 查询参数 {page, limit}
+ * @returns {Promise} - 通知列表和分页信息
+ */
+export const getAllNotifications = async (params = {}) => {
+    const auth = getStoredAuth()
+    if (!auth?.token) return null
+
+    const queryParams = new URLSearchParams()
+    if (params.page) queryParams.append('page', params.page)
+    if (params.limit) queryParams.append('limit', params.limit)
+
+    const response = await fetch(`${BASE_URL}/all?${queryParams.toString()}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`,
+        },
+    })
+
+    if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || '获取全部通知失败')
+    }
+
+    return response.json()
+}
