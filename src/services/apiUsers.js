@@ -221,3 +221,61 @@ export async function removeFavorite(userId, resourceId) {
 
     return data.data // 返回更新后的收藏列表等信息
 }
+
+// 删除指定用户
+export async function deleteUser(userId) {
+    const auth = getStoredAuth()
+    if (!auth || !auth.token) throw new Error('用户未登录')
+
+    const res = await fetch(`${BASE_URL}/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${auth.token}`,
+        },
+    })
+
+    if (res.status === 204) {
+        return { success: true, message: '用户已成功删除' }
+    }
+
+    let data = null
+    try {
+        data = await res.json()
+    } catch (e) {
+        // 兼容无内容
+    }
+
+    if (!res.ok) {
+        throw new Error((data && data.message) || '删除用户失败')
+    }
+
+    return data
+}
+
+// 更新指定用户
+export async function updateUser(userId, userData) {
+    const auth = getStoredAuth()
+    if (!auth || !auth.token) throw new Error('用户未登录')
+
+    const res = await fetch(`${BASE_URL}/users/${userId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`,
+        },
+        body: JSON.stringify(userData),
+    })
+
+    let data = null
+    try {
+        data = await res.json()
+    } catch (e) {
+        // 兼容无内容
+    }
+
+    if (!res.ok) {
+        throw new Error((data && data.message) || '更新用户信息失败')
+    }
+
+    return data
+}
