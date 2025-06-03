@@ -493,81 +493,108 @@ const NotificationManagePage = () => {
 
 // 样式
 const Container = styled.div`
-    padding: 2rem;
+    padding: 2.5rem 1rem;
     max-width: 1200px;
     margin: 0 auto;
+    background: var(--color-grey-50);
+    border-radius: 1.2rem;
+    box-shadow: 0 4px 32px 0 rgba(31, 41, 55, 0.08);
 `
 
 const Header = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
 `
 
 const Title = styled.h1`
-    font-weight: 600;
+    font-weight: 700;
     color: var(--color-grey-900);
+    /* font-size: 2.2rem; */
+    letter-spacing: 1px;
 `
 
 const CreateButton = styled.button`
-    background-color: var(--color-primary);
-    color: white;
+    background: linear-gradient(
+        90deg,
+        var(--color-primary) 60%,
+        var(--color-primary-dark) 100%
+    );
+    color: var(--color-grey-900);
     border: none;
-    padding: 0.625rem 1.25rem;
-    border-radius: 0.375rem;
-    font-weight: 500;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    /* font-size: 1.1rem; */
+    box-shadow: 0 2px 8px 0 rgba(99, 102, 241, 0.08);
     cursor: pointer;
-    transition: background-color 0.2s;
-
+    transition: background 0.2s, box-shadow 0.2s;
     &:hover {
-        background-color: var(--color-primary-dark);
+        background: linear-gradient(
+            90deg,
+            var(--color-primary-dark) 60%,
+            var(--color-primary) 100%
+        );
+        box-shadow: 0 4px 16px 0 rgba(99, 102, 241, 0.16);
     }
 `
 
 const Table = styled.table`
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 2px 12px 0 rgba(31, 41, 55, 0.06);
 `
 
 const TableHead = styled.thead`
-    background-color: var(--color-grey-50);
-
+    background: var(--color-grey-50);
     th {
-        padding: 0.75rem 1rem;
+        padding: 1rem 1.2rem;
         text-align: left;
-        font-weight: 500;
+        font-weight: 600;
         color: var(--color-grey-700);
-        border-bottom: 1px solid var(--color-grey-200);
+        border-bottom: 2px solid var(--color-grey-200);
+        /* font-size: 1.05rem; */
     }
 `
 
 const TableBody = styled.tbody`
     td {
-        padding: 0.75rem 1rem;
-        border-bottom: 1px solid var(--color-grey-200);
+        padding: 1rem 1.2rem;
+        border-bottom: 1px solid var(--color-grey-100);
+        vertical-align: middle;
+        /* font-size: 1rem; */
     }
-
     td.title {
-        font-weight: 500;
+        font-weight: 600;
         color: var(--color-grey-900);
+        max-width: 220px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 `
 
 const TableRow = styled.tr`
+    background: var(--color-grey-0);
     &:hover {
-        background-color: var(--color-grey-50);
+        background: var(--color-grey-50);
     }
 `
 
 const StatusBadge = styled.span`
     display: inline-block;
-    background-color: ${(props) => props.color};
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    /* font-size: 0.75rem; */
-    font-weight: 500;
+    background: ${(props) => props.color};
+    color: var(--color-grey-900);
+    padding: 0.3rem 0.9rem;
+    border-radius: 1rem;
+    font-weight: 600;
+    /* font-size: 0.98rem; */
+    box-shadow: 0 1px 4px 0 rgba(31, 41, 55, 0.08);
 `
 
 const PriorityCell = styled.div`
@@ -577,46 +604,44 @@ const PriorityCell = styled.div`
             : props.priority === 'medium'
             ? '#f59e0b'
             : '#64748b'};
-    font-weight: 500;
+    font-weight: 700;
+    /* font-size: 1.05rem; */
 `
 
 const ActionButtons = styled.div`
     display: flex;
-    gap: 0.5rem;
+    gap: 0.7rem;
 `
 
 const ActionButton = styled.button`
-    padding: 0.25rem 0.5rem;
+    padding: 0.35rem 1rem;
     border: none;
-    border-radius: 0.25rem;
-    /* font-size: 0.75rem; */
-    font-weight: 500;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    /* font-size: 0.98rem; */
     cursor: pointer;
-
+    transition: background 0.18s, color 0.18s;
     &.edit {
-        background-color: var(--color-primary-light);
+        background: var(--color-primary-light);
         color: var(--color-primary);
-
         &:hover {
-            background-color: var(--color-primary-light);
+            background: var(--color-primary);
+            color: #fff;
         }
     }
-
     &.archive {
-        background-color: var(--color-grey-50);
+        background: var(--color-grey-50);
         color: var(--color-grey-700);
-
         &:hover {
-            background-color: var(--color-grey-50);
+            background: var(--color-grey-200);
         }
     }
-
     &.delete {
-        background-color: var(--color-red-50);
+        background: var(--color-red-50);
         color: var(--color-red-700);
-
         &:hover {
-            background-color: var(--color-red-50);
+            background: var(--color-red-700);
+            color: #fff;
         }
     }
 `
@@ -639,12 +664,15 @@ const ErrorMessage = styled.div`
 
 const EmptyState = styled.div`
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     padding: 4rem 0;
-    background-color: var(--color-grey-50);
-    border-radius: 0.5rem;
-    border: 1px dashed var(--color-grey-200);
+    background: var(--color-grey-50);
+    border-radius: 0.7rem;
+    border: 1.5px dashed var(--color-grey-200);
+    color: var(--color-grey-600);
+    /* font-size: 1.1rem; */
 `
 
 const EmptyText = styled.p`
