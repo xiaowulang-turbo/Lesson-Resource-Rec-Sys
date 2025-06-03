@@ -150,6 +150,7 @@ export class DataService {
                     id: user._id,
                     name: user.name || account.name,
                     email: account.email || '',
+                    role: account.role || 'user',
                     phone: user.phone || '',
                     avatar: user.avatar || null,
                     subject: user.preferences?.preferredSubjects?.[0] || '',
@@ -176,6 +177,12 @@ export class DataService {
             if (userData.email) {
                 accountFields.email = userData.email
                 console.log('检测到邮箱更新请求:', userData.email)
+            }
+
+            // 角色需要在Account表中更新
+            if (userData.role) {
+                accountFields.role = userData.role
+                console.log('检测到角色更新请求:', userData.role)
             }
 
             // 过滤用户字段
@@ -260,6 +267,7 @@ export class DataService {
                 id: user._id,
                 name: user.name || account.name,
                 email: account.email || '',
+                role: account.role || 'user',
                 phone: user.phone || '',
                 avatar: user.avatar || null,
                 subject: user.preferences?.preferredSubjects?.[0] || '',
