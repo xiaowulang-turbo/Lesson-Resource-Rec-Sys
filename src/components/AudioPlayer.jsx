@@ -126,7 +126,7 @@ const PlayButton = styled(Button)`
 
     &:hover {
         background-color: var(--color-primary-700);
-        color: white;
+        color: var(--color-grey-900);
     }
 
     svg {
