@@ -310,6 +310,7 @@ function ResourceDetail() {
     const formattedDate = new Date(resource.createdAt).toLocaleDateString(
         'zh-CN'
     )
+
     // 假设 type 有对应的文本映射
     const resourceTypeMap = {
         1: '文档',
@@ -326,6 +327,39 @@ function ResourceDetail() {
         5: '专家',
     }
 
+    // 获取资源类型显示文本，如果无效则返回null
+    const getResourceTypeText = (type) => {
+        return resourceTypeMap[type] || null
+    }
+
+    // 获取难度显示文本，如果无效则返回null
+    const getDifficultyText = (difficulty) => {
+        return difficultyMap[difficulty] || null
+    }
+
+    // 构建副标题数组，只包含有效信息
+    const buildSubtitle = () => {
+        const parts = []
+
+        const typeText = getResourceTypeText(resource.type)
+        if (typeText) parts.push(typeText)
+
+        if (resource.subject) parts.push(resource.subject)
+
+        const difficultyText = getDifficultyText(resource.difficulty)
+        if (difficultyText) parts.push(difficultyText)
+
+        return parts.length > 0 ? parts.join(' | ') : '资源详情'
+    }
+
+    // 获取上传者显示文本
+    const getUploaderText = () => {
+        if (resource.createdBy) return resource.createdBy
+        if (resource.organization) return resource.organization
+        if (resource.publisher) return resource.publisher
+        return null // 返回null而不是"未知用户"
+    }
+
     // 获取封面图片 URL (优先使用资源的coverImage字段，如果没有则使用默认图片)
     const coverImageUrl =
         resource.cover || defaultCover || getDefaultCoverImage(resource.type)
@@ -338,9 +372,7 @@ function ResourceDetail() {
                     <TitleContainer>
                         <Heading as="h1">{resource.title}</Heading>
                         <div className="resource-subtitle">
-                            {resourceTypeMap[resource.type] || '未知'} |{' '}
-                            {resource.subject} |{' '}
-                            {difficultyMap[resource.difficulty] || '未知'}
+                            {buildSubtitle()}
                         </div>
                         <div className="resource-price">
                             {resource.price > 0
@@ -438,10 +470,12 @@ function ResourceDetail() {
                         <p>
                             <strong>描述：</strong> {resource.description}
                         </p>
-                        <p>
-                            <strong>上传者：</strong>{' '}
-                            {resource.createdBy || '未知用户'}
-                        </p>
+                        {/* 只有当有有效上传者信息时才显示 */}
+                        {getUploaderText() && (
+                            <p>
+                                <strong>上传者：</strong> {getUploaderText()}
+                            </p>
+                        )}
                         <p>
                             <strong>上传时间：</strong> {formattedDate}
                         </p>
