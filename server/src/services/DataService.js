@@ -167,8 +167,19 @@ export class DataService {
                     favoriteResources: user.favoriteResources,
                 }
             }
-            // 过滤掉不需要的字段，防止用户更新敏感信息
-            const allowedFields = [
+
+            // 分离需要在Account表中更新的字段
+            const accountFields = {}
+            const userFields = {}
+
+            // 邮箱需要在Account表中更新
+            if (userData.email) {
+                accountFields.email = userData.email
+                console.log('检测到邮箱更新请求:', userData.email)
+            }
+
+            // 过滤用户字段
+            const allowedUserFields = [
                 'name',
                 'phone',
                 'subject',
@@ -182,36 +193,60 @@ export class DataService {
                 'favoriteResources',
             ]
 
-            const filteredData = {}
             Object.keys(userData).forEach((key) => {
-                if (allowedFields.includes(key)) {
-                    filteredData[key] = userData[key]
+                if (allowedUserFields.includes(key)) {
+                    userFields[key] = userData[key]
                 }
             })
 
             // 处理前端传过来的分散字段，映射到数据库结构
             if (userData.fullName) {
-                filteredData.name = userData.fullName
+                userFields.name = userData.fullName
             }
 
             if (userData.subject) {
-                if (!filteredData.preferences) filteredData.preferences = {}
-                filteredData.preferences.preferredSubjects = [userData.subject]
+                if (!userFields.preferences) userFields.preferences = {}
+                userFields.preferences.preferredSubjects = [userData.subject]
             }
 
             if (userData.grade) {
-                if (!filteredData.preferences) filteredData.preferences = {}
-                filteredData.preferences.preferredGrades = [userData.grade]
+                if (!userFields.preferences) userFields.preferences = {}
+                userFields.preferences.preferredGrades = [userData.grade]
             }
 
             // 确保interests是一个数组
             if (userData.interests && !Array.isArray(userData.interests)) {
-                filteredData.interests = [userData.interests]
+                userFields.interests = [userData.interests]
             }
 
-            // console.log('更新用户前的数据:', filteredData)
+            // 首先获取用户信息
+            const currentUser = await User.findById(id)
+            if (!currentUser) return null
 
-            const user = await User.findByIdAndUpdate(id, filteredData, {
+            // 如果有Account字段需要更新，先更新Account表
+            if (
+                Object.keys(accountFields).length > 0 &&
+                currentUser.accountId
+            ) {
+                console.log(
+                    '正在更新Account表，字段:',
+                    accountFields,
+                    '账户ID:',
+                    currentUser.accountId
+                )
+                const updatedAccount = await Account.findByIdAndUpdate(
+                    currentUser.accountId,
+                    accountFields,
+                    {
+                        runValidators: true,
+                        new: true,
+                    }
+                )
+                console.log('Account表更新结果:', updatedAccount)
+            }
+
+            // 更新User表
+            const user = await User.findByIdAndUpdate(id, userFields, {
                 new: true,
                 runValidators: true,
             }).populate('account')
