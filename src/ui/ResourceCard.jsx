@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import Tag from './Tag'
+import { useState } from 'react'
 
 const Card = styled(Link)`
     display: flex;
@@ -146,6 +147,10 @@ function getTypeText(type) {
 }
 
 function ResourceCard({ resource }) {
+    // 添加图片加载状态
+    const [imageError, setImageError] = useState(false)
+    const [imageLoaded, setImageLoaded] = useState(false)
+
     // 检查是否有资源数据
     if (!resource) return null
 
@@ -157,11 +162,27 @@ function ResourceCard({ resource }) {
     // 获取父课程信息
     const parentCourse = courseStructure?.parentCourse
 
+    // 图片加载错误处理
+    const handleImageError = () => {
+        console.warn(`资源卡片图片加载失败: ${cover}`)
+        setImageError(true)
+    }
+
+    // 图片加载成功处理
+    const handleImageLoad = () => {
+        setImageLoaded(true)
+    }
+
     return (
         <Card to={`/resources/${_id}`}>
             <ImageContainer>
-                {cover ? (
-                    <Image src={cover} alt={title} />
+                {cover && !imageError ? (
+                    <Image
+                        src={cover}
+                        alt={title}
+                        onError={handleImageError}
+                        onLoad={handleImageLoad}
+                    />
                 ) : (
                     <NoImage>{getTypeIcon(type)}</NoImage>
                 )}
