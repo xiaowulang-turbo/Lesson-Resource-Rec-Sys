@@ -101,6 +101,8 @@ const Rating = styled.div`
 const ResourceRating = styled.span`
     font-size: 1.4rem;
     font-weight: 600;
+    color: ${(props) =>
+        props.hasRating ? 'var(--color-grey-700)' : 'var(--color-grey-400)'};
 `
 
 // Updated Label component styling logic based on difficulty strings
@@ -303,6 +305,21 @@ function ResourceList({ resources: initialResources }) {
         return isNaN(rating) ? 0 : rating
     }
 
+    // 获取评分显示文本
+    const getRatingDisplay = (averageRating) => {
+        const rating = parseRating(averageRating)
+        if (rating > 0) {
+            return `⭐ ${rating.toFixed(1)}`
+        }
+        return '⭐ 暂无评分'
+    }
+
+    // 检查是否有有效评分
+    const hasValidRating = (averageRating) => {
+        const rating = parseRating(averageRating)
+        return rating > 0
+    }
+
     // Difficulty mapping remains useful for display text, but label uses string directly
     const getDifficultyText = (levelString) => {
         // 处理数值型难度等级
@@ -365,7 +382,9 @@ function ResourceList({ resources: initialResources }) {
                         )
                     }
 
-                    const displayRating = parseRating(resource.averageRating)
+                    const displayRating = getRatingDisplay(
+                        resource.averageRating
+                    )
                     const tagsToDisplay = resource.tags || []
 
                     return (
@@ -403,8 +422,12 @@ function ResourceList({ resources: initialResources }) {
 
                                     <ResourceInfo>
                                         <Rating>
-                                            <ResourceRating>
-                                                {displayRating.toFixed(1)}
+                                            <ResourceRating
+                                                hasRating={hasValidRating(
+                                                    resource.averageRating
+                                                )}
+                                            >
+                                                {displayRating}
                                             </ResourceRating>
                                         </Rating>
 
