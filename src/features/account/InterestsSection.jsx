@@ -557,14 +557,34 @@ function InterestsSection({ user, onUpdate }) {
     // 根据分类获取图标
     const getCategoryIcon = (category) => {
         switch (category) {
+            case 'computer':
+                return <HiOutlineLightBulb />
+            case 'mathematics':
+                return <HiOutlineChartBar />
             case 'geometry':
                 return <HiOutlineStar />
-            case 'function':
+            case 'analysis':
                 return <HiOutlineChartBar />
-            case 'statistics':
+            case 'physics':
+                return <HiOutlineLightBulb />
+            case 'chemistry':
+                return <HiOutlineLightBulb />
+            case 'biology':
+                return <HiOutlineHeart />
+            case 'engineering':
+                return <HiOutlineLightBulb />
+            case 'economics':
                 return <HiOutlineChartBar />
+            case 'humanities':
+                return <HiOutlineBookOpen />
             case 'teaching':
                 return <HiOutlineBookOpen />
+            case 'language':
+                return <HiOutlineBookOpen />
+            case 'arts':
+                return <HiOutlineHeart />
+            case 'sports':
+                return <HiOutlineHeart />
             default:
                 return <HiOutlineLightBulb />
         }
@@ -573,16 +593,36 @@ function InterestsSection({ user, onUpdate }) {
     // 获取分类名称
     const getCategoryName = (category) => {
         switch (category) {
+            case 'computer':
+                return '💻 计算机科学'
+            case 'mathematics':
+                return '🔢 数学'
             case 'geometry':
-                return '几何'
-            case 'function':
-                return '函数'
-            case 'statistics':
-                return '统计'
+                return '📐 几何学'
+            case 'analysis':
+                return '📈 函数分析'
+            case 'physics':
+                return '⚛️ 物理学'
+            case 'chemistry':
+                return '🧪 化学'
+            case 'biology':
+                return '🧬 生物学'
+            case 'engineering':
+                return '⚙️ 工程技术'
+            case 'economics':
+                return '💰 经济管理'
+            case 'humanities':
+                return '📚 人文社科'
             case 'teaching':
-                return '教学'
+                return '👨‍🏫 教学教育'
+            case 'language':
+                return '🌐 语言学习'
+            case 'arts':
+                return '🎨 艺术创作'
+            case 'sports':
+                return '🏃‍♂️ 体育运动'
             default:
-                return '其他'
+                return '🔖 其他'
         }
     }
 
