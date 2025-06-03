@@ -309,11 +309,18 @@ export const getFavoriteResources = async (req, res) => {
                 .status(404)
                 .json({ status: 'error', message: '未找到用户' })
         }
-        // 直接查找 User 模型，填充 favoriteResources 字段
+        // 直接查找 User 模型，填充 favoriteResources 字段和课程结构信息
         const mongooseUser = await mongoose
             .model('User')
             .findById(userId)
-            .populate('favoriteResources')
+            .populate({
+                path: 'favoriteResources',
+                populate: {
+                    path: 'courseStructure.parentCourse',
+                    select: 'title _id contentType',
+                    model: 'Resource',
+                },
+            })
         res.status(200).json({
             status: 'success',
             message: '获取收藏资源成功',
