@@ -41,7 +41,7 @@ const ModalHeader = styled.div`
 const Title = styled.h3`
     font-size: 2rem;
     font-weight: 600;
-    color: var(--color-grey-700, #374151);
+    color: var(--color-grey-900, #111827);
     margin: 0;
 `
 
