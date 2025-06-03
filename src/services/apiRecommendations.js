@@ -16,7 +16,7 @@ export const fetchHomepageRecommendations = async (
 ) => {
     try {
         const url = `${API_URL}/recommendations/homepage?limit=${limit}${
-            skipCache ? '&skipCache=true' : ''
+            skipCache ? '&skipCache=false' : ''
         }`
 
         // 修正获取token的方式，从auth对象中获取，而不是直接获取jwt
