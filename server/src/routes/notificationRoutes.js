@@ -7,6 +7,13 @@ const router = express.Router()
 // 保护所有通知路由
 router.use(protect)
 
+// 管理员获取全部通知（放在前面，避免与用户路由冲突）
+router.get(
+    '/all',
+    restrictTo('admin'),
+    notificationController.getAllNotifications
+)
+
 // 用户路由
 router.get('/', notificationController.getUserNotifications)
 
@@ -32,13 +39,6 @@ router.patch(
     '/:id/archive',
     restrictTo('admin'),
     notificationController.archiveNotification
-)
-
-// 管理员获取全部通知（不做过滤，支持分页）
-router.get(
-    '/all',
-    restrictTo('admin'),
-    notificationController.getAllNotifications
 )
 
 export default router
