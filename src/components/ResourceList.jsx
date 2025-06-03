@@ -331,7 +331,7 @@ function ResourceList({ resources: initialResources }) {
                 4: '高级',
                 5: '专家',
             }
-            return difficultyMap[levelString] || '未知'
+            return difficultyMap[levelString] || null // 返回 null 而不是 '未知'
         }
 
         // 处理字符串型难度等级
@@ -339,8 +339,31 @@ function ResourceList({ resources: initialResources }) {
             return levelString.charAt(0).toUpperCase() + levelString.slice(1)
         }
 
-        // Fallback for null, undefined, '', false, etc.
-        return '未知'
+        // 对于无效数据返回 null，让组件决定是否显示
+        return null
+    }
+
+    // 获取机构名称，如果没有有效机构信息则使用默认值
+    const getOrganizationName = (resource, isMoocResource) => {
+        if (resource.organization) return resource.organization
+        if (resource.publisher) return resource.publisher
+        if (isMoocResource) return '中国大学MOOC'
+
+        // 对于没有机构信息的资源，返回空字符串而不是"未知机构"
+        return ''
+    }
+
+    // 获取学生数量的友好显示
+    const getEnrollCountDisplay = (enrollCount) => {
+        if (!enrollCount || enrollCount <= 0) return null
+
+        if (enrollCount >= 10000) {
+            return `${Math.floor(enrollCount / 1000) / 10}万人学习`
+        } else if (enrollCount >= 1000) {
+            return `${Math.floor(enrollCount / 100) / 10}千人学习`
+        } else {
+            return `${enrollCount}人学习`
+        }
     }
 
     return (
@@ -365,12 +388,12 @@ function ResourceList({ resources: initialResources }) {
                         resource.metadata?.mocSourceType === 'icourse163'
 
                     // 确保必要的字段都有值
-                    const resourceTitle = resource.title || '未知课程'
-                    const resourceOrg =
-                        resource.organization ||
-                        resource.publisher ||
-                        (isMoocResource ? '中国大学MOOC' : '未知机构')
-                    const resourceDesc = resource.description || '无描述'
+                    const resourceTitle = resource.title || '课程资源' // 更友好的默认标题
+                    const resourceOrg = getOrganizationName(
+                        resource,
+                        isMoocResource
+                    )
+                    const resourceDesc = resource.description || '暂无简介'
                     const resourceCover = resource.cover || PLACEHOLDER_IMAGE
 
                     if (isMoocResource) {
@@ -386,6 +409,12 @@ function ResourceList({ resources: initialResources }) {
                         resource.averageRating
                     )
                     const tagsToDisplay = resource.tags || []
+                    const difficultyText = getDifficultyText(
+                        resource.difficulty
+                    )
+                    const enrollCountDisplay = getEnrollCountDisplay(
+                        resource.enrollCount
+                    )
 
                     return (
                         <ResourceCardLink
@@ -416,9 +445,12 @@ function ResourceList({ resources: initialResources }) {
                                         {resourceTitle}
                                         {isMoocResource && ' 🌐'}
                                     </ResourceTitle>
-                                    <ResourcePublisher>
-                                        {resourceOrg}
-                                    </ResourcePublisher>
+                                    {/* 只有当机构信息存在时才显示 */}
+                                    {resourceOrg && (
+                                        <ResourcePublisher>
+                                            {resourceOrg}
+                                        </ResourcePublisher>
+                                    )}
 
                                     <ResourceInfo>
                                         <Rating>
@@ -431,19 +463,19 @@ function ResourceList({ resources: initialResources }) {
                                             </ResourceRating>
                                         </Rating>
 
-                                        {resource.difficulty && (
+                                        {/* 只有当难度信息有效时才显示 */}
+                                        {difficultyText && (
                                             <Label
                                                 type="difficulty"
                                                 value={resource.difficulty}
                                             >
-                                                {getDifficultyText(
-                                                    resource.difficulty
-                                                )}
+                                                {difficultyText}
                                             </Label>
                                         )}
-                                        {resource.enrollCount > 0 && (
+                                        {/* 使用优化后的学生数量显示 */}
+                                        {enrollCountDisplay && (
                                             <Label type="students">
-                                                {resource.enrollCount}
+                                                {enrollCountDisplay}
                                             </Label>
                                         )}
                                         {isMoocResource &&
