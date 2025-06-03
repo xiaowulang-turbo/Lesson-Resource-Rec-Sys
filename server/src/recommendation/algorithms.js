@@ -97,11 +97,11 @@ export const contentBasedRecommendation = async (user, limit = 10) => {
     const interests = user.interests || []
     const preferredDifficulty = user.preferred_difficulty || 3 // 默认中级难度
 
-    // console.log('[contentBased] 处理后的用户偏好:', {
-    //     preferredSubjects,
-    //     interests,
-    //     preferredDifficulty,
-    // })
+    console.log('[contentBased] 处理后的用户偏好:', {
+        preferredSubjects,
+        interests,
+        preferredDifficulty,
+    })
 
     // 加载资源数据
     const resources = await loadResourcesData()
@@ -118,16 +118,36 @@ export const contentBasedRecommendation = async (user, limit = 10) => {
         let score = 0
         const resourceTags = Array.isArray(resource.tags) ? resource.tags : []
 
-        // 学科匹配得分
+        // 学科匹配得分 - 提高权重
         if (preferredSubjects.includes(resource.subject)) {
-            score += 5 // 学科直接匹配得高分
+            score += 10 // 学科直接匹配得高分
         }
 
-        // 兴趣/标签重叠得分
+        // 兴趣/标签重叠得分 - 大幅提高权重
         const commonInterests = resourceTags.filter((tag) =>
             interests.includes(tag)
         )
-        score += commonInterests.length * 2 // 每个匹配的标签得分
+        score += commonInterests.length * 8 // 每个匹配的标签得更高分
+
+        // 模糊兴趣匹配 - 新增：检查用户兴趣是否包含在资源标签中或资源学科中
+        interests.forEach((interest) => {
+            // 检查兴趣是否与资源学科匹配
+            if (resource.subject && resource.subject.includes(interest)) {
+                score += 6 // 学科包含兴趣关键词
+            }
+
+            // 检查兴趣是否与资源标题匹配
+            if (resource.title && resource.title.includes(interest)) {
+                score += 4 // 标题包含兴趣关键词
+            }
+
+            // 检查资源标签是否包含兴趣的部分匹配
+            resourceTags.forEach((tag) => {
+                if (tag.includes(interest) || interest.includes(tag)) {
+                    score += 3 // 部分匹配
+                }
+            })
+        })
 
         // 难度匹配得分
         if (
@@ -144,7 +164,7 @@ export const contentBasedRecommendation = async (user, limit = 10) => {
             }
         }
 
-        // 添加少量基于选课人数的分数用于打破平局
+        // 大幅降低基于选课人数的分数权重，避免热门课程覆盖个性化推荐
         let enrollment = 0
         try {
             const enrollCountStr = resource.enrollCount?.toString() || '0'
@@ -157,7 +177,9 @@ export const contentBasedRecommendation = async (user, limit = 10) => {
             enrollment = 0
         }
 
-        score += enrollment * 0.001
+        // 将选课人数权重从0.001降低到0.00001，并设置上限
+        const popularityScore = Math.min(enrollment * 0.00001, 0.5) // 最多贡献0.5分
+        score += popularityScore
 
         return {
             ...resource,
@@ -165,9 +187,9 @@ export const contentBasedRecommendation = async (user, limit = 10) => {
             algorithm: 'content',
             recommendation_reason: `基于内容匹配 (学科: ${
                 resource.subject || '未知'
-            }, 难度: ${
-                resource.difficulty || '未知'
-            }, 匹配得分: ${score.toFixed(2)})`,
+            }, 难度: ${resource.difficulty || '未知'}, 兴趣匹配: ${
+                commonInterests.length
+            }个, 匹配得分: ${score.toFixed(2)})`,
         }
     })
 
