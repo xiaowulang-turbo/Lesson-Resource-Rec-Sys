@@ -484,3 +484,50 @@ export async function deleteResource(id) {
         throw new Error(error.message || '网络请求错误，无法删除资源')
     }
 }
+
+// 新增：批量删除资源
+export async function deleteMultipleResources(resourceIds) {
+    try {
+        // 获取存储的认证信息
+        const auth = getStoredAuth()
+        const token = auth?.token
+
+        if (!token) {
+            throw new Error('您尚未登录，请先登录')
+        }
+
+        if (!Array.isArray(resourceIds) || resourceIds.length === 0) {
+            throw new Error('请提供要删除的资源ID列表')
+        }
+
+        const res = await fetch(
+            `${BASE_URL}${ENDPOINTS.RESOURCES.BASE}/batch-delete`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ resourceIds }),
+            }
+        )
+
+        const data = await res.json()
+
+        if (!res.ok) {
+            console.error('API Error Response:', data)
+            throw new Error(data.message || '批量删除资源失败')
+        }
+
+        return {
+            success: true,
+            message: `已成功删除 ${
+                data.deletedCount || resourceIds.length
+            } 个资源`,
+            deletedCount: data.deletedCount || resourceIds.length,
+        }
+    } catch (error) {
+        console.error('批量删除资源失败:', error)
+        throw new Error(error.message || '网络请求错误，无法批量删除资源')
+    }
+}

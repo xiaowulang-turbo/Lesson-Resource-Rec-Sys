@@ -237,6 +237,64 @@ export const deleteResource = async (req, res) => {
     }
 }
 
+// 新增：批量删除资源
+export const deleteMultipleResources = async (req, res) => {
+    try {
+        const { resourceIds } = req.body
+
+        // 验证输入
+        if (!Array.isArray(resourceIds) || resourceIds.length === 0) {
+            return res.status(400).json({
+                status: 'error',
+                message: '请提供要删除的资源ID列表',
+            })
+        }
+
+        // 验证资源ID格式
+        const validResourceIds = resourceIds.filter((id) => {
+            return id && typeof id === 'string' && id.length === 24
+        })
+
+        if (validResourceIds.length === 0) {
+            return res.status(400).json({
+                status: 'error',
+                message: '没有有效的资源ID',
+            })
+        }
+
+        // 调用数据服务批量删除
+        const result = await dataService.deleteMultipleResources(
+            validResourceIds
+        )
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: '未找到要删除的资源',
+            })
+        }
+
+        // 清除相关推荐缓存
+        cacheService.clear()
+        console.log(
+            `[资源控制器] 已批量删除 ${result.deletedCount} 个资源，已清除相关缓存`
+        )
+
+        res.status(200).json({
+            status: 'success',
+            message: `成功删除 ${result.deletedCount} 个资源`,
+            deletedCount: result.deletedCount,
+            failedIds: result.failedIds || [],
+        })
+    } catch (err) {
+        console.error('[资源控制器] 批量删除资源失败:', err)
+        res.status(500).json({
+            status: 'error',
+            message: err.message || '批量删除资源失败',
+        })
+    }
+}
+
 export const addRating = async (req, res) => {
     try {
         const result = await dataService.addResourceRating(req.params.id, {

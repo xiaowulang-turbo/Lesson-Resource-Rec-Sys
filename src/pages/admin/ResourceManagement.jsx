@@ -16,6 +16,7 @@ import {
     getAllResources,
     getResourceById,
     deleteResource,
+    deleteMultipleResources,
 } from '../../services/apiResources'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { formatDate } from '../../utils/helpers'
@@ -74,6 +75,35 @@ const FilterSection = styled.div`
 const Actions = styled.div`
     display: flex;
     gap: 0.8rem;
+`
+
+// 新增：批量操作区域样式
+const BatchActionsContainer = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 1.6rem;
+    padding: 1.2rem;
+    background-color: var(--color-grey-50);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-grey-200);
+`
+
+const SelectInfo = styled.span`
+    font-size: 1.4rem;
+    color: var(--color-grey-600);
+`
+
+const BatchActions = styled.div`
+    display: flex;
+    gap: 0.8rem;
+`
+
+// 新增：复选框样式
+const Checkbox = styled.input`
+    width: 1.6rem;
+    height: 1.6rem;
+    cursor: pointer;
 `
 
 const ResourceType = styled.span`
@@ -149,6 +179,11 @@ function ResourceManagement() {
     const [deletingResourceId, setDeletingResourceId] = useState(null)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
+    // 新增：批量选择相关状态
+    const [selectedResources, setSelectedResources] = useState(new Set())
+    const [isSelectAll, setIsSelectAll] = useState(false)
+    const [isBatchDeleteModalOpen, setIsBatchDeleteModalOpen] = useState(false)
+
     // 删除资源 mutation
     const { mutate: deleteMutate, isLoading: isDeleting } = useMutation({
         mutationFn: deleteResource,
@@ -166,6 +201,27 @@ function ResourceManagement() {
             setDeletingResourceId(null)
         },
     })
+
+    // 新增：批量删除 mutation
+    const { mutate: batchDeleteMutate, isLoading: isBatchDeleting } =
+        useMutation({
+            mutationFn: deleteMultipleResources,
+            onSuccess: (data) => {
+                const deletedCount = data.deletedCount || selectedResources.size
+                toast.success(`已成功删除 ${deletedCount} 个资源`)
+
+                // 清空选择状态
+                setSelectedResources(new Set())
+                setIsSelectAll(false)
+
+                // 刷新资源列表
+                queryClient.invalidateQueries({ queryKey: ['resources'] })
+                handleRefreshResources()
+            },
+            onError: (err) => {
+                toast.error(err.message || '批量删除资源失败')
+            },
+        })
 
     // 当前页码
     const currentPage = parseInt(searchParams.get('page') || 1)
@@ -193,6 +249,16 @@ function ResourceManagement() {
 
         fetchResources()
     }, [currentPage, filters.sort])
+
+    // 新增：监听资源变化，更新全选状态
+    useEffect(() => {
+        if (resources.length > 0) {
+            const allSelected = resources.every((resource) =>
+                selectedResources.has(resource._id)
+            )
+            setIsSelectAll(allSelected)
+        }
+    }, [selectedResources, resources])
 
     // 资源类型映射
     const resourceTypeMap = {
@@ -236,6 +302,51 @@ function ResourceManagement() {
         if (deletingResourceId) {
             await deleteMutate(deletingResourceId)
             setIsDeleteModalOpen(false)
+        }
+    }
+
+    // 新增：处理单个资源选择
+    const handleResourceSelect = (resourceId) => {
+        const newSelected = new Set(selectedResources)
+        if (newSelected.has(resourceId)) {
+            newSelected.delete(resourceId)
+        } else {
+            newSelected.add(resourceId)
+        }
+        setSelectedResources(newSelected)
+    }
+
+    // 新增：处理全选/取消全选
+    const handleSelectAll = () => {
+        if (isSelectAll) {
+            setSelectedResources(new Set())
+        } else {
+            setSelectedResources(
+                new Set(resources.map((resource) => resource._id))
+            )
+        }
+        setIsSelectAll(!isSelectAll)
+    }
+
+    // 新增：打开批量删除确认对话框
+    const handleOpenBatchDeleteModal = () => {
+        if (selectedResources.size === 0) {
+            toast.error('请先选择要删除的资源')
+            return
+        }
+        setIsBatchDeleteModalOpen(true)
+    }
+
+    // 新增：关闭批量删除确认对话框
+    const handleCloseBatchDeleteModal = () => {
+        setIsBatchDeleteModalOpen(false)
+    }
+
+    // 新增：确认批量删除
+    const handleConfirmBatchDelete = async () => {
+        if (selectedResources.size > 0) {
+            await batchDeleteMutate(Array.from(selectedResources))
+            setIsBatchDeleteModalOpen(false)
         }
     }
 
@@ -297,13 +408,45 @@ function ResourceManagement() {
                     <ResourceFilter onFilterChange={handleFilterChange} />
                 </FilterSection> */}
 
+                {/* 新增：批量操作区域 */}
+                {!isLoading && resources.length > 0 && (
+                    <BatchActionsContainer>
+                        <Checkbox
+                            type="checkbox"
+                            checked={isSelectAll}
+                            onChange={handleSelectAll}
+                        />
+                        <SelectInfo>
+                            {selectedResources.size > 0
+                                ? `已选择 ${selectedResources.size} 个资源`
+                                : '全选'}
+                        </SelectInfo>
+                        {selectedResources.size > 0 && (
+                            <BatchActions>
+                                <Button
+                                    size="small"
+                                    variation="danger"
+                                    onClick={handleOpenBatchDeleteModal}
+                                    disabled={isBatchDeleting}
+                                >
+                                    <HiOutlineTrash />
+                                    <span>
+                                        批量删除 ({selectedResources.size})
+                                    </span>
+                                </Button>
+                            </BatchActions>
+                        )}
+                    </BatchActionsContainer>
+                )}
+
                 {isLoading ? (
                     <Spinner />
                 ) : resources.length === 0 ? (
                     <Empty resource="资源" />
                 ) : (
-                    <Table columns="2fr 0.8fr 0.8fr 1fr 1fr 0.5fr">
+                    <Table columns="0.5fr 2fr 0.8fr 0.8fr 1fr 1fr 0.5fr">
                         <Table.Header>
+                            <div></div>
                             <div>标题</div>
                             <div>类型</div>
                             <div>难度</div>
@@ -316,6 +459,19 @@ function ResourceManagement() {
                             data={resources}
                             render={(resource) => (
                                 <Table.Row key={resource._id}>
+                                    <div>
+                                        <Checkbox
+                                            type="checkbox"
+                                            checked={selectedResources.has(
+                                                resource._id
+                                            )}
+                                            onChange={() =>
+                                                handleResourceSelect(
+                                                    resource._id
+                                                )
+                                            }
+                                        />
+                                    </div>
                                     <div>{resource.title}</div>
                                     <div>
                                         <ResourceType>
@@ -428,6 +584,53 @@ function ResourceManagement() {
                         disabled={isDeleting}
                     >
                         {isDeleting ? '删除中...' : '确认删除'}
+                    </Button>
+                </div>
+            </Modal>
+
+            {/* 新增：批量删除确认Modal */}
+            <Modal
+                isOpen={isBatchDeleteModalOpen}
+                onClose={handleCloseBatchDeleteModal}
+                title="确认批量删除"
+                width="450px"
+            >
+                <div style={{ marginBottom: '2rem' }}>
+                    <p>
+                        您确定要删除选中的{' '}
+                        <strong>{selectedResources.size}</strong> 个资源吗？
+                    </p>
+                    <p
+                        style={{
+                            color: 'var(--color-red-700)',
+                            marginTop: '1rem',
+                        }}
+                    >
+                        此操作不可撤销，所有选中的资源将被永久删除。
+                    </p>
+                </div>
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        gap: '1rem',
+                    }}
+                >
+                    <Button
+                        variation="secondary"
+                        onClick={handleCloseBatchDeleteModal}
+                        disabled={isBatchDeleting}
+                    >
+                        取消
+                    </Button>
+                    <Button
+                        variation="danger"
+                        onClick={handleConfirmBatchDelete}
+                        disabled={isBatchDeleting}
+                    >
+                        {isBatchDeleting
+                            ? '删除中...'
+                            : `确认删除 ${selectedResources.size} 个资源`}
                     </Button>
                 </div>
             </Modal>

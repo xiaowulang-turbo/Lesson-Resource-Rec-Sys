@@ -5,6 +5,7 @@ import {
     getResource,
     updateResource,
     deleteResource,
+    deleteMultipleResources,
     getResourceFile,
     saveMoocResources,
 } from '../controllers/resourceController.js'
@@ -21,13 +22,16 @@ router.get('/', getAllResources)
 router.get('/:id', getResource)
 router.get('/:id/file', getResourceFile)
 
-// 保存MOOC资源到数据库的路由 - 不需要认证
-router.post('/mooc', saveMoocResources)
+// 需要身份验证的路由
+router.use(protect) // 应用身份验证中间件到以下所有路由
 
-// 以下路由需要登录
-router.use(protect)
+// 新增：批量删除资源路由（需要放在单个资源删除路由之前，避免路径冲突）
+router.delete('/batch-delete', deleteMultipleResources)
+
+// 其他需要身份验证的路由
 router.post('/', resourceUpload, handleUploadErrors, createResource)
-router.patch('/:id', updateResource)
+router.patch('/:id', resourceUpload, handleUploadErrors, updateResource)
 router.delete('/:id', deleteResource)
+router.post('/mooc', saveMoocResources)
 
 export default router

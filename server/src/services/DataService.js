@@ -718,6 +718,24 @@ export class DataService {
         return !!resource
     }
 
+    // 新增：批量删除资源
+    async deleteMultipleResources(resourceIds) {
+        try {
+            // 使用 deleteMany 进行批量删除
+            const result = await Resource.deleteMany({
+                _id: { $in: resourceIds },
+            })
+
+            return {
+                deletedCount: result.deletedCount,
+                acknowledged: result.acknowledged,
+            }
+        } catch (error) {
+            console.error('批量删除资源失败:', error)
+            throw new Error('批量删除资源时发生错误')
+        }
+    }
+
     // 更新资源统计信息
     async incrementResourceStat(resourceId, statName, incrementValue) {
         try {
