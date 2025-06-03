@@ -94,10 +94,11 @@ function Resources() {
         const fetchResources = async () => {
             try {
                 setLoading(true)
-                // 添加页码、每页数量参数到请求
+                // 添加页码、每页数量参数以及排序参数到请求
                 const result = await getAllResources({
                     page: currentPage,
                     limit: PAGE_SIZE,
+                    sortBy: 'newest', // 明确指定按最新时间排序
                 })
 
                 console.log('[Resources] Rendering - result:', result)
