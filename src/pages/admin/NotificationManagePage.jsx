@@ -735,12 +735,18 @@ const Input = styled.input`
     padding: 0.625rem;
     border: 1px solid var(--color-grey-200);
     border-radius: 0.375rem;
+    background-color: var(--color-grey-0);
+    color: var(--color-grey-900);
     /* font-size: 0.9375rem; */
 
     &:focus {
         outline: none;
         border-color: var(--color-primary);
         box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
+    }
+
+    &::placeholder {
+        color: var(--color-grey-400);
     }
 `
 
@@ -749,6 +755,8 @@ const TextArea = styled.textarea`
     padding: 0.625rem;
     border: 1px solid var(--color-grey-200);
     border-radius: 0.375rem;
+    background-color: var(--color-grey-0);
+    color: var(--color-grey-900);
     /* font-size: 0.9375rem; */
     font-family: inherit;
     resize: vertical;
@@ -758,6 +766,10 @@ const TextArea = styled.textarea`
         border-color: var(--color-primary);
         box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
     }
+
+    &::placeholder {
+        color: var(--color-grey-400);
+    }
 `
 
 const Select = styled.select`
@@ -765,13 +777,19 @@ const Select = styled.select`
     padding: 0.625rem;
     border: 1px solid var(--color-grey-200);
     border-radius: 0.375rem;
+    background-color: var(--color-grey-0);
+    color: var(--color-grey-900);
     /* font-size: 0.9375rem; */
-    background-color: white;
 
     &:focus {
         outline: none;
         border-color: var(--color-primary);
         box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
+    }
+
+    option {
+        background-color: var(--color-grey-0);
+        color: var(--color-grey-900);
     }
 `
 
@@ -791,12 +809,13 @@ const Button = styled.button`
 `
 
 const CancelButton = styled(Button)`
-    background-color: white;
+    background-color: var(--color-grey-0);
     color: var(--color-grey-700);
     border: 1px solid var(--color-grey-200);
 
     &:hover {
         background-color: var(--color-grey-50);
+        color: var(--color-grey-800);
     }
 `
 
