@@ -77,45 +77,46 @@ const InterestTag = styled(Tag)`
     padding: 0.8rem 1.2rem;
     background-color: var(--color-brand-50);
     border: 1px solid var(--color-brand-100);
+    color: var(--color-brand-700);
 
     ${(props) =>
         props.category === 'geometry' &&
         `
-        background-color: #e6f7ff;
-        border-color: #91d5ff;
-        color: #0050b3;
+        background-color: var(--color-blue-100);
+        border-color: var(--color-blue-100);
+        color: var(--color-blue-700);
     `}
 
     ${(props) =>
         props.category === 'function' &&
         `
-        background-color: #f6ffed;
-        border-color: #b7eb8f;
-        color: #389e0d;
+        background-color: var(--color-green-100);
+        border-color: var(--color-green-100);
+        color: var(--color-green-700);
     `}
     
     ${(props) =>
         props.category === 'statistics' &&
         `
-        background-color: #fff2e8;
-        border-color: #ffbb96;
-        color: #d4380d;
+        background-color: var(--color-red-100);
+        border-color: var(--color-red-100);
+        color: var(--color-red-700);
     `}
     
     ${(props) =>
         props.category === 'teaching' &&
         `
-        background-color: #f9f0ff;
-        border-color: #d3adf7;
-        color: #531dab;
+        background-color: var(--color-indigo-100);
+        border-color: var(--color-indigo-100);
+        color: var(--color-indigo-700);
     `}
     
     ${(props) =>
         props.category === 'other' &&
         `
-        background-color: #f0f2ff;
-        border-color: #adc6ff;
-        color: #1d39c4;
+        background-color: var(--color-brand-100);
+        border-color: var(--color-brand-100);
+        color: var(--color-brand-700);
     `}
 `
 
