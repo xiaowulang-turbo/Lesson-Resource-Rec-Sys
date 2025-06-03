@@ -89,11 +89,17 @@ export const getUserNotifications = async (req, res, next) => {
         const skip = (page - 1) * limit
         const now = new Date()
         let audience = ['all']
+
+        // 根据用户角色设置目标受众
         if (req.user.role === 'teacher') {
             audience.push('teachers')
         } else if (req.user.role === 'admin') {
             audience.push('admins')
+        } else if (req.user.role === 'user') {
+            // 普通用户对应学生目标受众
+            audience.push('students')
         }
+
         const cacheKey = `${cacheService.prefix}notifications_${req.user.role}_${page}_${limit}`
         const cachedData = await cacheService.get(cacheKey)
         if (cachedData) {
