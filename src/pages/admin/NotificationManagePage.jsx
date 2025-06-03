@@ -236,6 +236,22 @@ const NotificationManagePage = () => {
         }
     }
 
+    // 类型渲染
+    const renderType = (type) => {
+        switch (type) {
+            case 'announcement':
+                return '公告'
+            case 'system':
+                return '系统'
+            case 'resource':
+                return '资源'
+            case 'course':
+                return '课程'
+            default:
+                return '未知'
+        }
+    }
+
     // 格式化日期
     const formatDate = (dateString) => {
         try {
@@ -299,7 +315,7 @@ const NotificationManagePage = () => {
                                             notification?.status
                                         )}
                                     </td>
-                                    <td>{notification?.type}</td>
+                                    <td>{renderType(notification?.type)}</td>
                                     <td>
                                         <PriorityCell
                                             priority={notification?.priority}
@@ -786,7 +802,7 @@ const CancelButton = styled(Button)`
 
 const SubmitButton = styled(Button)`
     background-color: var(--color-primary);
-    color: white;
+    color: var(--color-grey-900);
     border: none;
 
     &:hover {
