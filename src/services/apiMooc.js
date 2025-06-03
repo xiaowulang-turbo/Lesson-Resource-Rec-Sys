@@ -71,7 +71,8 @@ export async function searchMoocCoursesDirectly(query, page = 1, limit = 20) {
         }
 
         const results = data.result?.list || []
-        console.log('MOOC教材搜索结果数量:', results.length)
+        // console.log('MOOC教材搜索结果数量:', results.length)
+        // console.log('MOOC教材搜索结果:', results)
 
         // 将MOOC原始数据转换为统一格式
         const convertedResults = results.map((item) => {
