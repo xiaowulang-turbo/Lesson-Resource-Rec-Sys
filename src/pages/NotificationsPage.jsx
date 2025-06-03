@@ -52,6 +52,30 @@ const NotificationsPage = () => {
         }
     }
 
+    // 将通知类型转换为中文显示
+    const getChineseNotificationType = (type) => {
+        const typeMap = {
+            announcement: '公告',
+            notice: '通知',
+            alert: '提醒',
+            update: '更新',
+            maintenance: '维护',
+            news: '新闻',
+            event: '活动',
+            system: '系统',
+            warning: '警告',
+            info: '信息',
+        }
+
+        // 如果已经是中文，直接返回
+        if (/[\u4e00-\u9fa5]/.test(type)) {
+            return type
+        }
+
+        // 转换英文类型为中文
+        return typeMap[type] || type
+    }
+
     // 渲染优先级标识
     const renderPriorityBadge = (priority) => {
         let color
@@ -107,7 +131,10 @@ const NotificationsPage = () => {
                                         </NotificationMessage>
                                         <NotificationMeta>
                                             <MetaItem>
-                                                类型：{item.type}
+                                                类型：
+                                                {getChineseNotificationType(
+                                                    item.type
+                                                )}
                                             </MetaItem>
                                             {/* <MetaItem>
                                             受众：{item.targetAudience}
