@@ -286,7 +286,24 @@ function Profile() {
                     加载{resourceType}失败: {error.message}
                 </p>
             )
-        if (resources.length === 0) return <Empty resourceName={resourceType} />
+        if (resources.length === 0) {
+            const config =
+                resourceType === '上传资源'
+                    ? {
+                          icon: '📤',
+                          message: '暂无上传的资源',
+                          subtext:
+                              '您还没有上传任何资源，点击上传按钮开始分享您的资源吧！',
+                      }
+                    : {
+                          icon: '⭐',
+                          message: '暂无收藏的资源',
+                          subtext:
+                              '您还没有收藏任何资源，浏览资源时可以点击收藏按钮保存喜欢的内容',
+                      }
+
+            return <Empty resourceName={resourceType} {...config} />
+        }
 
         return viewMode === 'tree' ? (
             <ResourceTreeView resources={resources} />

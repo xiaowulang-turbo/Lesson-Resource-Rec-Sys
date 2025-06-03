@@ -296,7 +296,13 @@ function ResourceList({ resources: initialResources }) {
 
     if (!resources || !resources.length) {
         console.log('[ResourceList] No resources to display.')
-        return <Empty resourceName="推荐内容" />
+        return (
+            <Empty
+                icon="📖"
+                message="暂无推荐资源"
+                subtext="当前没有符合条件的推荐内容，请稍后再试"
+            />
+        )
     }
 
     // Helper to safely parse rating
@@ -420,7 +426,7 @@ function ResourceList({ resources: initialResources }) {
                         <ResourceCardLink
                             key={resourceId}
                             to={`/resources/${resourceId}`}
-                            target={isMoocResource ? '_blank' : undefined}
+                            // target={isMoocResource ? '_blank' : undefined}
                             rel={
                                 isMoocResource
                                     ? 'noopener noreferrer'

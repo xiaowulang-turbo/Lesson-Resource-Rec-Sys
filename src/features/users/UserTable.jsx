@@ -84,7 +84,14 @@ function UserTable() {
 
     if (isLoading) return <Spinner />
     if (error) return <p>错误: {error.message}</p>
-    if (!users || users.length === 0) return <Empty resourceName="用户" />
+    if (!users || users.length === 0)
+        return (
+            <Empty
+                icon="👤"
+                message="暂无用户"
+                subtext="系统中还没有其他用户"
+            />
+        )
 
     return (
         <>

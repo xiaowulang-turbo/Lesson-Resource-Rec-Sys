@@ -446,13 +446,15 @@ function Search() {
                 query &&
                 (!currentResources || currentResources.length === 0) && (
                     <Empty
-                        resource={`没有找到与 "${query}" 相关的${
+                        icon="🔍"
+                        message={`没有找到与 "${query}" 相关的${
                             searchType === 'local'
                                 ? '本地'
                                 : searchType === 'mooc'
                                 ? 'MOOC'
                                 : '课程'
                         }资源`}
+                        subtext="尝试使用不同的关键词或者切换搜索类型"
                     />
                 )}
 
@@ -461,7 +463,13 @@ function Search() {
                 !isSaving &&
                 !currentError &&
                 !saveError &&
-                !query && <Empty resource="请输入关键词开始搜索资源" />}
+                !query && (
+                    <Empty
+                        icon="🔎"
+                        message="开始搜索资源"
+                        subtext="请输入关键词搜索您需要的教学资源或课程"
+                    />
+                )}
         </SearchPageLayout>
     )
 }

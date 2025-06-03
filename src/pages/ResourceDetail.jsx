@@ -303,8 +303,22 @@ function ResourceDetail() {
     }
 
     if (isLoading) return <Spinner />
-    if (error) return <Empty resourceName={`资源 (ID: ${resourceId})`} />
-    if (!resource) return <Empty resourceName="资源" />
+    if (error)
+        return (
+            <Empty
+                icon="❌"
+                message="资源加载失败"
+                subtext={`无法加载资源 (ID: ${resourceId})，请检查资源是否存在或稍后重试`}
+            />
+        )
+    if (!resource)
+        return (
+            <Empty
+                icon="🔍"
+                message="资源不存在"
+                subtext="请检查资源链接是否正确"
+            />
+        )
 
     // 格式化日期等 (可选)
     const formattedDate = new Date(resource.createdAt).toLocaleDateString(

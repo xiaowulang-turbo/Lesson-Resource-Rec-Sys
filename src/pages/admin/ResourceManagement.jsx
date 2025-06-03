@@ -442,7 +442,12 @@ function ResourceManagement() {
                 {isLoading ? (
                     <Spinner />
                 ) : resources.length === 0 ? (
-                    <Empty resource="资源" />
+                    <Empty
+                        resource="资源"
+                        icon="📚"
+                        message="暂无资源"
+                        subtext="系统中还没有任何资源，您可以上传一些资源来管理"
+                    />
                 ) : (
                     <Table columns="0.5fr 2fr 0.8fr 0.8fr 1fr 1fr 0.5fr">
                         <Table.Header>
