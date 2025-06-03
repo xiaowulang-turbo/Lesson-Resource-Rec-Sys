@@ -63,7 +63,7 @@ const ProgressHandle = styled.div`
 const Button = styled.button`
     background: none;
     border: none;
-    color: #fff;
+    color: var(--color-grey-0);
     font-size: 18px;
     cursor: pointer;
     width: 36px;
@@ -75,7 +75,8 @@ const Button = styled.button`
     transition: background-color 0.3s;
 
     &:hover {
-        background-color: rgba(255, 255, 255, 0.2);
+        /* background-color: rgba(255, 255, 255, 0.2); */
+        background-color: var(--color-primary-600);
     }
 
     svg {
@@ -85,7 +86,7 @@ const Button = styled.button`
 `
 
 const TimeDisplay = styled.div`
-    color: #fff;
+    color: var(--color-grey-0);
     font-size: 14px;
     margin-left: 10px;
 `
