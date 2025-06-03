@@ -226,18 +226,40 @@ const buildTreeStructure = (resources) => {
             resource.courseStructure?.parentCourse &&
             resource.contentType === 'resource'
         ) {
-            const courseId = resource.courseStructure.parentCourse
+            // 处理parentCourse，可能是ObjectId字符串或已填充的对象
+            const parentCourseInfo = resource.courseStructure.parentCourse
+            const courseId =
+                typeof parentCourseInfo === 'string'
+                    ? parentCourseInfo
+                    : parentCourseInfo._id || parentCourseInfo.id
+
             if (!courseMap.has(courseId)) {
                 courseMap.set(courseId, {
                     type: 'course',
                     id: courseId,
-                    title: '未知课程', // 默认标题，如果有课程信息会被覆盖
+                    title:
+                        typeof parentCourseInfo === 'object' &&
+                        parentCourseInfo.title
+                            ? parentCourseInfo.title
+                            : '未知课程', // 如果有课程信息则使用，否则使用默认标题
                     chapters: new Map(),
                     resources: [],
                 })
             }
 
             const course = courseMap.get(courseId)
+
+            // 如果parentCourse已经填充且有标题，更新课程标题
+            if (
+                typeof parentCourseInfo === 'object' &&
+                parentCourseInfo.title &&
+                course.title === '未知课程'
+            ) {
+                course.title = parentCourseInfo.title
+                course.description = parentCourseInfo.description
+                course.courseData = parentCourseInfo
+            }
+
             const chapterNumber = resource.courseStructure.chapter?.number
 
             if (chapterNumber) {
